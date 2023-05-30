@@ -3,7 +3,7 @@
 
 Версия для Windows
 
-[Версия для Linux и MacOS](https://github.com/MaksMN/ConsoleChatFP11)
+[Версия для Linux и MacOS](https://github.com/MaksMN/FinalProject_1)
 
 1. Участники команды: [Максим](https://github.com/MaksMN/ConsoleChatFP11), [Иван](https://github.com/ivanKispaj/ConsoleChatFP11), [Ирина](https://github.com/Fineralla/ConsoleChatFP11)
 2. Тимлид: [Максим](https://github.com/MaksMN/ConsoleChatFP11)
