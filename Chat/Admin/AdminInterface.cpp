@@ -164,15 +164,14 @@ chat::Results AdminInterface::setUserStatus(std::string description, chat::Resul
         {
             if (AuthorizedUser->getID() == user->getID())
             {
-                msg = "Вы не можете проводить операции над самим собой. Это может сделать другой администратор.";                
+                msg = "Вы не можете проводить операции над самим собой. Это может сделать другой администратор.";
                 fail = true;
             }
             if (user->getID() == 0)
             {
-                msg = "Нельзя менять статус сервисному администратору.";                
+                msg = "Нельзя менять статус сервисному администратору.";
                 fail = true;
             }
-
         }
         if (fail)
         {

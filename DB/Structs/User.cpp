@@ -48,12 +48,12 @@ user::status User::getStatus()
     return _status;
 }
 void User::setStatus(user::status &status)
-{    
+{
     _status = status;
 }
 
 void User::toUser()
-{    
+{
     _status = flags.flagsReplace(_status, user::status::user_, user::status::admin_);
 }
 
@@ -66,7 +66,7 @@ void User::unBan()
     _status = flags.removeFlag(_status, user::banned_);
 }
 void User::ban()
-{   
+{
     toUser();
     _status = flags.addFlag(_status, user::banned_);
 }

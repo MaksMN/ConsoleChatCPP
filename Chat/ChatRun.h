@@ -11,7 +11,7 @@
 class ChatRun
 {
 private:
-        DBmessages pubMessagesDB;
+    DBmessages pubMessagesDB;
     DBmessages privMessagesDB;
     DBcomplaints complaintsDB;
     DBusers usersDB;

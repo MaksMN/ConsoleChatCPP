@@ -22,7 +22,7 @@ const uint H[5] = {
 uint cycle_shift_left(uint val, int bit_count);
 uint bring_to_human_view(uint val);
 /// @brief Вычисляет sha1
-/// @param message 
-/// @param msize_bytes 
-/// @return 
+/// @param message
+/// @param msize_bytes
+/// @return
 uint *sha1(char *message, uint msize_bytes); // отданный массив нужно удалить вручную

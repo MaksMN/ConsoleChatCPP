@@ -169,7 +169,8 @@ chat::Results UserInterface::publicChat()
             return userInputResult;
         }
 
-        std::cout << "Вы находитесь в публичном чате.\n" << std::endl;
+        std::cout << "Вы находитесь в публичном чате.\n"
+                  << std::endl;
         if (msgListMode == chat::Pagination::last_page)
         {
             // последние 10 сообщений
@@ -478,7 +479,7 @@ std::shared_ptr<User> UserInterface::searchUserByID()
             }
             else if (yesno == chat::no_)
             {
-                continue;                
+                continue;
             }
         }
 
