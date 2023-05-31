@@ -4,7 +4,7 @@
 
 Это версия для Windows
 
-[Версия для Linux](tree/HW_mod16_Linux)
+[Версия для Linux](https://github.com/MaksMN/ConsoleChatFP/tree/HW_mod16_Linux)
 
 - Функционал консольного чата:
     - регистрация пользователей - логин, пароль, имя;
