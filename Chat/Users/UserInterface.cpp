@@ -364,6 +364,9 @@ chat::Results UserInterface::privateConversation(std::shared_ptr<User> discussan
         std::cout << "Ваш собеседник: ";
         discussant->printData();
 
+        if(AuthorizedUser->getID() == discussant->getID())
+            std::cout << "Вы ведете беседу с самим собой.\n";
+
         if (userInputResult == chat::user_input)
             userInputResult = chatConversationPage.IOgetline();
 

@@ -49,11 +49,19 @@ user::status User::getStatus()
 }
 void User::setStatus(user::status &status)
 {
+    if (getID() == 0)
+    {
+        return;
+    }
     _status = status;
 }
 
 void User::toUser()
 {
+    if (getID() == 0)
+    {
+        return;
+    }
     _status = flags.flagsReplace(_status, user::status::user_, user::status::admin_);
 }
 
@@ -67,6 +75,10 @@ void User::unBan()
 }
 void User::ban()
 {
+    if (getID() == 0)
+    {
+        return;
+    }
     toUser();
     _status = flags.addFlag(_status, user::banned_);
 }
