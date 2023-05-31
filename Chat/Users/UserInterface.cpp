@@ -9,8 +9,8 @@ UserInterface::UserInterface(DBmessages &_pubMessagesDB,
 chat::Results UserInterface::run()
 {
     UserInput<std::wstring, chat::Results> chatAreaPage(L"Страница авторизации и регистрации",
-                                                       L"Выберите действие (р - Регистрация, вх - Вход, н - Назад, вых - выход): ",
-                                                       L"Неверный ввод", 4);
+                                                        L"Выберите действие (р - Регистрация, вх - Вход, н - Назад, вых - выход): ",
+                                                        L"Неверный ввод", 4);
     chatAreaPage.addInputs(L"р", L"вх", L"н", L"вых");
     chatAreaPage.addOutputs(chat::in_register_page, chat::in_login_page, chat::back_, chat::exit_);
 
@@ -169,7 +169,8 @@ chat::Results UserInterface::publicChat()
             return userInputResult;
         }
 
-        std::wcout << L"Вы находитесь в публичном чате.\n" << std::endl;
+        std::wcout << L"Вы находитесь в публичном чате.\n"
+                   << std::endl;
         if (msgListMode == chat::Pagination::last_page)
         {
             // последние 10 сообщений
@@ -226,13 +227,13 @@ chat::Results UserInterface::privateChat()
     system(clear);
 
     UserInput<std::wstring, chat::Results> privateMainPage(L"Личные сообщения. Главная страница.",
-                                                          L"Выбор пользователя:\n"
-                                                          L"\tид - указать userid собеседника;\n"
-                                                          L"\tн - навигация по списку пользователей;\n"
-                                                          L"\tо - вернуться в общий чат;\n"
-                                                          L"\tв - выйти из чата\n"
-                                                          L"Укажите опцию: ",
-                                                          L"Неверный ввод", 4);
+                                                           L"Выбор пользователя:\n"
+                                                           L"\tид - указать userid собеседника;\n"
+                                                           L"\tн - навигация по списку пользователей;\n"
+                                                           L"\tо - вернуться в общий чат;\n"
+                                                           L"\tв - выйти из чата\n"
+                                                           L"Укажите опцию: ",
+                                                           L"Неверный ввод", 4);
     privateMainPage.addInputs(L"ид", L"н", L"о", L"в");
     privateMainPage.addOutputs(
         chat::search_user_byId,
@@ -315,11 +316,11 @@ chat::Results UserInterface::privateConversation(std::shared_ptr<User> discussan
         return chat::user_banned;
 
     std::wstring mainMessage = L"Опции: "
-                              L"\nс - написать сообщение; "
-                              L"\nн - навигация по сообщениям; "
-                              L"\nп - вернуться публичный чат; "
-                              L"\nв - выход из беседы;"
-                              L"\nВыберите опцию: ";
+                               L"\nс - написать сообщение; "
+                               L"\nн - навигация по сообщениям; "
+                               L"\nп - вернуться публичный чат; "
+                               L"\nв - выход из беседы;"
+                               L"\nВыберите опцию: ";
 
     UserInput<std::wstring, chat::Results> chatConversationPage(std::wstring(), mainMessage, L"Неверный ввод", 4);
     chatConversationPage.addInputs(L"с", L"н", L"п", L"в");
@@ -357,11 +358,14 @@ chat::Results UserInterface::privateConversation(std::shared_ptr<User> discussan
         std::wcout << std::endl;
 
         std::wcout << L"Личные сообщения. Беседа с пользователем.\n"
-                  << std::endl;
+                   << std::endl;
         std::wcout << L"Вы: ";
         AuthorizedUser->printData();
         std::wcout << L"Ваш собеседник: ";
         discussant->printData();
+
+        if (AuthorizedUser->getID() == discussant->getID())
+            std::wcout << L"Вы ведете беседу с самим собой.\n";
 
         if (userInputResult == chat::user_input)
             userInputResult = chatConversationPage.IOgetline();
@@ -434,13 +438,13 @@ chat::Results UserInterface::complaint()
 
     auto defendantUser = usersDB.getUserByID(troubleMsg->getAuthorID());
     std::wstring complaintText = L"\nЖалоба от пользователя: " +
-                                AuthorizedUser->getName() +
-                                L"[" + AuthorizedUser->getLogin() + L"][userid " + std::to_wstring(AuthorizedUser->getID()) + L"]\n" +
-                                L"На пользователя: " +
-                                defendantUser->getName() +
-                                L"[" + defendantUser->getLogin() + L"][userid " + std::to_wstring(defendantUser->getID()) + L"]\n" +
-                                L"Текст жалобы: " + text +
-                                L"\nЗа сообщение: [msgid " + std::to_wstring(troubleMsg->getID()) + L"]. Текст сообщения: " + troubleMsg->getText() + L"\n";
+                                 AuthorizedUser->getName() +
+                                 L"[" + AuthorizedUser->getLogin() + L"][userid " + std::to_wstring(AuthorizedUser->getID()) + L"]\n" +
+                                 L"На пользователя: " +
+                                 defendantUser->getName() +
+                                 L"[" + defendantUser->getLogin() + L"][userid " + std::to_wstring(defendantUser->getID()) + L"]\n" +
+                                 L"Текст жалобы: " + text +
+                                 L"\nЗа сообщение: [msgid " + std::to_wstring(troubleMsg->getID()) + L"]. Текст сообщения: " + troubleMsg->getText() + L"\n";
 
     yesnoIO.setDescription(complaintText);
     yesnoIO.setMainMessage(L"Вы действительно хотите отправить эту жалобу администрации чата? (да / нет): ");
@@ -478,7 +482,7 @@ std::shared_ptr<User> UserInterface::searchUserByID()
             }
             else if (yesno == chat::no_)
             {
-                continue;                
+                continue;
             }
         }
 
@@ -490,9 +494,9 @@ chat::Results UserInterface::userProfile()
 {
     system(clear);
     UserInput<std::wstring, user::options> options(L"Настройки пользователя. " + AuthorizedUser->getName() + L"[" + AuthorizedUser->getLogin() + L"]",
-                                                  L"Какие данные вы хотите поменять? (п - пароль; и - имя; з - закончить): ",
-                                                  L"Неверный ввод",
-                                                  3);
+                                                   L"Какие данные вы хотите поменять? (п - пароль; и - имя; з - закончить): ",
+                                                   L"Неверный ввод",
+                                                   3);
     options.addInputs(L"п", L"и", L"з");
     options.addOutputs(user::set_pass, user::set_name, user::complete_);
 
