@@ -136,44 +136,58 @@ bool User::validatePass(std::string &pass)
     return true;
 }
 
-void User::writeData()
+void User::writeData(std::ofstream &stream)
 {
-    std::ofstream stream("users", std::ios::app | std::ios::ate | std::ios::binary);
-    uint sectSize;
-    
     const uint uintSize = sizeof(uint);
     const uint loginSize = _login.size();
     const uint nameSize = _name.size();
     const uint pashSize = uintSize * 5;
     const uint passSaltSize = 64;
-    const uint statusSize = sizeof(int);
+    const uint status = (int)_status;
     const uint longSize = sizeof(unsigned long long);
-    sectSize = uintSize + loginSize + nameSize + pashSize + passSaltSize + longSize + 7;
-    char ss[uintSize];
 
-    stream << "USER";
-    memcpy(ss, &sectSize, uintSize);
-    stream.write(ss, uintSize);
-    stream << '\0';
+    char uint_num[uintSize];
+    char long_num[longSize];
 
-    stream << "_LOG";
-    memcpy(ss, &loginSize, uintSize);
-    stream.write(ss, uintSize);    
-    stream.write(_login.data(), loginSize);
-    stream << '\0';
+    // id
+    memcpy(uint_num, &_id, uintSize);
+    stream.write(uint_num, uintSize);
+    stream << '\n';
 
-    stream << "NAME";
-    memcpy(ss, &nameSize, uintSize);
-    stream.write(ss, uintSize);    
-    stream.write(_name.data(), loginSize);
-    stream << '\0';
+    // login
+    memcpy(uint_num, &loginSize, uintSize);
+    stream.write(uint_num, uintSize);       // login len
+    stream.write(_login.data(), loginSize); // login data
+    stream << '\n';
 
-    stream << "SALT";
-    memcpy(ss, &passSaltSize, uintSize);
-    stream.write(ss, uintSize);    
+    // name
+    memcpy(uint_num, &nameSize, uintSize);
+    stream.write(uint_num, uintSize);
+    stream.write(_name.data(), nameSize);
+    stream << '\n';
+
+    // pass
+    for (int i{0}; i < 5; i++)
+    {
+        memcpy(uint_num, &_pass_hash[i], uintSize);
+        stream.write(uint_num, uintSize);
+    }
+    stream << '\n';
+
+    // salt
+    memcpy(uint_num, &passSaltSize, uintSize);
+    stream.write(uint_num, uintSize);
     stream.write(_pass_salt, passSaltSize);
-    stream << '\0';
-    stream.close();
+    stream << '\n';
+
+    // status
+    memcpy(uint_num, &status, uintSize);
+    stream.write(uint_num, uintSize);
+    stream << '\n';
+
+    // timestamp
+    memcpy(long_num, &_timestamp, longSize);
+    stream << '\n';
 }
 
 void User::bytesForHash(const std::string &pass, char message[])
