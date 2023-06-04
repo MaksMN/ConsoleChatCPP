@@ -5,6 +5,8 @@
 #include "../../Misc/Flags.h"
 #include "../Options.h"
 #include "../../Misc/DateTime.h"
+#include <fstream>
+#include <cstring>
 
 typedef unsigned int uint;
 
@@ -78,6 +80,8 @@ public:
 
     /// @brief проверяет пароль пользователя
     bool validatePass(std::string &pass);
+
+    void writeData();
 
 private:
     /// @brief генерирует данные для хеширования

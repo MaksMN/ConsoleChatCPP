@@ -136,6 +136,46 @@ bool User::validatePass(std::string &pass)
     return true;
 }
 
+void User::writeData()
+{
+    std::ofstream stream("users", std::ios::app | std::ios::ate | std::ios::binary);
+    uint sectSize;
+    
+    const uint uintSize = sizeof(uint);
+    const uint loginSize = _login.size();
+    const uint nameSize = _name.size();
+    const uint pashSize = uintSize * 5;
+    const uint passSaltSize = 64;
+    const uint statusSize = sizeof(int);
+    const uint longSize = sizeof(unsigned long long);
+    sectSize = uintSize + loginSize + nameSize + pashSize + passSaltSize + longSize + 7;
+    char ss[uintSize];
+
+    stream << "USER";
+    memcpy(ss, &sectSize, uintSize);
+    stream.write(ss, uintSize);
+    stream << '\0';
+
+    stream << "_LOG";
+    memcpy(ss, &loginSize, uintSize);
+    stream.write(ss, uintSize);    
+    stream.write(_login.data(), loginSize);
+    stream << '\0';
+
+    stream << "NAME";
+    memcpy(ss, &nameSize, uintSize);
+    stream.write(ss, uintSize);    
+    stream.write(_name.data(), loginSize);
+    stream << '\0';
+
+    stream << "SALT";
+    memcpy(ss, &passSaltSize, uintSize);
+    stream.write(ss, uintSize);    
+    stream.write(_pass_salt, passSaltSize);
+    stream << '\0';
+    stream.close();
+}
+
 void User::bytesForHash(const std::string &pass, char message[])
 {
     int half_length = _pass_bytes / 2;
