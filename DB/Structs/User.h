@@ -24,9 +24,20 @@ private:
     const unsigned long long _timestamp; // дата регистрации
     Flags<user::status> flags;
 
+    /*позиции данных в файле*/
+
+    uint p_id = 4;
+    uint p_status = 8;
+    uint p_pass_hash = 12;
+    uint p_pass_salt = 32;
+    uint p_time = 96;
+    uint p_login_size = 104;
+    uint p_login = 108;
+
 public:
     User(const uint &id, const std::string &login, const std::string &name, std::string &pass);
     User(const uint &&id, const std::string &&login, const std::string &&name, std::string &&pass);
+    User(std::ifstream &stream);
     ~User();
 
     /// @brief Возвращает ID пользователя
@@ -81,7 +92,12 @@ public:
     /// @brief проверяет пароль пользователя
     bool validatePass(std::string &pass);
 
-    void writeData();
+    void writeData(std::ofstream &stream);
+    int getID(std::ifstream &stream);
+    std::string getLogin(std::ifstream &stream);
+    std::string getName(std::ifstream &stream);
+    user::status getStatus(std::ifstream &stream);
+    unsigned long long getTimestamp(std::ifstream &stream);
 
 private:
     /// @brief генерирует данные для хеширования

@@ -1,4 +1,5 @@
 #include "ChatRun.h"
+#include <fstream>
 #define PRESETS
 
 void ChatRun::Run()
@@ -10,6 +11,9 @@ void ChatRun::Run()
     std::cout << std::endl;
     bool showStartMessage = true;
 
+    std::ifstream stream("users", std::ios::binary);
+    User u(stream);
+
     auto admin = usersDB.addUser("admin", "Администратор", "1234");
     admin->toAdmin();
 
@@ -19,6 +23,11 @@ void ChatRun::Run()
     usersDB.addUser("maria", "Маша", "pass");
     usersDB.addUser("vano", "Иван", "pass");
     usersDB.addUser("igor", "Игорь", "pass");
+
+    
+    // std::ofstream stream("users", std::ios::app | std::ios::ate | std::ios::binary);
+    // usersDB.getUserByID(0)->writeData(stream);
+    // stream.close();
 
     pubMessagesDB.addMessage(0, 0, "Всем привет!!!", msg::public_);
     pubMessagesDB.addMessage(1, 1, "И тебе привет", msg::public_);

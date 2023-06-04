@@ -20,6 +20,11 @@ User::User(const uint &&id, const std::string &&login, const std::string &&name,
     _status = user::user_;
 }
 
+User::User(std::ifstream &stream)
+    : _id(getID(stream)), _login(getLogin(stream)), _timestamp(getTimestamp(stream))
+{
+}
+
 User::~User()
 {
     delete[] _pass_hash;
@@ -138,6 +143,12 @@ bool User::validatePass(std::string &pass)
 
 void User::writeData(std::ofstream &stream)
 {
+    /*
+    размеры двоичных данных записываемых в файл
+    |block_size|id|status|pass_h|pass_s|time|login_size|login|name_size|name|
+                4   4       20      64    8      4        x        4      x
+                4   8       12      32    96    104      108
+    */
     const uint uintSize = sizeof(uint);
     const uint loginSize = _login.size();
     const uint nameSize = _name.size();
@@ -146,25 +157,22 @@ void User::writeData(std::ofstream &stream)
     const uint status = (int)_status;
     const uint longSize = sizeof(unsigned long long);
 
+    uint block_size = 108 + loginSize + 4 + nameSize;
+
     char uint_num[uintSize];
     char long_num[longSize];
+
+    // block_size
+    memcpy(uint_num, &block_size, uintSize);
+    stream.write(uint_num, uintSize);
 
     // id
     memcpy(uint_num, &_id, uintSize);
     stream.write(uint_num, uintSize);
-    stream << '\n';
 
-    // login
-    memcpy(uint_num, &loginSize, uintSize);
-    stream.write(uint_num, uintSize);       // login len
-    stream.write(_login.data(), loginSize); // login data
-    stream << '\n';
-
-    // name
-    memcpy(uint_num, &nameSize, uintSize);
+    // status
+    memcpy(uint_num, &status, uintSize);
     stream.write(uint_num, uintSize);
-    stream.write(_name.data(), nameSize);
-    stream << '\n';
 
     // pass
     for (int i{0}; i < 5; i++)
@@ -172,22 +180,66 @@ void User::writeData(std::ofstream &stream)
         memcpy(uint_num, &_pass_hash[i], uintSize);
         stream.write(uint_num, uintSize);
     }
-    stream << '\n';
-
     // salt
     memcpy(uint_num, &passSaltSize, uintSize);
     stream.write(uint_num, uintSize);
     stream.write(_pass_salt, passSaltSize);
-    stream << '\n';
-
-    // status
-    memcpy(uint_num, &status, uintSize);
-    stream.write(uint_num, uintSize);
-    stream << '\n';
 
     // timestamp
     memcpy(long_num, &_timestamp, longSize);
-    stream << '\n';
+
+    // login
+    memcpy(uint_num, &loginSize, uintSize);
+    stream.write(uint_num, uintSize); // login len
+    stream << _login;                 // login data
+
+    // name
+    memcpy(uint_num, &nameSize, uintSize);
+    stream.write(uint_num, uintSize);
+    stream << _name;
+}
+
+int User::getID(std::ifstream &stream)
+{
+    uint id_;
+    auto pos = stream.tellg();
+    auto pos2 = pos;
+    pos2 += p_id;
+    char id[4];
+    stream.read(id, 4);
+    memcpy(&id_, id, 4);
+    stream.seekg(pos);
+    return id_;
+}
+
+std::string User::getLogin(std::ifstream &stream)
+{
+    std::string login_;
+    auto pos = stream.tellg();
+    auto pos2 = pos;
+    pos2 += p_login_size;
+    stream.seekg(pos2);
+    auto loginLength = getID(stream);
+    char l[loginLength];
+    stream.read(l, loginLength);
+    stream.seekg(pos);
+    login_ = l;
+    return login_;
+}
+
+std::string User::getName(std::ifstream &stream)
+{
+    return std::string();
+}
+
+user::status User::getStatus(std::ifstream &stream)
+{
+    return user::status();
+}
+
+unsigned long long User::getTimestamp(std::ifstream &stream)
+{
+    return 0;
 }
 
 void User::bytesForHash(const std::string &pass, char message[])
