@@ -1,12 +1,14 @@
 #pragma once
 #include <string>
 #include <iostream>
+#include <filesystem>
 #include "../../Misc/sha1.h"
 #include "../../Misc/Flags.h"
 #include "../Options.h"
 #include "../../Misc/DateTime.h"
 #include <fstream>
 #include <cstring>
+#include "../../Misc/Stream.h"
 
 typedef unsigned int uint;
 
@@ -24,15 +26,7 @@ private:
     const unsigned long long _timestamp; // дата регистрации
     Flags<user::status> flags;
 
-    /*позиции данных в файле*/
-
-    uint p_id = 4;
-    uint p_status = 8;
-    uint p_pass_hash = 12;
-    uint p_pass_salt = 32;
-    uint p_time = 96;
-    uint p_login_size = 104;
-    uint p_login = 108;
+    
 
 public:
     User(const uint &id, const std::string &login, const std::string &name, std::string &pass);
@@ -92,7 +86,7 @@ public:
     /// @brief проверяет пароль пользователя
     bool validatePass(std::string &pass);
 
-    void writeData(std::ofstream &stream);
+    void writeData();
     int getID(std::ifstream &stream);
     std::string getLogin(std::ifstream &stream);
     std::string getName(std::ifstream &stream);

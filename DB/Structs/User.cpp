@@ -21,8 +21,30 @@ User::User(const uint &&id, const std::string &&login, const std::string &&name,
 }
 
 User::User(std::ifstream &stream)
-    : _id(getID(stream)), _login(getLogin(stream)), _timestamp(getTimestamp(stream))
+    : _id(Stream::getUint(stream, 4)),
+      _login(Stream::getString(stream, 104)),
+      _timestamp(Stream::getLong64(stream, 96))
 {
+    /*
+    размеры двоичных данных записываемых в файл
+    |block_size|id     |status | pass_h  |  pass_s  |  time  | login_size  |  login|name_size|name|
+               4       8       12        32         96      104           108
+    */
+
+    auto pos = stream.tellg();
+    uint block_size = Stream::getUint(stream);
+    _status = (user::status)Stream::getUint(stream, 8);
+    _name = Stream::getString(stream, Stream::getUint(stream, 104) + 108);
+    _pass_hash = new uint[5];
+    uint pass_pos = 12;
+    for (int i{0}; i < 5; i++)
+    {
+        _pass_hash[i] = Stream::getUint(stream, pass_pos);
+        pass_pos += 4;
+    }
+    stream.seekg(pos += 32);
+    stream.read(_pass_salt, 64);
+    stream.seekg(pos += (block_size - 32) + 4);
 }
 
 User::~User()
@@ -141,14 +163,15 @@ bool User::validatePass(std::string &pass)
     return true;
 }
 
-void User::writeData(std::ofstream &stream)
+void User::writeData()
 {
     /*
     размеры двоичных данных записываемых в файл
-    |block_size|id|status|pass_h|pass_s|time|login_size|login|name_size|name|
-                4   4       20      64    8      4        x        4      x
-                4   8       12      32    96    104      108
+    |block_size|id     |status | pass_h  |  pass_s  |  time  | login_size  |  login|name_size|name|
+               4       8       12        32         96      104           108
     */
+    std::ofstream stream("users", std::ios::app | std::ios::ate | std::ios::binary);
+    stream << "USER";
     const uint uintSize = sizeof(uint);
     const uint loginSize = _login.size();
     const uint nameSize = _name.size();
@@ -157,7 +180,7 @@ void User::writeData(std::ofstream &stream)
     const uint status = (int)_status;
     const uint longSize = sizeof(unsigned long long);
 
-    uint block_size = 108 + loginSize + 4 + nameSize;
+    uint block_size = 108 - 4 + loginSize + 4 + nameSize;
 
     char uint_num[uintSize];
     char long_num[longSize];
@@ -181,12 +204,11 @@ void User::writeData(std::ofstream &stream)
         stream.write(uint_num, uintSize);
     }
     // salt
-    memcpy(uint_num, &passSaltSize, uintSize);
-    stream.write(uint_num, uintSize);
     stream.write(_pass_salt, passSaltSize);
 
     // timestamp
     memcpy(long_num, &_timestamp, longSize);
+    stream.write(long_num, longSize);
 
     // login
     memcpy(uint_num, &loginSize, uintSize);
@@ -197,34 +219,12 @@ void User::writeData(std::ofstream &stream)
     memcpy(uint_num, &nameSize, uintSize);
     stream.write(uint_num, uintSize);
     stream << _name;
-}
-
-int User::getID(std::ifstream &stream)
-{
-    uint id_;
-    auto pos = stream.tellg();
-    auto pos2 = pos;
-    pos2 += p_id;
-    char id[4];
-    stream.read(id, 4);
-    memcpy(&id_, id, 4);
-    stream.seekg(pos);
-    return id_;
-}
-
-std::string User::getLogin(std::ifstream &stream)
-{
-    std::string login_;
-    auto pos = stream.tellg();
-    auto pos2 = pos;
-    pos2 += p_login_size;
-    stream.seekg(pos2);
-    auto loginLength = getID(stream);
-    char l[loginLength];
-    stream.read(l, loginLength);
-    stream.seekg(pos);
-    login_ = l;
-    return login_;
+    // stream << EOF;
+    stream.close();
+    std::filesystem::permissions(
+        "users",
+        std::filesystem::perms::owner_all & ~(std::filesystem::perms::group_all |
+                                              std::filesystem::perms::others_all));
 }
 
 std::string User::getName(std::ifstream &stream)

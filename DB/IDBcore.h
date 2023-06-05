@@ -8,6 +8,8 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <fstream>
+#include <filesystem>
 
 /// @brief Базовый класс для работы с БД чата
 /// @tparam T

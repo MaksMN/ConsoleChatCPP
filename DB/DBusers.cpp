@@ -11,6 +11,7 @@ bool DBusers::uniqueLogin(std::string &login) const
 std::shared_ptr<User> DBusers::addUser(const std::string &login, const std::string &name, std::string &pass)
 {
     _DB.push_back(std::make_shared<User>(lastUserID++, login, name, pass));
+    _DB.back()->writeData();
     return _DB.back();
 }
 
@@ -35,4 +36,24 @@ std::shared_ptr<User> DBusers::getUserByLogin(std::string &login)
     if (_DB.end() != it)
         return *it;
     return nullptr;
+}
+
+void DBusers::updateFromFile()
+{
+    std::ifstream stream("users", std::ios::app | std::ios::ate | std::ios::binary);
+    stream.seekg(0);
+
+    while (!stream.eof())
+    {
+        char u[4];
+        stream.read(u, 4);
+        auto pos = stream.tellg();
+        std::string u_(u, 4);
+        if (u_ != "USER" || pos == -1)
+            break;
+
+        _DB.push_back(std::make_shared<User>(stream));
+    }
+    stream.close();
+    lastUserID = _DB.back()->getID();
 }

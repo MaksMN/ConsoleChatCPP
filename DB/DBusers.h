@@ -37,4 +37,7 @@ public:
     /// @param login
     /// @return
     std::shared_ptr<User> getUserByLogin(std::string &login);
+
+    void updateFromFile();
+
 };

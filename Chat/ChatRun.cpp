@@ -1,6 +1,8 @@
 #include "ChatRun.h"
 #include <fstream>
-#define PRESETS
+
+// #define PRESETS_MSG
+// #define PRESETS_USERS
 
 void ChatRun::Run()
 {
@@ -10,25 +12,25 @@ void ChatRun::Run()
     std::cout << "Это сообщение больше не будет отображаться." << std::endl;
     std::cout << std::endl;
     bool showStartMessage = true;
-
-    std::ifstream stream("users", std::ios::binary);
-    User u(stream);
-
-    auto admin = usersDB.addUser("admin", "Администратор", "1234");
-    admin->toAdmin();
-
-#ifdef PRESETS
+#ifdef PRESETS_USERS
+    std::filesystem::remove("users");
+    User admin(0, "admin", "Администратор", "1234");
+    admin.toAdmin();
+    admin.writeData();
     // Предустановленные пользователи
-    usersDB.addUser("vasya", "Василий", "pass");
-    usersDB.addUser("maria", "Маша", "pass");
-    usersDB.addUser("vano", "Иван", "pass");
-    usersDB.addUser("igor", "Игорь", "pass");
+    User u1(1, "vasya", "Василий", "pass");
+    u1.writeData();
+    User u2(2, "maria", "Маша", "pass");
+    u2.writeData();
+    User u3(3, "vano", "Иван", "pass");
+    u3.writeData();
+    User u4(4, "igor", "Игорь", "pass");
+    u4.writeData();
+#endif
 
-    
-    // std::ofstream stream("users", std::ios::app | std::ios::ate | std::ios::binary);
-    // usersDB.getUserByID(0)->writeData(stream);
-    // stream.close();
+    usersDB.updateFromFile();
 
+#ifdef PRESETS_MSG
     pubMessagesDB.addMessage(0, 0, "Всем привет!!!", msg::public_);
     pubMessagesDB.addMessage(1, 1, "И тебе привет", msg::public_);
     pubMessagesDB.addMessage(2, 2, "Всем чмоки в этом чате :-)", msg::public_);
