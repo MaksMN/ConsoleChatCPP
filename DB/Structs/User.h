@@ -25,13 +25,12 @@ private:
     user::status _status = user::none_;
     const unsigned long long _timestamp; // дата регистрации
     Flags<user::status> flags;
-
-    
+    std::string DBfilePath;
 
 public:
-    User(const uint &id, const std::string &login, const std::string &name, std::string &pass);
-    User(const uint &&id, const std::string &&login, const std::string &&name, std::string &&pass);
-    User(std::ifstream &stream);
+    User(const uint &id, const std::string &login, const std::string &name, std::string &pass, std::string db_file);
+    User(const uint &&id, const std::string &&login, const std::string &&name, std::string &&pass, std::string db_file);
+    User(std::ifstream &stream, std::string db_file);
     ~User();
 
     /// @brief Возвращает ID пользователя

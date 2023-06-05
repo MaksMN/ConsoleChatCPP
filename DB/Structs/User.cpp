@@ -1,29 +1,32 @@
 #include "User.h"
 
-User::User(const uint &id, const std::string &login, const std::string &name, std::string &pass)
+User::User(const uint &id, const std::string &login, const std::string &name, std::string &pass, std::string db_file)
     : _id(id),
       _login(login),
       _name(name),
-      _timestamp(time(NULL))
+      _timestamp(time(NULL)),
+      DBfilePath(db_file)
 {
     setPass(pass);
     _status = user::user_;
 }
 
-User::User(const uint &&id, const std::string &&login, const std::string &&name, std::string &&pass)
+User::User(const uint &&id, const std::string &&login, const std::string &&name, std::string &&pass, std::string db_file)
     : _id(id),
       _login(login),
       _name(name),
-      _timestamp(time(NULL))
+      _timestamp(time(NULL)),
+      DBfilePath(db_file)
 {
     setPass(pass);
     _status = user::user_;
 }
 
-User::User(std::ifstream &stream)
+User::User(std::ifstream &stream, std::string db_file)
     : _id(Stream::getUint(stream, 4)),
       _login(Stream::getString(stream, 104)),
-      _timestamp(Stream::getLong64(stream, 96))
+      _timestamp(Stream::getLong64(stream, 96)),
+      DBfilePath(db_file)
 {
     /*
     размеры двоичных данных записываемых в файл
@@ -170,7 +173,7 @@ void User::writeData()
     |block_size|id     |status | pass_h  |  pass_s  |  time  | login_size  |  login|name_size|name|
                4       8       12        32         96      104           108
     */
-    std::ofstream stream("users", std::ios::app | std::ios::ate | std::ios::binary);
+    std::ofstream stream(DBfilePath, std::ios::app | std::ios::ate | std::ios::binary);
     stream << "USER";
     const uint uintSize = sizeof(uint);
     const uint loginSize = _login.size();
@@ -180,7 +183,7 @@ void User::writeData()
     const uint status = (int)_status;
     const uint longSize = sizeof(unsigned long long);
 
-    uint block_size = 108 - 4 + loginSize + 4 + nameSize;
+    const uint block_size = 108 - 4 + loginSize + 4 + nameSize;
 
     char uint_num[uintSize];
     char long_num[longSize];
@@ -219,7 +222,7 @@ void User::writeData()
     memcpy(uint_num, &nameSize, uintSize);
     stream.write(uint_num, uintSize);
     stream << _name;
-    // stream << EOF;
+    
     stream.close();
     std::filesystem::permissions(
         "users",

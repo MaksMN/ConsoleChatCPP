@@ -520,11 +520,13 @@ chat::Results UserInterface::userProfile()
         case user::set_name:
             name = getName.IOgetlineThrough(true);
             AuthorizedUser->setName(name);
+            usersDB.updateFiles("users");
             break;
 
         case user::set_pass:
             pass = getPass.IOgetlineThrough(true);
             AuthorizedUser->setPass(pass);
+            usersDB.updateFiles("users");
             break;
         case user::complete_:
             system(clear);

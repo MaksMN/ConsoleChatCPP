@@ -1,42 +1,30 @@
 #include "ChatRun.h"
 #include <fstream>
 
-// #define PRESETS_MSG
-// #define PRESETS_USERS
-
 void ChatRun::Run()
 {
+    pubMessagesDB.setDBfilePath("pub_messages");
+    privMessagesDB.setDBfilePath("priv_messages");
+    usersDB.setDBfilePath("users");
+
     system(clear);
     std::cout << "Логин сервисного администратора: admin, пароль: 1234" << std::endl;
     std::cout << "Рекомендуем сменить пароль. Войдите в чат -> настройки профиля." << std::endl;
     std::cout << "Это сообщение больше не будет отображаться." << std::endl;
     std::cout << std::endl;
     bool showStartMessage = true;
-#ifdef PRESETS_USERS
-    std::filesystem::remove("users");
-    User admin(0, "admin", "Администратор", "1234");
-    admin.toAdmin();
-    admin.writeData();
-    // Предустановленные пользователи
-    User u1(1, "vasya", "Василий", "pass");
-    u1.writeData();
-    User u2(2, "maria", "Маша", "pass");
-    u2.writeData();
-    User u3(3, "vano", "Иван", "pass");
-    u3.writeData();
-    User u4(4, "igor", "Игорь", "pass");
-    u4.writeData();
-#endif
+
+    // Сервисный админ должен быь всегда
+    if (!std::filesystem::exists("users"))
+    {
+        User admin(0, "admin", "Администратор", "1234", "users");
+        admin.toAdmin();
+        admin.writeData();
+    }
 
     usersDB.updateFromFile();
-
-#ifdef PRESETS_MSG
-    pubMessagesDB.addMessage(0, 0, "Всем привет!!!", msg::public_);
-    pubMessagesDB.addMessage(1, 1, "И тебе привет", msg::public_);
-    pubMessagesDB.addMessage(2, 2, "Всем чмоки в этом чате :-)", msg::public_);
-    pubMessagesDB.addMessage(3, 3, "Какие у нас планы?", msg::public_);
-    pubMessagesDB.addMessage(4, 4, "Предлагаю всем завтра рвануть на шашлыки", msg::public_);
-#endif
+    pubMessagesDB.updateFromFile();
+    privMessagesDB.updateFromFile();
 
     UserInput<std::string, chat::Results> coreAreaPage("Главная станица",
                                                        "Выберите действия: ч - Чат, а - Раздел администратора, в - Выход из программы ",

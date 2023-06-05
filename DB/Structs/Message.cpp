@@ -4,13 +4,34 @@ Message::Message(const uint &id,
                  const uint &author_id,
                  const uint &recipient_id,
                  const std::string &text,
-                 msg::status status)
+                 msg::status status,
+                 std::string db_file)
     : _id(id),
       _author_id(author_id),
       _recipient_id(recipient_id),
       _status(status),
       _text(text),
-      _timestamp(time(NULL)) {}
+      _timestamp(time(NULL)),
+      DBfilePath(db_file) {}
+
+Message::Message(std::ifstream &stream, std::string db_file)
+    : _id(Stream::getUint(stream, 4)),
+      _author_id(Stream::getUint(stream, 12)),
+      _recipient_id(Stream::getUint(stream, 16)),
+      _status((msg::status)Stream::getUint(stream, 8)),
+      _text(Stream::getString(stream, 28)),
+      _timestamp(Stream::getLong64(stream, 20)),
+      DBfilePath(db_file)
+{
+    /*
+    |block_size|  _id    |   status  |  author  |  recipient   |  timestamp |  text size | text  |
+               4         8           12         16             20           28           32
+    */
+
+    auto pos = stream.tellg();
+    uint block_size = Stream::getUint(stream);
+    stream.seekg(pos += (block_size + 4));
+}
 
 msg::status Message::getStatus()
 {
@@ -81,4 +102,52 @@ void Message::printData()
         std::cout << _text << std::endl;
     }
     std::cout << std::endl;
+}
+
+void Message::writeData()
+{
+    /*
+    |block_size|  _id    |   status  |  author  |  recipient   |  timestamp |  text size | text  |
+               4         8           12         16             20           28           32
+    */
+    std::ofstream stream(DBfilePath, std::ios::app | std::ios::ate | std::ios::binary);
+    stream << "MESG";
+    const uint uintSize = sizeof(uint);
+    const uint longSize = sizeof(unsigned long long);
+    const uint textSize = _text.size();
+    const uint status = (int)_status;
+
+    const uint block_size = 32 - 4 + textSize;
+
+    char uint_num[uintSize];
+    char long_num[longSize];
+
+    // block_size
+    memcpy(uint_num, &block_size, uintSize);
+    stream.write(uint_num, uintSize);
+
+    // id
+    memcpy(uint_num, &_id, uintSize);
+    stream.write(uint_num, uintSize);
+
+    // status
+    memcpy(uint_num, &status, uintSize);
+    stream.write(uint_num, uintSize);
+
+    // author_id
+    memcpy(uint_num, &_author_id, uintSize);
+    stream.write(uint_num, uintSize);
+
+    // recipient_id
+    memcpy(uint_num, &_recipient_id, uintSize);
+    stream.write(uint_num, uintSize);
+
+    // timestamp
+    memcpy(long_num, &_timestamp, longSize);
+    stream.write(long_num, longSize);
+
+    // text
+    memcpy(uint_num, &textSize, uintSize);
+    stream.write(uint_num, uintSize);
+    stream << _text;
 }

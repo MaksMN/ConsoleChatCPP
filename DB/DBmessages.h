@@ -5,6 +5,7 @@ class DBmessages : public IDBcore<Message>
 {
 private:
     uint lastMsgID = 0;
+    std::string DBfilePath;
 
 public:
     ~DBmessages() = default;
@@ -31,4 +32,8 @@ public:
     /// @brief Удаляет сообщение из базы
     /// @param id
     void deleteMessage(uint id);
+
+    void updateFromFile();
+    std::string getDBfilePath();
+    void setDBfilePath(std::string path);
 };

@@ -48,6 +48,9 @@ public:
     /// @brief Удаляет элемент из базы по ID элемента. Не по индексу вектора.
     /// @param id
     void remove(uint id);
+
+    void readFromFile(std::string path, std::string marker, uint &last);
+    void updateFiles(std::string path);
 };
 
 template <typename T>
@@ -130,4 +133,38 @@ inline void IDBcore<T>::remove(uint id)
 
     if (_DB.end() != it)
         _DB.erase(it);
+}
+
+template <typename T>
+inline void IDBcore<T>::readFromFile(std::string path, std::string marker, uint &last)
+{
+    if(!std::filesystem::exists(path)){
+        return;
+    }
+    std::ifstream stream(path, std::ios::app | std::ios::ate | std::ios::binary);
+    stream.seekg(0);
+
+    while (!stream.eof())
+    {
+        char u[4];
+        stream.read(u, 4);
+        auto pos = stream.tellg();
+        std::string u_(u, 4);
+        if (u_ != marker || pos == -1)
+            break;
+
+        _DB.push_back(std::make_shared<T>(stream, path));
+    }
+    stream.close();
+    last = _DB.back()->getID();
+}
+
+template <typename T>
+inline void IDBcore<T>::updateFiles(std::string path)
+{
+    std::filesystem::remove(path);
+    for (int i{0}; i < _DB.size(); i++)
+    {
+        _DB[i]->writeData();
+    }
 }

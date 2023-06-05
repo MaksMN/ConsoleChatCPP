@@ -4,6 +4,11 @@
 #include "../../Misc/Flags.h"
 #include "../Options.h"
 #include "../../Misc/DateTime.h"
+#include <filesystem>
+#include <fstream>
+#include <cstring>
+#include "../../Misc/Stream.h"
+
 typedef unsigned int uint;
 
 class Message
@@ -17,6 +22,8 @@ private:
     msg::status _status;
     Flags<msg::status> flags;
 
+    std::string DBfilePath;
+
 public:
     ~Message() = default;
     Message(
@@ -24,8 +31,9 @@ public:
         const uint &author_id,
         const uint &recipient_id,
         const std::string &text,
-        msg::status _status);
-
+        msg::status _status,
+        std::string db_file);
+    Message(std::ifstream &stream, std::string db_file);
     /// @brief Возвращает статус сообщения
     /// @return
     msg::status getStatus();
@@ -68,4 +76,6 @@ public:
 
     /// @brief Выводит на экран данные сообщения.
     void printData();
+
+    void writeData();
 };

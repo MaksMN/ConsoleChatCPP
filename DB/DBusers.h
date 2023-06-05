@@ -6,7 +6,7 @@ class DBusers final : public IDBcore<User>
 {
 private:
     uint lastUserID = 0;
-
+     std::string DBfilePath;
 public:
     virtual ~DBusers() = default;
     /// @brief Проверяет уникальность логина
@@ -39,5 +39,8 @@ public:
     std::shared_ptr<User> getUserByLogin(std::string &login);
 
     void updateFromFile();
+
+    std::string getDBfilePath();
+    void setDBfilePath(std::string path);
 
 };

@@ -6,7 +6,8 @@ std::shared_ptr<Message> DBmessages::addMessage(
     const std::string &text,
     msg::status status)
 {
-    _DB.push_back(std::make_shared<Message>(lastMsgID++, author_id, recipient_id, text, status));
+    _DB.push_back(std::make_shared<Message>(lastMsgID++, author_id, recipient_id, text, status, DBfilePath));
+    _DB.back()->writeData();
     return _DB.back();
 }
 
@@ -75,4 +76,19 @@ void DBmessages::deleteMessage(uint id)
 
     if (_DB.end() != it)
         _DB.erase(it);
+}
+
+void DBmessages::updateFromFile()
+{
+    readFromFile(getDBfilePath(), "MESG", lastMsgID);
+}
+
+std::string DBmessages::getDBfilePath()
+{
+    return DBfilePath;
+}
+
+void DBmessages::setDBfilePath(std::string path)
+{
+    DBfilePath = path;
 }

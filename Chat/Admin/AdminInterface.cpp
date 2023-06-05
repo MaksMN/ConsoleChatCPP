@@ -191,12 +191,16 @@ chat::Results AdminInterface::setUserStatus(std::string description, chat::Resul
     } while (user == nullptr);
     if (status == chat::admin_ban_user)
         user->ban();
+    usersDB.updateFiles("users");
     if (status == chat::admin_unban_user)
         user->unBan();
+    usersDB.updateFiles("users");
     if (status == chat::user_to_admin)
         user->toAdmin();
+    usersDB.updateFiles("users");
     if (status == chat::admin_to_user)
         user->toUser();
+    usersDB.updateFiles("users");
 
     system(clear);
     return chat::user_input;
@@ -316,11 +320,14 @@ chat::Results AdminInterface::complaintActions(chat::Results action)
     {
     case chat::complaint_delete_message_ban:
         pubMessagesDB.deleteMessage(complaint->getTroubleMsgID());
+        pubMessagesDB.updateFiles("messages");
         complaint->complete();
         troubleUser->ban();
+        usersDB.updateFiles("users");
         break;
     case chat::complaint_delete_message_noban:
         pubMessagesDB.deleteMessage(complaint->getTroubleMsgID());
+        pubMessagesDB.updateFiles("messages");
         complaint->complete();
         break;
     case chat::complaint_complete:
