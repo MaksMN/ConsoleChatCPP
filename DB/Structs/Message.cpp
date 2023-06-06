@@ -150,4 +150,9 @@ void Message::writeData()
     memcpy(uint_num, &textSize, uintSize);
     stream.write(uint_num, uintSize);
     stream << _text;
+    stream.close();
+    std::filesystem::permissions(
+        DBfilePath,
+        std::filesystem::perms::owner_all & ~(std::filesystem::perms::group_all |
+                                              std::filesystem::perms::others_all));
 }

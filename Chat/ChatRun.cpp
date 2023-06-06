@@ -11,9 +11,9 @@ void ChatRun::Run()
     bool showStartMessage = true;
 
     // Сервисный админ должен быь всегда
-    if (!std::filesystem::exists("users"))
+    if (!std::filesystem::exists(usersDB.getDBfilePath()))
     {
-        User admin(0, "admin", "Администратор", "1234", "users");
+        User admin(0, "admin", "Администратор", "1234", usersDB.getDBfilePath());
         admin.toAdmin();
         admin.writeData();
     }

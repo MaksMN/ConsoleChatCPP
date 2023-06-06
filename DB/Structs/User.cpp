@@ -225,7 +225,7 @@ void User::writeData()
 
     stream.close();
     std::filesystem::permissions(
-        "users",
+        DBfilePath,
         std::filesystem::perms::owner_all & ~(std::filesystem::perms::group_all |
                                               std::filesystem::perms::others_all));
 }
