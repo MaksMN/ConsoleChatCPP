@@ -26,6 +26,14 @@ private:
 
 public:
     ~Message() = default;
+
+    /// @brief Создает сообщение чата путем прямого указания данных
+    /// @param id
+    /// @param author_id
+    /// @param recipient_id
+    /// @param text
+    /// @param _status
+    /// @param db_file
     Message(
         const uint &id,
         const uint &author_id,
@@ -33,6 +41,10 @@ public:
         const std::string &text,
         msg::status _status,
         std::string db_file);
+
+    /// @brief Создает сообщение из файла
+    /// @param stream
+    /// @param db_file
     Message(std::ifstream &stream, std::string db_file);
     /// @brief Возвращает статус сообщения
     /// @return
@@ -77,5 +89,6 @@ public:
     /// @brief Выводит на экран данные сообщения.
     void printData();
 
+    /// @brief Записывает в файл данные сообщения
     void writeData();
 };

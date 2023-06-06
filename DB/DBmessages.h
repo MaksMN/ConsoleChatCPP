@@ -31,7 +31,14 @@ public:
     /// @param id
     void deleteMessage(uint id);
 
+    /// @brief Выгружает данные в базу из файла
     void updateFromFile();
+
+    /// @brief возвращает путь к файлу базы
+    /// @return
     std::string getDBfilePath();
+
+    /// @brief изменяет путь к файлу базы
+    /// @param path
     void setDBfilePath(std::string path);
 };

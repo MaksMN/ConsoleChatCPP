@@ -51,7 +51,11 @@ public:
     /// @param id
     void remove(uint id);
 
+    /// @brief Заполняет базу данных из файла
+    /// @param marker Маркер, разделяющий элементы базы данных в файле
     void readFromFile(std::string marker);
+
+    /// @brief Записывает базу данных в файл
     void updateFiles();
 };
 

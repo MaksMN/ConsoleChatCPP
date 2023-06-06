@@ -28,8 +28,25 @@ private:
     std::string DBfilePath;
 
 public:
+    /// @brief Создает нового пользователя путем указания данных в аргументах
+    /// @param id
+    /// @param login
+    /// @param name
+    /// @param pass
+    /// @param db_file путь к файлу базы пользователей
     User(const uint &id, const std::string &login, const std::string &name, std::string &pass, std::string db_file);
+
+    /// @brief Создает нового пользователя
+    /// @param id
+    /// @param login
+    /// @param name
+    /// @param pass
+    /// @param db_file путь к файлу базы пользователей
     User(const uint &&id, const std::string &&login, const std::string &&name, std::string &&pass, std::string db_file);
+
+    /// @brief Создает нового пользователя из файла базы
+    /// @param stream
+    /// @param db_file путь к файлу базы пользователей
     User(std::ifstream &stream, std::string db_file);
     ~User();
 
@@ -85,12 +102,8 @@ public:
     /// @brief проверяет пароль пользователя
     bool validatePass(std::string &pass);
 
+    /// @brief Записывает данные пользователя в файл
     void writeData();
-    int getID(std::ifstream &stream);
-    std::string getLogin(std::ifstream &stream);
-    std::string getName(std::ifstream &stream);
-    user::status getStatus(std::ifstream &stream);
-    unsigned long long getTimestamp(std::ifstream &stream);
 
 private:
     /// @brief генерирует данные для хеширования

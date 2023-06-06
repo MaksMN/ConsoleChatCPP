@@ -230,21 +230,6 @@ void User::writeData()
                                               std::filesystem::perms::others_all));
 }
 
-std::string User::getName(std::ifstream &stream)
-{
-    return std::string();
-}
-
-user::status User::getStatus(std::ifstream &stream)
-{
-    return user::status();
-}
-
-unsigned long long User::getTimestamp(std::ifstream &stream)
-{
-    return 0;
-}
-
 void User::bytesForHash(const std::string &pass, char message[])
 {
     int half_length = _pass_bytes / 2;

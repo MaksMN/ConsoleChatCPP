@@ -1,5 +1,9 @@
+SRC = main.cpp DB/*.cpp DB/**/*.cpp Chat/*.cpp Chat/**/*.cpp
+TARGET = consolechat
+PREFIX = /usr/local/bin
+
 consolechat: miscLib
-	g++ -o _Make/consolechat main.cpp DB/*.cpp DB/**/*.cpp Chat/*.cpp Chat/**/*.cpp -L. -l:_Make/miscLib.a
+	g++ -o _Make/$(TARGET) $(SRC) -L. -l:_Make/miscLib.a
 
 miscLib: Misc/sha1.cpp Misc/DateTime.cpp Misc/Stream.cpp
 	mkdir -p _Make
@@ -10,3 +14,9 @@ miscLib: Misc/sha1.cpp Misc/DateTime.cpp Misc/Stream.cpp
 	
 clean:
 	rm -rf _Make/*.o _Make/*.a
+
+install:
+	install _Make/$(TARGET) $(PREFIX)
+	
+uninstall:
+	rm -rf $(PREFIX)/$(TARGET)
