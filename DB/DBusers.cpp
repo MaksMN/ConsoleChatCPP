@@ -15,7 +15,7 @@ bool DBusers::uniqueLogin(std::string &login) const
 
 std::shared_ptr<User> DBusers::addUser(const std::string &login, const std::string &name, std::string &pass)
 {
-    _DB.push_back(std::make_shared<User>(lastUserID++, login, name, pass, DBfilePath));
+    _DB.push_back(std::make_shared<User>(LastElement++, login, name, pass, DBfilePath));
     _DB.back()->writeData();
     return _DB.back();
 }
@@ -45,7 +45,7 @@ std::shared_ptr<User> DBusers::getUserByLogin(std::string &login)
 
 void DBusers::updateFromFile()
 {
-    readFromFile("USER", lastUserID);
+    readFromFile("USER");
 }
 
 std::string DBusers::getDBfilePath()

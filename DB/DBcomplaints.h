@@ -5,8 +5,6 @@
 class DBcomplaints : public DBcore<Complaint>
 {
 private:
-    uint lastComplaintID = 0;
-
 public:
     ~DBcomplaints() = default;
 

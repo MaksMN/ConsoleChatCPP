@@ -5,8 +5,6 @@
 class DBusers final : public DBcore<User>
 {
 private:
-    uint lastUserID = 0;
-
 public:
     DBusers(std::string db_path);
     virtual ~DBusers() = default;

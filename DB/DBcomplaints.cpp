@@ -9,7 +9,7 @@ std::shared_ptr<Complaint> DBcomplaints::addComplaint(
     const std::string &messageText)
 {
     _DB.push_back(std::make_shared<Complaint>(
-        lastComplaintID++,
+        LastElement++,
         troubleMsgID,
         applicantUID,
         defendantUID,

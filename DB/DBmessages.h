@@ -4,8 +4,6 @@
 class DBmessages : public DBcore<Message>
 {
 private:
-    uint lastMsgID = 0;
-
 public:
     DBmessages(std::string db_path);
     ~DBmessages() = default;

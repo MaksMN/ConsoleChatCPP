@@ -19,6 +19,7 @@ class DBcore
 protected:
     std::vector<std::shared_ptr<T>> _DB; // основная база всех данных
     std::string DBfilePath;
+    uint LastElement = 0;
 
 public:
     virtual ~DBcore() = default;
@@ -50,7 +51,7 @@ public:
     /// @param id
     void remove(uint id);
 
-    void readFromFile(std::string marker, uint &last);
+    void readFromFile(std::string marker);
     void updateFiles();
 };
 
@@ -137,7 +138,7 @@ inline void DBcore<T>::remove(uint id)
 }
 
 template <typename T>
-inline void DBcore<T>::readFromFile(std::string marker, uint &last)
+inline void DBcore<T>::readFromFile(std::string marker)
 {
     if (!std::filesystem::exists(DBfilePath))
     {
@@ -158,7 +159,8 @@ inline void DBcore<T>::readFromFile(std::string marker, uint &last)
         _DB.push_back(std::make_shared<T>(stream, DBfilePath));
     }
     stream.close();
-    last = _DB.back()->getID();
+    LastElement = _DB.back()->getID();
+    LastElement++;
 }
 
 template <typename T>
