@@ -1,5 +1,10 @@
 #include "DBmessages.h"
 
+DBmessages::DBmessages(std::string db_path)
+{
+    DBfilePath = db_path;
+}
+
 std::shared_ptr<Message> DBmessages::addMessage(
     const uint &author_id,
     const uint &recipient_id,
@@ -80,7 +85,7 @@ void DBmessages::deleteMessage(uint id)
 
 void DBmessages::updateFromFile()
 {
-    readFromFile(getDBfilePath(), "MESG", lastMsgID);
+    readFromFile("MESG", lastMsgID);
 }
 
 std::string DBmessages::getDBfilePath()

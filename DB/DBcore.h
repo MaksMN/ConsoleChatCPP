@@ -14,13 +14,14 @@
 /// @brief Базовый класс для работы с БД чата
 /// @tparam T
 template <typename T>
-class IDBcore
+class DBcore
 {
 protected:
     std::vector<std::shared_ptr<T>> _DB; // основная база всех данных
+    std::string DBfilePath;
 
 public:
-    virtual ~IDBcore() = default;
+    virtual ~DBcore() = default;
 
     /// @brief Возвращает диапазон элементов из базы.
     /// @param start Индекс первого элемента
@@ -49,12 +50,12 @@ public:
     /// @param id
     void remove(uint id);
 
-    void readFromFile(std::string path, std::string marker, uint &last);
-    void updateFiles(std::string path);
+    void readFromFile(std::string marker, uint &last);
+    void updateFiles();
 };
 
 template <typename T>
-inline std::vector<std::shared_ptr<T>> IDBcore<T>::list(uint &start, const uint &perPage, uint &end)
+inline std::vector<std::shared_ptr<T>> DBcore<T>::list(uint &start, const uint &perPage, uint &end)
 {
     if (_DB.empty())
     {
@@ -77,7 +78,7 @@ inline std::vector<std::shared_ptr<T>> IDBcore<T>::list(uint &start, const uint 
 }
 
 template <typename T>
-inline std::vector<std::shared_ptr<T>> IDBcore<T>::listLast(uint &start, const uint &perPage, uint &end)
+inline std::vector<std::shared_ptr<T>> DBcore<T>::listLast(uint &start, const uint &perPage, uint &end)
 {
     if (_DB.empty())
     {
@@ -97,19 +98,19 @@ inline std::vector<std::shared_ptr<T>> IDBcore<T>::listLast(uint &start, const u
 }
 
 template <typename T>
-inline uint IDBcore<T>::getCount()
+inline uint DBcore<T>::getCount()
 {
     return _DB.size();
 }
 
 template <typename T>
-inline bool IDBcore<T>::empty()
+inline bool DBcore<T>::empty()
 {
     return _DB.empty();
 }
 
 template <typename T>
-inline std::shared_ptr<T> IDBcore<T>::operator[](uint id)
+inline std::shared_ptr<T> DBcore<T>::operator[](uint id)
 {
     auto it = std::find_if(_DB.begin(), _DB.end(),
                            [&id](const auto &t)
@@ -123,7 +124,7 @@ inline std::shared_ptr<T> IDBcore<T>::operator[](uint id)
 }
 
 template <typename T>
-inline void IDBcore<T>::remove(uint id)
+inline void DBcore<T>::remove(uint id)
 {
     auto it = std::find_if(_DB.begin(), _DB.end(),
                            [&id](const auto &t)
@@ -136,12 +137,13 @@ inline void IDBcore<T>::remove(uint id)
 }
 
 template <typename T>
-inline void IDBcore<T>::readFromFile(std::string path, std::string marker, uint &last)
+inline void DBcore<T>::readFromFile(std::string marker, uint &last)
 {
-    if(!std::filesystem::exists(path)){
+    if (!std::filesystem::exists(DBfilePath))
+    {
         return;
     }
-    std::ifstream stream(path, std::ios::app | std::ios::ate | std::ios::binary);
+    std::ifstream stream(DBfilePath, std::ios::app | std::ios::ate | std::ios::binary);
     stream.seekg(0);
 
     while (!stream.eof())
@@ -153,16 +155,16 @@ inline void IDBcore<T>::readFromFile(std::string path, std::string marker, uint 
         if (u_ != marker || pos == -1)
             break;
 
-        _DB.push_back(std::make_shared<T>(stream, path));
+        _DB.push_back(std::make_shared<T>(stream, DBfilePath));
     }
     stream.close();
     last = _DB.back()->getID();
 }
 
 template <typename T>
-inline void IDBcore<T>::updateFiles(std::string path)
+inline void DBcore<T>::updateFiles()
 {
-    std::filesystem::remove(path);
+    std::filesystem::remove(DBfilePath);
     for (int i{0}; i < _DB.size(); i++)
     {
         _DB[i]->writeData();

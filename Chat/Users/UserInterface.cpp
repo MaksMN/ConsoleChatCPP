@@ -364,7 +364,7 @@ chat::Results UserInterface::privateConversation(std::shared_ptr<User> discussan
         std::cout << "Ваш собеседник: ";
         discussant->printData();
 
-        if(AuthorizedUser->getID() == discussant->getID())
+        if (AuthorizedUser->getID() == discussant->getID())
             std::cout << "Вы ведете беседу с самим собой.\n";
 
         if (userInputResult == chat::user_input)
@@ -520,13 +520,13 @@ chat::Results UserInterface::userProfile()
         case user::set_name:
             name = getName.IOgetlineThrough(true);
             AuthorizedUser->setName(name);
-            usersDB.updateFiles("users");
+            usersDB.updateFiles();
             break;
 
         case user::set_pass:
             pass = getPass.IOgetlineThrough(true);
             AuthorizedUser->setPass(pass);
-            usersDB.updateFiles("users");
+            usersDB.updateFiles();
             break;
         case user::complete_:
             system(clear);

@@ -1,13 +1,14 @@
 #pragma once
-#include "IDBcore.h"
+#include "DBcore.h"
 
 /// @brief Класс для работы с базой данных пользователей
-class DBusers final : public IDBcore<User>
+class DBusers final : public DBcore<User>
 {
 private:
     uint lastUserID = 0;
-     std::string DBfilePath;
+
 public:
+    DBusers(std::string db_path);
     virtual ~DBusers() = default;
     /// @brief Проверяет уникальность логина
     /// @param login
@@ -42,5 +43,4 @@ public:
 
     std::string getDBfilePath();
     void setDBfilePath(std::string path);
-
 };

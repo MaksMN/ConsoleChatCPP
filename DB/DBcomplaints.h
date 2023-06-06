@@ -1,8 +1,8 @@
 #pragma once
-#include "IDBcore.h"
+#include "DBcore.h"
 
 /// @brief Класс управления жалобами
-class DBcomplaints : public IDBcore<Complaint>
+class DBcomplaints : public DBcore<Complaint>
 {
 private:
     uint lastComplaintID = 0;

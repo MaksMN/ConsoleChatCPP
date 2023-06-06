@@ -11,16 +11,15 @@
 class ChatRun
 {
 private:
-    DBmessages pubMessagesDB;
-    DBmessages privMessagesDB;
+    DBmessages pubMessagesDB{"pub_messages"};
+    DBmessages privMessagesDB{"priv_messages"};
     DBcomplaints complaintsDB;
-    DBusers usersDB;
+    DBusers usersDB{"users"};
 
     UserInterface userInterface{pubMessagesDB, privMessagesDB, complaintsDB, usersDB};
     AdminInterface adminInterface{pubMessagesDB, privMessagesDB, complaintsDB, usersDB};
 
 public:
-    ChatRun() = default;
     ~ChatRun() = default;
     void Run();
 };

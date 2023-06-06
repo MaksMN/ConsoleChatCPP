@@ -1,5 +1,10 @@
 #include "DBusers.h"
 
+DBusers::DBusers(std::string db_path)
+{
+    DBfilePath = db_path;
+}
+
 bool DBusers::uniqueLogin(std::string &login) const
 {
     if (_DB.empty())
@@ -40,7 +45,7 @@ std::shared_ptr<User> DBusers::getUserByLogin(std::string &login)
 
 void DBusers::updateFromFile()
 {
-    readFromFile(getDBfilePath(), "USER", lastUserID);
+    readFromFile("USER", lastUserID);
 }
 
 std::string DBusers::getDBfilePath()

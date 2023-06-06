@@ -222,7 +222,7 @@ void User::writeData()
     memcpy(uint_num, &nameSize, uintSize);
     stream.write(uint_num, uintSize);
     stream << _name;
-    
+
     stream.close();
     std::filesystem::permissions(
         "users",

@@ -1,13 +1,13 @@
 #pragma once
-#include "IDBcore.h"
+#include "DBcore.h"
 
-class DBmessages : public IDBcore<Message>
+class DBmessages : public DBcore<Message>
 {
 private:
     uint lastMsgID = 0;
-    std::string DBfilePath;
 
 public:
+    DBmessages(std::string db_path);
     ~DBmessages() = default;
 
     std::shared_ptr<Message> addMessage(const uint &author_id,

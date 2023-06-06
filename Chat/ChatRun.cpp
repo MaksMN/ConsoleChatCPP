@@ -3,10 +3,6 @@
 
 void ChatRun::Run()
 {
-    pubMessagesDB.setDBfilePath("pub_messages");
-    privMessagesDB.setDBfilePath("priv_messages");
-    usersDB.setDBfilePath("users");
-
     system(clear);
     std::cout << "Логин сервисного администратора: admin, пароль: 1234" << std::endl;
     std::cout << "Рекомендуем сменить пароль. Войдите в чат -> настройки профиля." << std::endl;
