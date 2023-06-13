@@ -30,13 +30,22 @@ void processRequest()
             close(socket_file_descriptor);
             exit(0);
         }
-        std::cout << "Message Received from Client: " << buffer << std::endl;
+        std::cout << "Сообщение, полученное от клиента: " << buffer << std::endl;
         // ответим клиенту
+
+        // std::string m("Hello ");
+        // m += std::string(buffer);
+        // for (int i{0}; i < m.length(); i++)
+        // {
+        //     message[i] = m[i];
+        // }
+
         std::cout << "Enter reply message to the client: " << std::endl;
         std::cin >> message;
+
         sendto(socket_file_descriptor, message, MESSAGE_BUFFER, 0, (struct sockaddr *)&client, sizeof(client));
-        std::cout << "Message Sent Successfully to the client: " << message << std::endl;
-        std::cout << "Waiting for the Reply from Client..!" << std::endl;
+        std::cout << "Сообщение успешно отправлено клиенту: " << message << std::endl;
+        std::cout << "Жду ответа от клиента..." << std::endl;
     }
 
     // закрываем сокет, завершаем соединение
