@@ -1,4 +1,18 @@
-#include "DateTime.h"
+#include "Misc.h"
+
+void printMessage(std::string wmesg, bool endl)
+{
+#if defined(_WIN64) || defined(_WIN32)
+    std::wstring wmesg = std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t>{}.from_bytes(wmesg.data());
+    std::wcout << wmesg;
+    if (endl)
+        std::wcout << std::endl;
+#else
+    std::cout << wmesg;
+    if (endl)
+        std::cout << std::endl;
+#endif
+}
 
 std::string StampToTime(long long timestamp)
 {
@@ -13,5 +27,3 @@ std::string StampToTime(long long timestamp)
     std::string sec = (tm.tm_sec < 10) ? "0" + std::to_string(tm.tm_sec) : std::to_string(tm.tm_sec);
     return std::string(day + "." + month + "." + year + " " + hour + ":" + min + ":" + sec);
 }
-
-// Функция имеет такой формат потому-что в Windows преобразователи структуры tm не работают с wstring

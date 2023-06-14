@@ -30,24 +30,22 @@ void processRequest()
             close(socket_file_descriptor);
             exit(0);
         }
-        std::cout << "Сообщение, полученное от клиента: " << buffer << std::endl;
-        // ответим клиенту
+        // buffer это сообщение от клиента
 
-        // std::string m("Hello ");
-        // m += std::string(buffer);
-        // for (int i{0}; i < m.length(); i++)
-        // {
-        //     message[i] = m[i];
-        // }
-
-        std::cout << "Enter reply message to the client: " << std::endl;
-        std::cin >> message;
+        // message это сообщение отправляемое клиенту
 
         sendto(socket_file_descriptor, message, MESSAGE_BUFFER, 0, (struct sockaddr *)&client, sizeof(client));
-        std::cout << "Сообщение успешно отправлено клиенту: " << message << std::endl;
-        std::cout << "Жду ответа от клиента..." << std::endl;
     }
 
     // закрываем сокет, завершаем соединение
     close(socket_file_descriptor);
 }
+
+/**
+ * Принцип такой:
+ * 1. От клиента приходит сообщение в котором первые 4 байта это имя команды, дальше данные команды.
+ * 2. Отправляем данные в обработчик команд.
+ * 3. Обработчик команд возвращает сообщение и его размер.
+ * 4. Отправляем клиенту 8 байт. Первый блок 4 байта - метка TAKE. Второй блок - длина данных следующего сообщения.
+ * 5. Следующим сообщением отправляем данные клиенту.
+ */

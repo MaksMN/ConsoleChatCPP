@@ -6,7 +6,6 @@
 
 #include <codecvt>
 #include <cstdint>
-
 #include <locale>
 
 /// @brief Создает станицу обработки ввода пользователя
@@ -34,13 +33,13 @@ public:
     /// @param mainMessage - Сообщение пользователю
     /// @param failMessage - Сообщение при неверном вводе
     /// @param ioCapacity - Количество возможных вариантов ввода
-    UserInput(const std::wstring &description, const std::wstring &mainMessage, const std::wstring &failMessage, int ioCapacity);
+    UserInput(const std::string &description, const std::string &mainMessage, const std::string &failMessage, int ioCapacity);
 
     /// @brief Создает страницу сквозного пользовательского ввода. output = input.
     /// @param description - Заголовок страницы
     /// @param mainMessage - Сообщение пользователю
     /// @param failMessage - Сообщение при неверном вводе
-    UserInput(const std::wstring &description, const std::wstring &mainMessage, const std::wstring &failMessage);
+    UserInput(const std::string &description, const std::string &mainMessage, const std::string &failMessage);
 
     /// @brief Создает страницу сквозного пользовательского ввода (output = input). Без указания сообщений запроса.
     /// Запросы можно задать во время выполнения.
@@ -70,21 +69,22 @@ public:
     template <typename IO, typename... Args>
     void addIO(IO value, Args... args);
 
-    /// @brief Отображает страницу обработки множественного ввода пользователя. Использует std::wcin
+    /// @brief (Deprecated) Отображает страницу обработки множественного ввода пользователя. Использует std::wcin
     /// @return
     O IOcin();
 
-    /// @brief Отображает страницу обработки сквозного ввода пользователя output = input. Использует std::wcin
+    /// @brief Отображает страницу обработки сквозного ввода пользователя output = input. Использует wcin.
+    /// Подходит для запроса чисел.
     /// @return
-    I IOcinThrough();
+    I getThroughIO();
 
-    /// @brief Отображает страницу обработки множественного ввода пользователя. Использует std::getline
+    /// @brief Отображает страницу обработки множественного ввода пользователя.
     /// @return
-    O IOgetline();
+    O getMultipleIO();
     /// @brief Отображает страницу обработки сквозного ввода пользователя output = input. Использует std::getline
     /// @param denyEmpty true - запретить пустой ввод, по умолчанию false
     /// @return
-    std::wstring IOgetlineThrough(bool denyEmpty = false, bool no_pass = true);
+    std::string getStringIO(bool denyEmpty = false, bool no_pass = true);
 
     void setDescription(const std::wstring &newText);
     void setMainMessage(const std::wstring &newText);
@@ -95,29 +95,31 @@ public:
 };
 
 template <typename I, typename O>
-inline UserInput<I, O>::UserInput(const std::wstring &description,
-                                  const std::wstring &mainMessage,
-                                  const std::wstring &failMessage,
-                                  int ioCapacity) : Description(description),
-                                                    MainMessage(mainMessage),
-                                                    FailMessage(failMessage),
-                                                    ioCount{0},
-                                                    ioLength(ioCapacity),
-                                                    inputs(std::make_unique<I[]>(ioLength)),
-                                                    outputs(std::make_unique<O[]>(ioLength)),
-                                                    throughIO(false) {}
+inline UserInput<I, O>::UserInput(const std::string &description,
+                                  const std::string &mainMessage,
+                                  const std::string &failMessage,
+                                  int ioCapacity)
+    : Description(to_wstring(description)),
+      MainMessage(to_wstring(mainMessage)),
+      FailMessage(to_wstring(failMessage)),
+      ioCount{0},
+      ioLength(ioCapacity),
+      inputs(std::make_unique<I[]>(ioLength)),
+      outputs(std::make_unique<O[]>(ioLength)),
+      throughIO(false) {}
 
 template <typename I, typename O>
-inline UserInput<I, O>::UserInput(const std::wstring &description,
-                                  const std::wstring &mainMessage,
-                                  const std::wstring &failMessage) : Description(description),
-                                                                     MainMessage(mainMessage),
-                                                                     FailMessage(failMessage),
-                                                                     ioCount{0},
-                                                                     ioLength(0),
-                                                                     inputs(std::make_unique<I[]>(1)),
-                                                                     outputs(std::make_unique<O[]>(1)),
-                                                                     throughIO(true) {}
+inline UserInput<I, O>::UserInput(const std::string &description,
+                                  const std::string &mainMessage,
+                                  const std::string &failMessage)
+    : Description(to_wstring(description)),
+      MainMessage(to_wstring(mainMessage)),
+      FailMessage(to_wstring(failMessage)),
+      ioCount{0},
+      ioLength(0),
+      inputs(std::make_unique<I[]>(1)),
+      outputs(std::make_unique<O[]>(1)),
+      throughIO(true) {}
 
 template <typename I, typename O>
 inline UserInput<I, O>::UserInput() : inputs(std::make_unique<I[]>(1)), outputs(std::make_unique<O[]>(1)), throughIO(true) {}
@@ -156,7 +158,7 @@ inline O UserInput<I, O>::IOcin()
 }
 
 template <typename I, typename O>
-inline I UserInput<I, O>::IOcinThrough()
+inline I UserInput<I, O>::getThroughIO()
 {
     // Сквозной ввод
     I throughInput;
@@ -172,7 +174,7 @@ inline I UserInput<I, O>::IOcinThrough()
 /*На Windows getline работает не очень корректно с кириллицей. Для обратной совместимости используется std::wcin*/
 
 template <typename I, typename O>
-inline O UserInput<I, O>::IOgetline()
+inline O UserInput<I, O>::getMultipleIO()
 {
     if (throughIO)
     {
@@ -201,7 +203,7 @@ inline O UserInput<I, O>::IOgetline()
 
         for (int i{0}; i < ioLength; i++)
         {
-            if (userInput == inputs[i])
+            if (to_string(userInput) == inputs[i])
             {
                 return outputs[i];
             }
@@ -211,12 +213,16 @@ inline O UserInput<I, O>::IOgetline()
 }
 
 template <typename I, typename O>
-inline std::wstring UserInput<I, O>::IOgetlineThrough(bool denyEmpty, bool no_pass)
+inline std::string UserInput<I, O>::getStringIO(bool denyEmpty, bool no_pass)
 {
     // Сквозной ввод
     std::wstring throughInput;
     do
     {
+        if (!Description.empty())
+        {
+            std::wcout << Description << std::endl;
+        }
         std::wcout << MainMessage;
         std::wcin >> throughInput;
         std::wcin.clear();
@@ -238,7 +244,7 @@ inline std::wstring UserInput<I, O>::IOgetlineThrough(bool denyEmpty, bool no_pa
             denyEmpty = false;
         }
     } while (denyEmpty);
-    return throughInput;
+    return to_string(throughInput);
 }
 
 template <typename I, typename O>
