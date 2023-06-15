@@ -71,15 +71,15 @@ public:
 
     /// @brief Отображает страницу обработки сквозного ввода пользователя output = input. Использует std::cin
     /// @return
-    I IOcinThrough();
+    I getThroughIO();
 
     /// @brief Отображает страницу обработки множественного ввода пользователя. Использует std::getline
     /// @return
-    O IOgetline();
+    O getMultipleIO();
     /// @brief Отображает страницу обработки сквозного ввода пользователя output = input. Использует std::getline
     /// @param denyEmpty true - запретить пустой ввод, по умолчанию false
     /// @return
-    std::string IOgetlineThrough(bool denyEmpty = false);
+    std::string getStringIO(bool denyEmpty = false);
 
     void setDescription(const std::string &newText);
     void setMainMessage(const std::string &newText);
@@ -148,7 +148,7 @@ inline O UserInput<I, O>::IOcin()
 }
 
 template <typename I, typename O>
-inline I UserInput<I, O>::IOcinThrough()
+inline I UserInput<I, O>::getThroughIO()
 {
     // Сквозной ввод
     I throughInput;
@@ -162,7 +162,7 @@ inline I UserInput<I, O>::IOcinThrough()
 }
 
 template <typename I, typename O>
-inline O UserInput<I, O>::IOgetline()
+inline O UserInput<I, O>::getMultipleIO()
 {
     if (throughIO)
     {
@@ -191,7 +191,7 @@ inline O UserInput<I, O>::IOgetline()
 }
 
 template <typename I, typename O>
-inline std::string UserInput<I, O>::IOgetlineThrough(bool denyEmpty)
+inline std::string UserInput<I, O>::getStringIO(bool denyEmpty)
 {
     // Сквозной ввод
     std::string throughInput;
