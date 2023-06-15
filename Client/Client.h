@@ -5,6 +5,7 @@
 #include <cstring>
 #include <sys/socket.h> // Библиотека для работы с сокетами
 #include <arpa/inet.h>
+#include "../Misc/Misc.h"
 
 // Максимальный размер буфера для приема и передачи
 #define MESSAGE_BUFFER 4096

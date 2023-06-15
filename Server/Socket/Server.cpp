@@ -1,14 +1,17 @@
 #include "Server.h"
 // Номер порта, который будем использовать для приема и передачи
 
-char buffer[MESSAGE_BUFFER];
-char message[MESSAGE_BUFFER];
+char buffer[BUFFER];
+char take[8]; // |TAKE|size| Высылается клиенту перед основным сообщением, передает размер сообщения
 int socket_file_descriptor, message_size;
 socklen_t length;
 const char *end_string = "end";
 struct sockaddr_in serveraddress, client;
 void processRequest()
 {
+    Handler handler(buffer);
+    handler.InitialiseDB();
+    Misc::writeStringBuffer("TAKE", take);
     // Создадим UDP сокет
     socket_file_descriptor = socket(AF_INET, SOCK_DGRAM, 0);
     serveraddress.sin_addr.s_addr = htonl(INADDR_ANY);
@@ -34,7 +37,18 @@ void processRequest()
 
         // message это сообщение отправляемое клиенту
 
-        sendto(socket_file_descriptor, message, MESSAGE_BUFFER, 0, (struct sockaddr *)&client, sizeof(client));
+        handler.Run(); // обработка входящих данных и формирование ответа
+
+        const uint msg_size = handler.message.size();      // размер ответа
+        char message[msg_size];                            // буфер для ответа
+        Misc::writeVectorBuffer(message, handler.message); // записываем ответ в буфер
+
+        // Сначала отправляем клиенту take - пакет с размером сообщения
+        Misc::writeIntBuffer(msg_size, take, 4);
+        sendto(socket_file_descriptor, take, 8, 0, (struct sockaddr *)&client, sizeof(client));
+
+        // Отправка основного сообщения
+        sendto(socket_file_descriptor, message, msg_size, 0, (struct sockaddr *)&client, sizeof(client));
     }
 
     // закрываем сокет, завершаем соединение

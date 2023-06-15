@@ -25,8 +25,7 @@ void sendRequest()
 
     while (1)
     {
-        std::cout << "Введите сообщение, которое вы хотите отправить на сервер: " << std::endl;
-        std::cin >> message;
+
         if (strcmp(message, "end") == 0)
         {
             sendto(socket_descriptor, message, MESSAGE_BUFFER, 0, nullptr, sizeof(serveraddress));
