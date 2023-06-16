@@ -1,7 +1,7 @@
 #pragma once
 #if defined(_WIN64) || defined(_WIN32)
-#undef UNICODE
 
+#undef UNICODE
 #define WIN32_LEAN_AND_MEAN
 
 #include <windows.h>
@@ -14,8 +14,14 @@
 #pragma comment(lib, "Ws2_32.lib")
 // #pragma comment (lib, "Mswsock.lib")
 
-#define DEFAULT_BUFLEN 512
-#define DEFAULT_PORT "27015"
-int server_socket();
+const extern int PORT;
+
+#include "../Handler/ServerHandler.h"
+#include "../../Misc/Misc.h"
+
+#define DATA_BUFFER 4096 // Размер буфера для данных
+#define CMD_BUFFER 1024  // Размер буфера команд и заголовков
+
+int server_socket(char port[]);
 
 #endif

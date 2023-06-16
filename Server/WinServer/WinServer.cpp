@@ -1,7 +1,11 @@
 #include "WinServer.h"
 #if defined(_WIN64) || defined(_WIN32)
-int server_socket()
+int server_socket(char port[])
 {
+    char cmd_buffer[CMD_BUFFER];
+    char data_buffer[DATA_BUFFER];
+    ServerHandler handler(data_buffer, cmd_buffer);
+    handler.InitialiseDB();
     WSADATA wsaData;
     int iResult;
 
@@ -12,8 +16,6 @@ int server_socket()
     struct addrinfo hints;
 
     int iSendResult;
-    char recvbuf[DEFAULT_BUFLEN];
-    int recvbuflen = DEFAULT_BUFLEN;
 
     // Initialize Winsock
     iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
@@ -30,7 +32,7 @@ int server_socket()
     hints.ai_flags = AI_PASSIVE;
 
     // Resolve the server address and port
-    iResult = getaddrinfo(NULL, DEFAULT_PORT, &hints, &result);
+    iResult = getaddrinfo(NULL, port, &hints, &result);
     if (iResult != 0)
     {
         printf("getaddrinfo failed with error: %d\n", iResult);
@@ -86,14 +88,24 @@ int server_socket()
     // Receive until the peer shuts down the connection
     do
     {
-
-        iResult = recv(ClientSocket, recvbuf, recvbuflen, 0);
+        iResult = recv(ClientSocket, cmd_buffer, CMD_BUFFER, 0);
         if (iResult > 0)
         {
             printf("Bytes received: %d\n", iResult);
 
+            handler.Run();
+
             // Echo the buffer back to the sender
-            iSendResult = send(ClientSocket, recvbuf, iResult, 0);
+            iSendResult = send(ClientSocket, cmd_buffer, CMD_BUFFER, 0);
+            if (iSendResult == SOCKET_ERROR)
+            {
+                printf("send failed with error: %d\n", WSAGetLastError());
+                closesocket(ClientSocket);
+                WSACleanup();
+                return 1;
+            }
+            // Echo the buffer back to the sender
+            iSendResult = send(ClientSocket, data_buffer, DATA_BUFFER, 0);
             if (iSendResult == SOCKET_ERROR)
             {
                 printf("send failed with error: %d\n", WSAGetLastError());
@@ -113,7 +125,7 @@ int server_socket()
             return 1;
         }
 
-    } while (iResult > 0);
+    } while (1);
 
     // shutdown the connection since we're done
     iResult = shutdown(ClientSocket, SD_SEND);

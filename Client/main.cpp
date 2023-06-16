@@ -13,7 +13,9 @@ const char clear[]{"clear"};
 
 #endif
 
-const int PORT{7777}; // Порт сервера
+const char SERVER_ADDRESS[]{"127.0.0.1"}; // Адрес сервера
+const int SERVER_PORT{7777};              // Порт сервера
+
 int main(int argc, char **argv)
 {
     std::cout << "CLIENT IS ESTABLISHING A CONNECTION WITH SERVER THROUGH PORT: " << PORT << std::endl;
