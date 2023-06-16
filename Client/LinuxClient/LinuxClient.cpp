@@ -1,5 +1,5 @@
-#include "Client.h"
-
+#include "LinuxClient.h"
+#if defined(__linux__)
 char data_buffer[DATA_BUFFER];
 char cmd_buffer[CMD_BUFFER];
 int socket_descriptor;
@@ -55,3 +55,4 @@ void sendRequest()
     // закрываем сокет, завершаем соединение
     close(socket_descriptor);
 }
+#endif

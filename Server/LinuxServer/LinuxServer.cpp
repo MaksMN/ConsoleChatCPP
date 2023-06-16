@@ -1,4 +1,5 @@
-#include "Server.h"
+#include "LinuxServer.h"
+#if defined(__linux__)
 // Номер порта, который будем использовать для приема и передачи
 
 char data_buffer[DATA_BUFFER];
@@ -8,7 +9,7 @@ int socket_file_descriptor, message_size;
 socklen_t length;
 const char *end_string = "end";
 struct sockaddr_in serveraddress, client;
-void processRequest()
+void server()
 {
     ServerHandler handler(data_buffer, cmd_buffer);
     handler.InitialiseDB();
@@ -61,3 +62,5 @@ void processRequest()
  * 4. Отправляем клиенту 8 байт. Первый блок 4 байта - метка TAKE. Второй блок - длина данных следующего сообщения.
  * 5. Следующим сообщением отправляем данные клиенту.
  */
+
+#endif

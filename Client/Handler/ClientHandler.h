@@ -1,10 +1,12 @@
 #pragma once
-#include "../Misc/Misc.h"
+#include "../../Misc/Misc.h"
 #include <vector>
 
 #if defined(_WIN64) || defined(_WIN32)
-#include "../Misc/UserInputW.h"
+#include "../../Misc/UserInputW.h"
+const char clear[]{"cls"};
 #else
+const char clear[]{"clear"};
 #include "../Misc/UserInput.h"
 #endif
 #include <string>
@@ -14,7 +16,7 @@
 
 typedef unsigned int uint;
 typedef unsigned long long ullong;
-const extern char clear[];
+
 class ClientHandler
 {
 private:

@@ -1,16 +1,17 @@
 #pragma once
+#if defined(__linux__)
 #include <iostream>
-#include <stdlib.h>
 #include <unistd.h>
+#include <stdlib.h>
 #include <cstring>
+#include <sys/socket.h> // Библиотека для работы с сокетами
 #include <arpa/inet.h>
-#include <sys/socket.h>
-
-#include "../Handler/ServerHandler.h"
-#include "../../Misc/Misc.h"
+#include "../Misc/Misc.h"
+#include "ClientHandler.h"
 
 #define DATA_BUFFER 4096 // Размер буфера для данных
 #define CMD_BUFFER 1024  // Размер буфера команд и заголовков
 const extern int PORT;
 
-void processRequest();
+void sendRequest();
+#endif
