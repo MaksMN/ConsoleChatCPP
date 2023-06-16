@@ -1,23 +1,20 @@
 #include "WinClient.h"
 #if defined(_WIN64) || defined(_WIN32)
-int client(int argc, char **argv)
+
+int client_socket(char server_address[], char port[])
 {
+    char data_buffer[DATA_BUFFER];
+    char cmd_buffer[CMD_BUFFER];
+    ClientHandler handler(data_buffer, cmd_buffer);
+    handler.Initialise();
+
     WSADATA wsaData;
     SOCKET ConnectSocket = INVALID_SOCKET;
     struct addrinfo *result = NULL,
                     *ptr = NULL,
                     hints;
-    const char *sendbuf = "this is a test";
-    char recvbuf[DEFAULT_BUFLEN];
-    int iResult;
-    int recvbuflen = DEFAULT_BUFLEN;
 
-    // Validate the parameters
-    if (argc != 2)
-    {
-        printf("usage: %s server-name\n", argv[0]);
-        //        return 1;
-    }
+    int iResult;
 
     // Initialize Winsock
     iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
@@ -33,7 +30,7 @@ int client(int argc, char **argv)
     hints.ai_protocol = IPPROTO_TCP;
 
     // Resolve the server address and port
-    iResult = getaddrinfo("127.0.0.1", DEFAULT_PORT, &hints, &result);
+    iResult = getaddrinfo(server_address, port, &hints, &result);
     if (iResult != 0)
     {
         printf("getaddrinfo failed with error: %d\n", iResult);
@@ -75,33 +72,33 @@ int client(int argc, char **argv)
         return 1;
     }
 
-    // Send an initial buffer
-    iResult = send(ConnectSocket, sendbuf, (int)strlen(sendbuf), 0);
-    if (iResult == SOCKET_ERROR)
-    {
-        printf("send failed with error: %d\n", WSAGetLastError());
-        closesocket(ConnectSocket);
-        WSACleanup();
-        return 1;
-    }
+    // printf("Bytes Sent: %ld\n", iResult);
 
-    printf("Bytes Sent: %ld\n", iResult);
-
-    // shutdown the connection since no more data will be sent
-    iResult = shutdown(ConnectSocket, SD_SEND);
-    if (iResult == SOCKET_ERROR)
-    {
-        printf("shutdown failed with error: %d\n", WSAGetLastError());
-        closesocket(ConnectSocket);
-        WSACleanup();
-        return 1;
-    }
+    // // shutdown the connection since no more data will be sent
+    // iResult = shutdown(ConnectSocket, SD_SEND);
+    // if (iResult == SOCKET_ERROR)
+    // {
+    //     printf("shutdown failed with error: %d\n", WSAGetLastError());
+    //     closesocket(ConnectSocket);
+    //     WSACleanup();
+    //     return 1;
+    // }
 
     // Receive until the peer closes the connection
     do
     {
+        handler.Run();
+        // Send an initial buffer
+        iResult = send(ConnectSocket, cmd_buffer, CMD_BUFFER, 0);
+        if (iResult == SOCKET_ERROR)
+        {
+            printf("send failed with error: %d\n", WSAGetLastError());
+            closesocket(ConnectSocket);
+            WSACleanup();
+            return 1;
+        }
 
-        iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
+        iResult = recv(ConnectSocket, cmd_buffer, CMD_BUFFER, 0);
         if (iResult > 0)
             printf("Bytes received: %d\n", iResult);
         else if (iResult == 0)
@@ -109,7 +106,15 @@ int client(int argc, char **argv)
         else
             printf("recv failed with error: %d\n", WSAGetLastError());
 
-    } while (iResult > 0);
+        iResult = recv(ConnectSocket, data_buffer, DATA_BUFFER, 0);
+        if (iResult > 0)
+            printf("Bytes received: %d\n", iResult);
+        else if (iResult == 0)
+            printf("Connection closed\n");
+        else
+            printf("recv failed with error: %d\n", WSAGetLastError());
+
+    } while (1);
 
     // cleanup
     closesocket(ConnectSocket);

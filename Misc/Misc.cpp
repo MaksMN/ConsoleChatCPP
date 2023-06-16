@@ -1,9 +1,9 @@
 #include "Misc.h"
 
-void Misc::printMessage(std::string mesg, bool endl)
+void Misc::printMessage(std::string msg, bool endl)
 {
 #if defined(_WIN64) || defined(_WIN32)
-    std::wstring wmesg = std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t>{}.from_bytes(mesg.data());
+    std::wstring wmesg = std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t>{}.from_bytes(msg.data());
     std::wcout << wmesg;
     if (endl)
         std::wcout << std::endl;

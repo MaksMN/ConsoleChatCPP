@@ -7,14 +7,14 @@
 #include <ws2tcpip.h>
 #include <stdlib.h>
 #include <stdio.h>
-
+#include "../Handler/ClientHandler.h"
 // Need to link with Ws2_32.lib, Mswsock.lib, and Advapi32.lib
 #pragma comment(lib, "Ws2_32.lib")
 #pragma comment(lib, "Mswsock.lib")
 #pragma comment(lib, "AdvApi32.lib")
 
-#define DEFAULT_BUFLEN 512
-#define DEFAULT_PORT "27015"
+#define DATA_BUFFER 4096 // Размер буфера для данных
+#define CMD_BUFFER 1024  // Размер буфера команд и заголовков
 
-int client(int argc, char **argv);
+int client_socket(char server_address[], char port[]);
 #endif
