@@ -9,7 +9,7 @@
 
 #include "WinClient\WinClient.h"
 // команда ОС для очистки консоли
-
+const char clear[]{"cls"};
 #elif defined(__linux__)
 
 #include "LinuxClient/LinuxClient.h"
@@ -24,6 +24,7 @@ int main(int argc, char **argv)
 
     _setmode(_fileno(stdout), _O_U16TEXT);
     _setmode(_fileno(stdin), _O_U16TEXT);
+#endif
 
     std::string port_s;
     std::string server_address_s = "127.0.0.1";
@@ -50,7 +51,7 @@ int main(int argc, char **argv)
     const auto server_address = server_address_s.data();
     std::cout << "CLIENT IS ESTABLISHING A CONNECTION WITH SERVER THROUGH PORT: " << port << " WITHIN A LOCAL SYSTEM" << std::endl;
     client_socket(server_address, port);
-#endif
+
     system("pause");
     return 0;
 }

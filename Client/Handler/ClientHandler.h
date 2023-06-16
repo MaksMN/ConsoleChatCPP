@@ -1,21 +1,24 @@
 #pragma once
 #include "../../Misc/Misc.h"
 #include <vector>
+#include <string>
 
 #if defined(_WIN64) || defined(_WIN32)
+
 #include "../../Misc/UserInputW.h"
-const char clear[]{"cls"};
+
 #else
-const char clear[]{"clear"};
+
 #include "../Misc/UserInput.h"
+
 #endif
-#include <string>
 
 #define DATA_BUFFER 4096 // Размер буфера для данных
 #define CMD_BUFFER 1024  // Размер буфера команд и заголовков
 
 typedef unsigned int uint;
 typedef unsigned long long ullong;
+const extern char clear[];
 
 class ClientHandler
 {
