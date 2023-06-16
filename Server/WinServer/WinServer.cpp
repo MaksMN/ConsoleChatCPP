@@ -6,110 +6,62 @@ int server_socket(char port[])
     char data_buffer[DATA_BUFFER];
     ServerHandler handler(data_buffer, cmd_buffer);
     handler.InitialiseDB();
-    WSADATA wsaData;
-    int iResult;
 
-    SOCKET ListenSocket = INVALID_SOCKET;
-    SOCKET ClientSocket = INVALID_SOCKET;
+    WSADATA WSAData;
+    WORD sockVersion = MAKEWORD(2, 2);
+    if (WSAStartup(sockVersion, &WSAData) != 0)
+        return 0;
 
-    struct addrinfo *result = NULL;
-    struct addrinfo hints;
-
-    int iSendResult;
-
-    // Initialize Winsock
-    iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
-    if (iResult != 0)
+    SOCKET serSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP); // Create server socket
+    if (INVALID_SOCKET == serSocket)
     {
-        printf("WSAStartup failed with error: %d\n", iResult);
-        return 1;
+        std::cout << "socket error!";
+        return 0;
     }
 
-    ZeroMemory(&hints, sizeof(hints));
-    hints.ai_family = AF_INET;
-    hints.ai_socktype = SOCK_STREAM;
-    hints.ai_protocol = IPPROTO_TCP;
-    hints.ai_flags = AI_PASSIVE;
+    // Set the transmission protocol, port and destination address
+    sockaddr_in serAddr;
+    serAddr.sin_family = AF_INET;
+    serAddr.sin_port = htons(atoi(port));
+    serAddr.sin_addr.S_un.S_addr = INADDR_ANY;
 
-    // Resolve the server address and port
-    iResult = getaddrinfo(NULL, port, &hints, &result);
-    if (iResult != 0)
+    if (bind(serSocket, (sockaddr *)&serAddr, sizeof(serAddr)) == SOCKET_ERROR) // bind socket to address
     {
-        printf("getaddrinfo failed with error: %d\n", iResult);
-        WSACleanup();
-        return 1;
+        std::cout << "bind error";
+        closesocket(serSocket);
+        return 0;
     }
 
-    // Create a SOCKET for the server to listen for client connections.
-    ListenSocket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
-    if (ListenSocket == INVALID_SOCKET)
-    {
-        printf("socket failed with error: %ld\n", WSAGetLastError());
-        freeaddrinfo(result);
-        WSACleanup();
-        return 1;
-    }
+    sockaddr_in clientAddr;
+    int iAddrlen = sizeof(clientAddr);
 
-    // Setup the TCP listening socket
-    iResult = bind(ListenSocket, result->ai_addr, (int)result->ai_addrlen);
-    if (iResult == SOCKET_ERROR)
-    {
-        printf("bind failed with error: %d\n", WSAGetLastError());
-        freeaddrinfo(result);
-        closesocket(ListenSocket);
-        WSACleanup();
-        return 1;
-    }
-
-    freeaddrinfo(result);
-
-    iResult = listen(ListenSocket, SOMAXCONN);
-    if (iResult == SOCKET_ERROR)
-    {
-        printf("listen failed with error: %d\n", WSAGetLastError());
-        closesocket(ListenSocket);
-        WSACleanup();
-        return 1;
-    }
-
-    // Accept a client socket
-    ClientSocket = accept(ListenSocket, NULL, NULL);
-    if (ClientSocket == INVALID_SOCKET)
-    {
-        printf("accept failed with error: %d\n", WSAGetLastError());
-        closesocket(ListenSocket);
-        WSACleanup();
-        return 1;
-    }
-
-    // No longer need server socket
-    closesocket(ListenSocket);
-
-    // Receive until the peer shuts down the connection
     do
     {
-        iResult = recv(ClientSocket, cmd_buffer, CMD_BUFFER, 0);
+        // ждем запросы от клиентов
+        int iResult = recvfrom(serSocket, cmd_buffer, CMD_BUFFER, 0, (sockaddr *)&clientAddr, &iAddrlen);
         if (iResult > 0)
         {
             printf("Bytes received: %d\n", iResult);
 
+            // обрабатываем взводящие данные
             handler.Run();
 
-            // Echo the buffer back to the sender
-            iSendResult = send(ClientSocket, cmd_buffer, CMD_BUFFER, 0);
+            // отправляем клиенту буфер команд
+            int iSendResult = sendto(serSocket, cmd_buffer, CMD_BUFFER, 0, (sockaddr *)&clientAddr, iAddrlen);
+
             if (iSendResult == SOCKET_ERROR)
             {
                 printf("send failed with error: %d\n", WSAGetLastError());
-                closesocket(ClientSocket);
+                closesocket(serSocket);
                 WSACleanup();
                 return 1;
             }
-            // Echo the buffer back to the sender
-            iSendResult = send(ClientSocket, data_buffer, DATA_BUFFER, 0);
+            // Отправляем клиенту буфер данных
+            iSendResult = sendto(serSocket, data_buffer, DATA_BUFFER, 0, (sockaddr *)&clientAddr, iAddrlen);
             if (iSendResult == SOCKET_ERROR)
             {
                 printf("send failed with error: %d\n", WSAGetLastError());
-                closesocket(ClientSocket);
+                closesocket(serSocket);
                 WSACleanup();
                 return 1;
             }
@@ -120,25 +72,15 @@ int server_socket(char port[])
         else
         {
             printf("recv failed with error: %d\n", WSAGetLastError());
-            closesocket(ClientSocket);
+            closesocket(serSocket);
             WSACleanup();
             return 1;
         }
 
     } while (1);
 
-    // shutdown the connection since we're done
-    iResult = shutdown(ClientSocket, SD_SEND);
-    if (iResult == SOCKET_ERROR)
-    {
-        printf("shutdown failed with error: %d\n", WSAGetLastError());
-        closesocket(ClientSocket);
-        WSACleanup();
-        return 1;
-    }
-
     // cleanup
-    closesocket(ClientSocket);
+    closesocket(serSocket);
     WSACleanup();
     system("pause");
     return 0;
