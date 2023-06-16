@@ -6,6 +6,8 @@ const char clear[]{"cls"};
 // команда ОС для очистки консоли
 const char clear[]{"clear"};
 #endif
+
+const int PORT{7777}; // Порт сервера
 int main()
 {
     std::cout << "CLIENT IS ESTABLISHING A CONNECTION WITH SERVER THROUGH PORT: " << PORT << std::endl;

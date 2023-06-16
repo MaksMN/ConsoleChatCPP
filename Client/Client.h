@@ -6,9 +6,10 @@
 #include <sys/socket.h> // Библиотека для работы с сокетами
 #include <arpa/inet.h>
 #include "../Misc/Misc.h"
+#include "ClientHandler.h"
 
-// Максимальный размер буфера для приема и передачи
-#define MESSAGE_BUFFER 4096
-#define PORT 7777 // номер порта, который будем использовать для приема и передачи
+#define DATA_BUFFER 4096 // Размер буфера для данных
+#define CMD_BUFFER 1024  // Размер буфера команд и заголовков
+const extern int PORT;
 
 void sendRequest();

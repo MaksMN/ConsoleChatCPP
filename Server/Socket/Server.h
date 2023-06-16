@@ -6,10 +6,11 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 
-#include "../Handler/Handler.h"
+#include "../Handler/ServerHandler.h"
 #include "../../Misc/Misc.h"
 
-#define BUFFER 4096 // Максимальный размер буфера для приема и передачи
+#define DATA_BUFFER 4096 // Размер буфера для данных
+#define CMD_BUFFER 1024  // Размер буфера команд и заголовков
 const extern int PORT;
 
 void processRequest();

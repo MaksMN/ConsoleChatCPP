@@ -103,3 +103,16 @@ std::vector<char> Misc::writeVectorBuffer(std::string str)
 
     return vector;
 }
+
+std::string Misc::cutBeginString(std::string str, const uint max_len)
+{
+    char buf[max_len];
+    auto buf2 = str.data();
+    if (str.size() > max_len)
+    {
+
+        memcpy(buf, &buf2[max_len - str.size()], max_len);
+    }
+    std::string s(buf, max_len);
+    return s;
+}

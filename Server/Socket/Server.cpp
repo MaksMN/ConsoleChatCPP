@@ -1,17 +1,18 @@
 #include "Server.h"
 // Номер порта, который будем использовать для приема и передачи
 
-char buffer[BUFFER];
-char take[8]; // |TAKE|size| Высылается клиенту перед основным сообщением, передает размер сообщения
+char data_buffer[DATA_BUFFER];
+char cmd_buffer[CMD_BUFFER];
+
 int socket_file_descriptor, message_size;
 socklen_t length;
 const char *end_string = "end";
 struct sockaddr_in serveraddress, client;
 void processRequest()
 {
-    Handler handler(buffer);
+    ServerHandler handler(data_buffer, cmd_buffer);
     handler.InitialiseDB();
-    Misc::writeStringBuffer("TAKE", take);
+
     // Создадим UDP сокет
     socket_file_descriptor = socket(AF_INET, SOCK_DGRAM, 0);
     serveraddress.sin_addr.s_addr = htonl(INADDR_ANY);
@@ -25,7 +26,10 @@ void processRequest()
     {
         // Длина сообщения от клиента
         length = sizeof(client);
-        message_size = recvfrom(socket_file_descriptor, buffer, sizeof(buffer), 0, (struct sockaddr *)&client, &length);
+        message_size = recvfrom(socket_file_descriptor, cmd_buffer, sizeof(cmd_buffer), 0, (struct sockaddr *)&client, &length);
+
+        /*
+        // отключение клиента
         buffer[message_size] = '\0';
         if (strcmp(buffer, end_string) == 0)
         {
@@ -33,22 +37,16 @@ void processRequest()
             close(socket_file_descriptor);
             exit(0);
         }
-        // buffer это сообщение от клиента
 
-        // message это сообщение отправляемое клиенту
+        */
 
         handler.Run(); // обработка входящих данных и формирование ответа
 
-        const uint msg_size = handler.message.size();      // размер ответа
-        char message[msg_size];                            // буфер для ответа
-        Misc::writeVectorBuffer(message, handler.message); // записываем ответ в буфер
+        // Отправка пакета команд
+        sendto(socket_file_descriptor, cmd_buffer, sizeof(cmd_buffer), 0, (struct sockaddr *)&client, sizeof(client));
 
-        // Сначала отправляем клиенту take - пакет с размером сообщения
-        Misc::writeIntBuffer(msg_size, take, 4);
-        sendto(socket_file_descriptor, take, 8, 0, (struct sockaddr *)&client, sizeof(client));
-
-        // Отправка основного сообщения
-        sendto(socket_file_descriptor, message, msg_size, 0, (struct sockaddr *)&client, sizeof(client));
+        // Отправка пакета с данными
+        sendto(socket_file_descriptor, data_buffer, sizeof(data_buffer), 0, (struct sockaddr *)&client, sizeof(client));
     }
 
     // закрываем сокет, завершаем соединение

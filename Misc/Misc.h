@@ -75,4 +75,6 @@ namespace Misc
     /// @return
     std::vector<char> writeVectorBuffer(std::string str);
 
+    std::string cutBeginString(std::string str, const uint max_len = 4092);
+
 } // namespace name
