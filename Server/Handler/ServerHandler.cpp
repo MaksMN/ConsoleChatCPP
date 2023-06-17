@@ -60,6 +60,11 @@ void ServerHandler::Run()
     // Запишем в буфер данные на случай если при обработке данные не изменятся.
     Misc::writeStringBuffer("Вы ввели неизвестную команду.\nВведите команду: ", data_buffer);
 
+    if (cmd_text.compare("HELLO") == 0)
+    {
+        Misc::writeStringBuffer("Привет, " + login + "! Я сервер, я живой.\nВведите команду: ", data_buffer);
+        return;
+    }
     user = usersDB.getUserByLogin(login);
 
     if ((user != nullptr && user->getSessionKey() != session_key) || user == nullptr)
@@ -70,13 +75,8 @@ void ServerHandler::Run()
 
     if (user == nullptr)
     {
-        ChatGuestPage guestPage{pubMessagesDB, privMessagesDB, complaintsDB, usersDB, data_buffer, cmd_buffer};
-        guestPage.run(pageText, cmdText);
-        // return;
-    }
-    if (cmdText.compare("HELLO") == 0)
-    {
-        Misc::writeStringBuffer("Привет, " + login + "! Я сервер, я живой.\nВведите команду: ", data_buffer);
+        ChatGuestPage guestPage{pubMessagesDB, privMessagesDB, complaintsDB, usersDB, page_text, cmd_text, login, session_key, data_buffer, cmd_buffer};
+        guestPage.run();
         return;
     }
 

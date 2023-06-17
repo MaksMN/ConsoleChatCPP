@@ -20,13 +20,24 @@ protected:
 
     std::shared_ptr<User> AuthorizedUser = nullptr;
 
+    std::string &page_text;
+    std::string &cmd_text;
+    std::string &login;
+    ullong &session_key;
+
 public:
     virtual ~IChatInterface() = default;
     IChatInterface(DBmessages &_pubMessagesDB,
                    DBmessages &_privMessagesDB,
                    DBcomplaints &_complaintsDB,
                    DBusers &_usersDB,
+                   std::string &_page_text,
+                   std::string &_cmd_text,
+                   std::string &_login,
+                   ullong &_session_key,
                    char (&_data_buffer)[DATA_BUFFER],
                    char (&_cmd_buffer)[CMD_BUFFER]);
-    virtual void run(std::string &pageText, std::string &cmdText) = 0;
+    virtual void run() = 0;
+
+    void writeBuffer();
 };

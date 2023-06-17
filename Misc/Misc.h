@@ -93,4 +93,6 @@ namespace Misc
     /// @return
     ullong getRandomKey();
 
+    std::vector<std::string> stringExplode(std::string const &str, std::string delimeter);
+
 }

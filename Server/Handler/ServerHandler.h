@@ -19,18 +19,6 @@ private:
     char (&data_buffer)[DATA_BUFFER];
     char (&cmd_buffer)[CMD_BUFFER];
 
-    std::string pageText;
-    uint pagePos;
-    uint pageSize;
-
-    std::string cmdText;
-    uint cmdPos;
-    uint cmdSize;
-
-    ullong session_key;
-    uint login_size;
-    std::string login;
-
     DBmessages pubMessagesDB{"pub_messages"};
     DBmessages privMessagesDB{"priv_messages"};
     DBcomplaints complaintsDB;

@@ -142,3 +142,17 @@ ullong Misc::getRandomKey()
     memcpy(&key, buf, 8);
     return key;
 }
+
+std::vector<std::string> Misc::stringExplode(std::string const &str, std::string delimeter)
+{
+    std::vector<std::string> out;
+    size_t start;
+    size_t end = 0;
+
+    while ((start = str.find_first_not_of(delimeter, end)) != std::string::npos)
+    {
+        end = str.find(delimeter, start);
+        out.push_back(str.substr(start, end - start));
+    }
+    return out;
+}
