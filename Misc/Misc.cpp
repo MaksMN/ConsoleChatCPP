@@ -8,7 +8,7 @@ void Misc::printMessage(std::string msg, bool endl)
     if (endl)
         std::wcout << std::endl;
 #else
-    std::cout << mesg;
+    std::cout << msg;
     if (endl)
         std::cout << std::endl;
 #endif
@@ -78,6 +78,18 @@ void Misc::writeStringBuffer(std::string str, char buffer[], uint offset, bool a
     }
 }
 
+uint Misc::findDynamicData(char buffer[], uint offset, uint offset_data, uint max_size)
+{
+    for (uint i{0}; i < offset_data; i++)
+    {
+        uint size = getInt(buffer, offset) + 4;
+        if (size > max_size)
+            return 0;
+        offset += size;
+    }
+    return offset;
+}
+
 std::vector<char> Misc::writeVectorBuffer(char buffer[], uint len)
 {
     std::vector<char> v;
@@ -115,4 +127,18 @@ std::string Misc::cutBeginString(std::string str, const uint max_len)
     }
     std::string s(buf, max_len);
     return s;
+}
+
+ullong Misc::getRandomKey()
+{
+    char buf[8];
+    ullong key = std::abs(std::rand());
+    std::srand(time(NULL) - key);
+    for (int i{0}; i < 8; i++)
+    {
+        // std::srand(time(NULL) - buf[0]);
+        buf[i] = std::abs(std::rand());
+    }
+    memcpy(&key, buf, 8);
+    return key;
 }

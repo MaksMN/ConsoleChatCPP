@@ -7,9 +7,9 @@ char cmd_buffer[CMD_BUFFER];
 
 int socket_file_descriptor, message_size;
 socklen_t length;
-const char *end_string = "end";
+
 struct sockaddr_in serveraddress, client;
-void server()
+int server_socket(char port[])
 {
     ServerHandler handler(data_buffer, cmd_buffer);
     handler.InitialiseDB();
@@ -18,28 +18,16 @@ void server()
     socket_file_descriptor = socket(AF_INET, SOCK_DGRAM, 0);
     serveraddress.sin_addr.s_addr = htonl(INADDR_ANY);
     // Зададим порт для соединения
-    serveraddress.sin_port = htons(PORT);
+    serveraddress.sin_port = htons(atoi(port));
     // Используем IPv4
     serveraddress.sin_family = AF_INET;
     // Привяжем сокет
     bind(socket_file_descriptor, (struct sockaddr *)&serveraddress, sizeof(serveraddress));
     while (1)
     {
-        // Длина сообщения от клиента
         length = sizeof(client);
-        message_size = recvfrom(socket_file_descriptor, cmd_buffer, sizeof(cmd_buffer), 0, (struct sockaddr *)&client, &length);
 
-        /*
-        // отключение клиента
-        buffer[message_size] = '\0';
-        if (strcmp(buffer, end_string) == 0)
-        {
-            std::cout << "Server is Quitting" << std::endl;
-            close(socket_file_descriptor);
-            exit(0);
-        }
-
-        */
+        int iResult = recvfrom(socket_file_descriptor, cmd_buffer, sizeof(cmd_buffer), 0, (struct sockaddr *)&client, &length);
 
         handler.Run(); // обработка входящих данных и формирование ответа
 

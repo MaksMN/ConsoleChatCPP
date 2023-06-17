@@ -5,15 +5,15 @@ char cmd_buffer[CMD_BUFFER];
 int socket_descriptor;
 struct sockaddr_in serveraddress;
 
-void sendRequest()
+int client_socket(char server_address[], char port[])
 {
     ClientHandler handler(data_buffer, cmd_buffer);
     handler.Initialise();
 
     // Укажем адрес сервера
-    serveraddress.sin_addr.s_addr = inet_addr("127.0.0.1");
+    serveraddress.sin_addr.s_addr = inet_addr(server_address);
     // Зададим номер порта для соединения с сервером
-    serveraddress.sin_port = htons(PORT);
+    serveraddress.sin_port = htons(atoi(port));
     // Используем IPv4
     serveraddress.sin_family = AF_INET;
     // Создадим сокет
@@ -25,31 +25,21 @@ void sendRequest()
                   << " Something went wrong Connection Failed" << std::endl;
         exit(1);
     }
-
+    struct timeval tv;
+    tv.tv_sec = 5;
+    tv.tv_usec = 0;
+    auto in = setsockopt(socket_descriptor, SOL_SOCKET, SO_RCVTIMEO, (const char *)&tv, sizeof tv);
     while (1)
     {
         handler.Run();
-        /*
-        if (strcmp(message, "end") == 0)
-        {
-            sendto(socket_descriptor, message, BUFFER, 0, nullptr, sizeof(serveraddress));
-            std::cout << "Client work is done.!" << std::endl;
-            close(socket_descriptor);
-            exit(0);
-        }
-        else
-        {
-            sendto(socket_descriptor, message, BUFFER, 0, nullptr, sizeof(serveraddress));
-            std::cout << "Сообщение успешно отправлено на сервер: " << message << std::endl;
-            std::cout << "Ожидание ответа от сервера..." << std::endl;
-        }
-        */
 
+        // отправка команды на сервер
         sendto(socket_descriptor, cmd_buffer, CMD_BUFFER, 0, nullptr, sizeof(serveraddress));
 
         // получение команды от сервера
         recvfrom(socket_descriptor, cmd_buffer, sizeof(cmd_buffer), 0, nullptr, nullptr);
 
+        // получение данных с сервера
         recvfrom(socket_descriptor, data_buffer, sizeof(data_buffer), 0, nullptr, nullptr);
     }
     // закрываем сокет, завершаем соединение

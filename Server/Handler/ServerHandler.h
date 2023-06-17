@@ -5,6 +5,8 @@
 #include <vector>
 #include "../../Misc/Misc.h"
 #include "../../DB/Headers.h"
+#include "IChatInterface.h"
+#include "ChatGuestPage.h"
 
 #define DATA_BUFFER 4096 // Размер буфера для данных
 #define CMD_BUFFER 1024  // Размер буфера команд и заголовков
@@ -33,6 +35,8 @@ private:
     DBmessages privMessagesDB{"priv_messages"};
     DBcomplaints complaintsDB;
     DBusers usersDB{"users"};
+
+    std::shared_ptr<User> user;
 
 public:
     ServerHandler(char (&_data_buffer)[DATA_BUFFER], char (&_cmd_buffer)[CMD_BUFFER]);

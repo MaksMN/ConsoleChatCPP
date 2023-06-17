@@ -15,6 +15,6 @@
 #define CMD_BUFFER 1024  // Размер буфера команд и заголовков
 const extern int PORT;
 
-void server();
+int server_socket(char port[]);
 
 #endif

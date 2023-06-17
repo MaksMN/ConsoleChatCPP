@@ -11,6 +11,7 @@
 #include "../../Misc/Stream.h"
 
 typedef unsigned int uint;
+typedef unsigned long long ullong;
 
 /// @brief Класс контейнер данных пользователя.
 class User
@@ -26,6 +27,7 @@ private:
     const unsigned long long _timestamp; // дата регистрации
     Flags<user::status> flags;
     std::string DBfilePath;
+    ullong session_key = 0;
 
 public:
     /// @brief Создает нового пользователя путем указания данных в аргументах
@@ -104,6 +106,9 @@ public:
 
     /// @brief Записывает данные пользователя в файл
     void writeData();
+
+    ullong getSessionKey();
+    void setSessionKey(ullong key);
 
 private:
     /// @brief генерирует данные для хеширования

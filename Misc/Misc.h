@@ -8,6 +8,7 @@
 #include <vector>
 
 typedef unsigned int uint;
+typedef unsigned long long ullong;
 namespace Misc
 {
 
@@ -61,6 +62,13 @@ namespace Misc
     /// @param add_size true - добавить размер блока в начале
     void writeStringBuffer(std::string str, char buffer[], uint offset = 0, bool add_size = true);
 
+    /// @brief Ищет позицию блока динамических данных в буфере
+    /// @param buffer
+    /// @param offset
+    /// @param offset_data
+    /// @return
+    uint findDynamicData(char buffer[], uint offset = 0, uint offset_data = 0, uint max_size = 1024);
+
     /// @brief Записывает буфер в вектор
     /// @param buffer
     /// @param len
@@ -75,6 +83,14 @@ namespace Misc
     /// @return
     std::vector<char> writeVectorBuffer(std::string str);
 
+    /// @brief (в разработке)Обрезает строку в начале
+    /// @param str
+    /// @param max_len
+    /// @return
     std::string cutBeginString(std::string str, const uint max_len = 4092);
 
-} // namespace name
+    /// @brief Генерирует случайное число 8 байт
+    /// @return
+    ullong getRandomKey();
+
+}

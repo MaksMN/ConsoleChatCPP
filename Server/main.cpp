@@ -7,7 +7,7 @@
 
 #elif defined(__linux__)
 
-#include "LinuxServer\LinuxServer.h"
+#include "LinuxServer/LinuxServer.h"
 
 #endif
 
@@ -17,6 +17,8 @@ int main(int argc, const char *argv[])
 {
 
 #if defined(_WIN64) || defined(_WIN32)
+
+#endif
     std::string port_s;
     if (argc == 2)
     {
@@ -30,7 +32,6 @@ int main(int argc, const char *argv[])
     const auto PORT = port_s.data();
     std::cout << "SERVER IS LISTENING THROUGH THE PORT: " << PORT << " WITHIN A LOCAL SYSTEM" << std::endl;
     server_socket(PORT);
-#endif
 
     return 0;
 }

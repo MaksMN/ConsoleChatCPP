@@ -230,6 +230,16 @@ void User::writeData()
                                               std::filesystem::perms::others_all));
 }
 
+ullong User::getSessionKey()
+{
+    return session_key;
+}
+
+void User::setSessionKey(ullong key)
+{
+    session_key = key;
+}
+
 void User::bytesForHash(const std::string &pass, char message[])
 {
     int half_length = _pass_bytes / 2;

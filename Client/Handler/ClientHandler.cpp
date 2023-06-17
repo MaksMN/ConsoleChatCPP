@@ -4,11 +4,29 @@ ClientHandler::ClientHandler(char (&_data_buffer)[DATA_BUFFER], char (&_cmd_buff
 
 void ClientHandler::Initialise()
 {
+    // При инициализации клиента надо сбросить и сформировать новый сессионный ключ,
+    // который будет действовать во время всего сеанса.
+    // он не должен быть равным нулю.
+    session_key = 0;
+    while (session_key == 0)
+    {
+        session_key = Misc::getRandomKey();
+    }
+
+    // Статические данные
     Misc::writeStringBuffer("00", cmd_buffer, 0, false);
-    Misc::writeStringBuffer("MAIN_PAGE", cmd_buffer, 2);
+    Misc::writeUlongBuffer(session_key, cmd_buffer, 2);
+
+    // Динамические данные
+    Misc::writeStringBuffer(login, cmd_buffer, 10);
+    Misc::writeStringBuffer("MAIN_PAGE", cmd_buffer, Misc::findDynamicData(cmd_buffer, 10, 1));
+    Misc::writeStringBuffer("NONE", cmd_buffer, Misc::findDynamicData(cmd_buffer, 10, 2));
+
     std::string data =
-        "Вы находитесь на главной странице чата. Введите команду chat чтобы начать общение.\n"
-        "Команда HELLO - пинг сервера.\n"
+        "Вы находитесь на главной странице чата.\n"
+        "Введите команду chat чтобы начать общение.\n"
+        "Команда admin - в раздел администратора.\n"
+        "Команда HELLO - пинг сервера. Работает на любой странице.\n"
         "Введите команду: ";
     Misc::writeStringBuffer(data, data_buffer);
 }
@@ -17,43 +35,44 @@ void ClientHandler::Run()
 {
     /*
 
-    Исходящий пакет
-    |session_key|login_size|login|page_size|    PAGE_TEXT    |size| CMD_TEXT        |
-                8         12     |12+login_size              |pagePos + 4 + pageSize
-    Если ожидается ввод числа, записываем его в блок size CMD_TEXT
-
-    Входящий пакет команд
-    |I - Запрос числа|clear 0-1|size|PAGE_TEXT|
-                               2
+    Командный пакет
+    |Запрос у клиента I/S (1)|clear 0-1 (1)|session_key (8)|login_size(4)|login|page_size(4)|PAGE_TEXT|cmd_size(4)|CMD_TEXT|
+    0                        1             2               10                  1                      2
+    |  static                                              | dynamic
+    Запрос у клиента: I - число S - строка
+    Если ожидается ввод числа, записываем его в блок cmd_size
 
     */
 
-    // получение команды
     if (cmd_buffer[1] == 1)
         system(clear);
 
-    pageText = Misc::getString(cmd_buffer, 2);
-    dataText = Misc::getString(data_buffer);
-    Misc::printMessage(dataText, false);
+    if (Misc::getInt(data_buffer) > DATA_BUFFER)
+    {
+        Misc::printMessage("Что-то пошло не так. От сервера пришли данные неверной длинны.", false);
+    }
+    else
+    {
+        Misc::printMessage(Misc::getString(data_buffer), false);
+    }
 
-    // формируем ответ
-    pagePos = 12 + login_size;
-    cmdPos = pagePos + 4 + pageText.size();
+    // запишем в буфер текст который отобразится если сервер отвалится
+    Misc::writeStringBuffer("Сервер не ответил на ваш запрос.\nВведите команду: ", data_buffer);
 
-    Misc::writeUlongBuffer(session_key, cmd_buffer);
-    Misc::writeStringBuffer(login, cmd_buffer, 8);
-    Misc::writeStringBuffer(pageText, cmd_buffer, pagePos);
+    uint cmd_pos = Misc::findDynamicData(cmd_buffer, 10, 2);
 
     if (cmd_buffer[0] == 'I')
     {
         uint n = userInputInt.getThroughIO();
-        Misc::writeIntBuffer(n, cmd_buffer, cmdPos);
+        Misc::writeIntBuffer(n, cmd_buffer, cmd_pos);
     }
     else
     {
         std::string s = userInputStr.getStringIO();
-        Misc::writeStringBuffer(s, cmd_buffer, cmdPos);
+        Misc::writeStringBuffer(s, cmd_buffer, cmd_pos);
     }
+
+    Misc::writeUlongBuffer(session_key, cmd_buffer);
 
     return;
 }
