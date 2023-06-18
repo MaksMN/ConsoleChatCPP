@@ -28,3 +28,13 @@ void IChatInterface::writeBuffer()
   Misc::writeStringBuffer(page_text, cmd_buffer, Misc::findDynamicData(cmd_buffer, 10, 1));
   Misc::writeStringBuffer(cmd_text, cmd_buffer, Misc::findDynamicData(cmd_buffer, 10, 2));
 }
+
+void IChatInterface::clearConsole(bool status)
+{
+  cmd_buffer[1] = status;
+}
+
+void IChatInterface::inputClient(char input)
+{
+  cmd_buffer[0] = input;
+}

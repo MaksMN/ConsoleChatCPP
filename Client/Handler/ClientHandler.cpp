@@ -23,10 +23,10 @@ void ClientHandler::Initialise()
     Misc::writeStringBuffer("NONE", cmd_buffer, Misc::findDynamicData(cmd_buffer, 10, 2));
 
     std::string data =
-        "Вы находитесь на главной странице чата.\n"
+        "Вы запустили клиент чата.\n"
         "Введите команду chat чтобы начать общение.\n"
-        "Команда admin - в раздел администратора.\n"
-        "Команда HELLO - пинг сервера. Работает на любой странице.\n"
+        "Команда /help - справка.\n"
+        "Команда /hello - опрос сервера.\n"
         "Введите команду: ";
     Misc::writeStringBuffer(data, data_buffer);
 }
@@ -54,6 +54,7 @@ void ClientHandler::Run()
     else
     {
         Misc::printMessage(Misc::getString(data_buffer), false);
+        clearConsole(false);
     }
 
     // запишем в буфер текст который отобразится если сервер отвалится
@@ -70,9 +71,34 @@ void ClientHandler::Run()
     {
         std::string s = userInputStr.getStringIO();
         Misc::writeStringBuffer(s, cmd_buffer, cmd_pos);
+
+        if (s == "/quit")
+        {
+            quit();
+        }
     }
 
     Misc::writeUlongBuffer(session_key, cmd_buffer);
 
     return;
+}
+
+void ClientHandler::clearConsole(bool status)
+{
+    cmd_buffer[1] = status;
+}
+
+void ClientHandler::inputClient(char input)
+{
+    cmd_buffer[0] = input;
+}
+
+bool ClientHandler::getWork()
+{
+    return work;
+}
+
+void ClientHandler::quit()
+{
+    work = false;
 }

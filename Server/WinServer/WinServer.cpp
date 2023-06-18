@@ -35,7 +35,7 @@ int server_socket(char port[])
     sockaddr_in clientAddr;
     int iAddrlen = sizeof(clientAddr);
 
-    do
+    while (handler.getWork())
     {
         // ждем запросы от клиентов
         int iResult = recvfrom(serSocket, cmd_buffer, CMD_BUFFER, 0, (sockaddr *)&clientAddr, &iAddrlen);
@@ -76,8 +76,7 @@ int server_socket(char port[])
             WSACleanup();
             return 1;
         }
-
-    } while (1);
+    }
 
     // cleanup
     closesocket(serSocket);

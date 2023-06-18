@@ -40,4 +40,12 @@ public:
     virtual void run() = 0;
 
     void writeBuffer();
+
+    /// @brief Дает команду клиенту очистить консоль
+    /// @param status
+    void clearConsole(bool status = true);
+
+    /// @brief Тип ввода на клиенте
+    /// @param input I - число; S - строка;
+    void inputClient(char input = 'S');
 };

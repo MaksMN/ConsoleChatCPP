@@ -60,13 +60,33 @@ void ServerHandler::Run()
     // Запишем в буфер данные на случай если при обработке данные не изменятся.
     Misc::writeStringBuffer("Вы ввели неизвестную команду.\nВведите команду: ", data_buffer);
 
-    if (cmd_text.compare("HELLO") == 0)
+    if (cmd_text == "/hello")
     {
         Misc::writeStringBuffer("Привет, " + login + "! Я сервер, я живой.\nВведите команду: ", data_buffer);
+        clearConsole(false);
         return;
     }
-    user = usersDB.getUserByLogin(login);
+    if (cmd_text == "/help")
+    {
+        std::string str =
+            "Команда /chat - перейти на главную страницу из любого раздела;\n"
+            "Команда /help - справка;\n"
+            "Команда /hello - опрос сервера;\n"
+            "Команда /logout - выйти;\n"
+            "Команда /quit - закрыть программу;\n"
+            "Команды администратора:"
+            "Команда /sv_quit - завершить работу сервера;\n";
+        Misc::writeStringBuffer(str + "\nВведите команду: ", data_buffer);
+        clearConsole(false);
+        return;
+    }
 
+    if (page_text == "MAIN_PAGE" && cmd_text != "/chat")
+        return;
+    if (cmd_text == "/chat")
+        page_text == "MAIN_PAGE";
+
+    user = usersDB.getUserByLogin(login);
     if ((user != nullptr && user->getSessionKey() != session_key) || user == nullptr)
     {
         user = nullptr;
@@ -80,12 +100,48 @@ void ServerHandler::Run()
         return;
     }
 
+    if (cmd_text.compare("/sv_quit") == 0)
+    {
+        if (user != nullptr && user->isAdmin())
+        {
+            quit();
+            Misc::writeStringBuffer("Сервер завершил свою работу.\nВведите команду /quit чтобы завершить работу клиента\nили команду chat когда запустите сервер: ", data_buffer);
+        }
+        else
+        {
+            Misc::writeStringBuffer("Вы ввели команду доступную только администраторам.\nВведите команду: ", data_buffer);
+            clearConsole(false);
+        }
+        return;
+    }
+
     // Запишем в буфер данные если ни одна из команд не попала под условия обработки.
-    Misc::writeStringBuffer("Вы ввели неизвестную команду.\nВведите команду: ", data_buffer);
+    Misc::writeStringBuffer("Не найдена страница для вашей команды.\nВведите команду: ", data_buffer);
+    clearConsole(false);
     return;
 }
 
 void ServerHandler::badRequest()
 {
     Misc::writeStringBuffer("Что-то пошло не так. На сервер пришли данные неверной длинны.", data_buffer);
+}
+
+bool ServerHandler::getWork()
+{
+    return work;
+}
+
+void ServerHandler::quit()
+{
+    work = false;
+}
+
+void ServerHandler::clearConsole(bool status)
+{
+    cmd_buffer[1] = status;
+}
+
+void ServerHandler::inputClient(char input)
+{
+    cmd_buffer[0] = input;
 }

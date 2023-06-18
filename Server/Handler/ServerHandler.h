@@ -26,10 +26,26 @@ private:
 
     std::shared_ptr<User> user;
 
+    bool work = true;
+
 public:
     ServerHandler(char (&_data_buffer)[DATA_BUFFER], char (&_cmd_buffer)[CMD_BUFFER]);
     ~ServerHandler() = default;
     void InitialiseDB();
     void Run();
     void badRequest();
+
+    /// @brief Получает статус работы сервера;
+    /// @return
+    bool getWork();
+    /// @brief дает команду завершить работу сервера
+    void quit();
+
+    /// @brief Дает команду клиенту очистить консоль
+    /// @param status
+    void clearConsole(bool status = true);
+
+    /// @brief Тип ввода на клиенте
+    /// @param input I - число; S - строка;
+    void inputClient(char input = 'S');
 };

@@ -53,19 +53,19 @@ void ChatGuestPage::offerRegisterOrLogin(std::string message)
                     "Введите команду: ";
     Misc::writeStringBuffer(str, data_buffer);
     Misc::writeStringBuffer("S", cmd_buffer, 0, false);
-    cmd_buffer[1] = 1;
+    clearConsole(true);
     writeBuffer();
 }
 
-void ChatGuestPage::loginPage()
+void ChatGuestPage::loginPage(std::string message)
 {
     page_text = "INPUT_LOGIN_PAGE";
     std::string str;
-    str = "Введите логин и пароль разделив их двоеточием (логин:пароль).\n"
-          "Введите команду: ";
+    str = message + "Введите логин и пароль разделив их двоеточием (логин:пароль).\n"
+                    "Введите команду: ";
     Misc::writeStringBuffer(str, data_buffer);
-    Misc::writeStringBuffer("S", cmd_buffer, 0, false);
-    cmd_buffer[1] = 0;
+    inputClient('S');
+    clearConsole(false);
     writeBuffer();
 }
 
@@ -74,20 +74,20 @@ void ChatGuestPage::validateLogin()
     std::vector<std::string> login_pass = Misc::stringExplode(cmd_text, ":");
     if (login_pass.size() != 2)
     {
-        offerRegisterOrLogin("Вы ввели неверные данные\n");
+        loginPage("Вы ввели неверные данные\n");
         return;
     }
 
     std::shared_ptr<User> user = usersDB.getUserByLogin(login_pass[0]);
     if (user == nullptr)
     {
-        offerRegisterOrLogin("Пользователь с логином " + login_pass[0] + " не существует  \n");
+        loginPage("Пользователь с логином " + login_pass[0] + " не существует  \n");
         return;
     }
 
     if (!user->validatePass(login_pass[1]))
     {
-        offerRegisterOrLogin("Вы ввели неверный пароль\n");
+        loginPage("Вы ввели неверный пароль\n");
         return;
     }
 
@@ -98,8 +98,7 @@ void ChatGuestPage::validateLogin()
     str = "Вы успешно авторизовались в чате.\n"
           "Введите команду chat: ";
     Misc::writeStringBuffer(str, data_buffer);
-
-    Misc::writeStringBuffer("S", cmd_buffer, 0, false);
-    cmd_buffer[1] = 1;
+    inputClient('S');
+    clearConsole(true);
     writeBuffer();
 }

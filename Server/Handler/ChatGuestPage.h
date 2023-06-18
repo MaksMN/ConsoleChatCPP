@@ -21,7 +21,7 @@ public:
 
     void offerRegisterOrLogin(std::string message = std::string());
 
-    void loginPage();
+    void loginPage(std::string message = std::string());
 
     void validateLogin();
 

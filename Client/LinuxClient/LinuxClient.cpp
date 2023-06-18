@@ -29,9 +29,11 @@ int client_socket(char server_address[], char port[])
     tv.tv_sec = 5;
     tv.tv_usec = 0;
     auto in = setsockopt(socket_descriptor, SOL_SOCKET, SO_RCVTIMEO, (const char *)&tv, sizeof tv);
-    while (1)
+    while (handler.getWork())
     {
         handler.Run();
+        if (!handler.getWork())
+            break;
 
         // отправка команды на сервер
         sendto(socket_descriptor, cmd_buffer, CMD_BUFFER, 0, nullptr, sizeof(serveraddress));
@@ -44,5 +46,6 @@ int client_socket(char server_address[], char port[])
     }
     // закрываем сокет, завершаем соединение
     close(socket_descriptor);
+    return 0;
 }
 #endif

@@ -40,10 +40,11 @@ int client_socket(char server_address[], char port[])
                            */
                            (const char *)&iTimeout,
                            sizeof(iTimeout));
-    do
+    while (handler.getWork())
     {
         handler.Run();
-
+        if (!handler.getWork())
+            return;
         // отправляем пакет команд
         int iResult = sendto(socket_descriptor, cmd_buffer, CMD_BUFFER, 0, nullptr, sizeof(serveraddress));
         if (iResult == SOCKET_ERROR)
@@ -59,8 +60,7 @@ int client_socket(char server_address[], char port[])
 
         // получение данных от сервера
         recvfrom(socket_descriptor, data_buffer, sizeof(data_buffer), 0, nullptr, nullptr);
-
-    } while (1);
+    }
 
     // cleanup
     closesocket(socket_descriptor);

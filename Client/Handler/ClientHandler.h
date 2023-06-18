@@ -43,9 +43,25 @@ private:
     UserInput<int, int> userInputInt;
     UserInput<std::string, std::string> userInputStr;
 
+    bool work = true;
+
 public:
     ClientHandler(char (&_data_buffer)[DATA_BUFFER], char (&_cmd_buffer)[CMD_BUFFER]);
     ~ClientHandler() = default;
     void Initialise();
     void Run();
+
+    /// @brief Дает команду клиенту очистить консоль
+    /// @param status
+    void clearConsole(bool status = true);
+
+    /// @brief Тип ввода на клиенте
+    /// @param input I - число; S - строка;
+    void inputClient(char input = 'S');
+
+    /// @brief Получает статус работы сервера;
+    /// @return
+    bool getWork();
+    /// @brief дает команду завершить работу сервера
+    void quit();
 };

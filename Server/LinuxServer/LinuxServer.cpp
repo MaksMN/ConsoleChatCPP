@@ -23,7 +23,7 @@ int server_socket(char port[])
     serveraddress.sin_family = AF_INET;
     // Привяжем сокет
     bind(socket_file_descriptor, (struct sockaddr *)&serveraddress, sizeof(serveraddress));
-    while (1)
+    while (handler.getWork())
     {
         length = sizeof(client);
 
@@ -40,6 +40,7 @@ int server_socket(char port[])
 
     // закрываем сокет, завершаем соединение
     close(socket_file_descriptor);
+    return 0;
 }
 
 /**

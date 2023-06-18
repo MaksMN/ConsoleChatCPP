@@ -27,6 +27,7 @@ int main(int argc, char **argv)
 #endif
 
     std::string port_s;
+    // std::string server_address_s = "192.168.1.109";//windows
     std::string server_address_s = "127.0.0.1";
     if (argc == 2)
     {
@@ -51,7 +52,5 @@ int main(int argc, char **argv)
     const auto server_address = server_address_s.data();
     std::cout << "CLIENT IS ESTABLISHING A CONNECTION WITH SERVER THROUGH PORT: " << port << " WITHIN A LOCAL SYSTEM" << std::endl;
     client_socket(server_address, port);
-
-    system("pause");
     return 0;
 }
