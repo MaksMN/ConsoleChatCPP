@@ -14,7 +14,7 @@ void ClientHandler::Initialise()
     }
 
     // Статические данные
-    Misc::writeStringBuffer("00", cmd_buffer, 0, false);
+    cmd_buffer[0] = sv::get_string;
     Misc::writeUlongBuffer(session_key, cmd_buffer, 2);
 
     // Динамические данные
@@ -24,7 +24,7 @@ void ClientHandler::Initialise()
 
     std::string data =
         "Вы запустили клиент чата.\n"
-        "Введите команду chat чтобы начать общение.\n"
+        "Введите команду /chat чтобы начать общение.\n"
         "Команда /help - справка.\n"
         "Команда /hello - опрос сервера.\n"
         "Введите команду: ";
@@ -36,16 +36,22 @@ void ClientHandler::Run()
     /*
 
     Командный пакет
-    |Запрос у клиента I/S (1)|clear 0-1 (1)|session_key (8)|login_size(4)|login|page_size(4)|PAGE_TEXT|cmd_size(4)|CMD_TEXT|
-    0                        1             2               10                  1                      2
-    |  static                                              | dynamic
-    Запрос у клиента: I - число S - строка
-    Если ожидается ввод числа, записываем его в блок cmd_size
+    |флаги(1)|NONE(1)|session_key (8)|login_size(4)|login|page_size(4)|PAGE_TEXT|cmd_size(4)|CMD_TEXT|
+    0        1       2               10                  1                      2
+    |  static                        | dynamic
+
 
     */
 
-    if (cmd_buffer[1] == 1)
+    if (netOptions.is(cmd_buffer[0], sv::clear_console))
         system(clear);
+    cmd_buffer[0] = netOptions.remove(cmd_buffer[0], sv::clear_console);
+
+    if (netOptions.is(cmd_buffer[0], sv::write_session))
+    {
+        session_key = Misc::getLong(cmd_buffer, 2);
+        Misc::writeUlongBuffer(session_key, cmd_buffer, 2);
+    }
 
     if (Misc::getInt(data_buffer) > DATA_BUFFER)
     {
@@ -54,7 +60,6 @@ void ClientHandler::Run()
     else
     {
         Misc::printMessage(Misc::getString(data_buffer), false);
-        clearConsole(false);
     }
 
     // запишем в буфер текст который отобразится если сервер отвалится
@@ -62,7 +67,7 @@ void ClientHandler::Run()
 
     uint cmd_pos = Misc::findDynamicData(cmd_buffer, 10, 2);
 
-    if (cmd_buffer[0] == 'I')
+    if (netOptions.is(cmd_buffer[0], sv::get_int))
     {
         uint n = userInputInt.getThroughIO();
         Misc::writeIntBuffer(n, cmd_buffer, cmd_pos);
@@ -78,19 +83,7 @@ void ClientHandler::Run()
         }
     }
 
-    Misc::writeUlongBuffer(session_key, cmd_buffer);
-
     return;
-}
-
-void ClientHandler::clearConsole(bool status)
-{
-    cmd_buffer[1] = status;
-}
-
-void ClientHandler::inputClient(char input)
-{
-    cmd_buffer[0] = input;
 }
 
 bool ClientHandler::getWork()

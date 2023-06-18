@@ -19,13 +19,17 @@ public:
 
     void run();
 
+    /// @brief Страница с предложением авторизации или регистрации
+    /// @param message Дополнительное сообщение от функций валидации.
     void offerRegisterOrLogin(std::string message = std::string());
 
+    /// @brief Страница авторизации
+    /// @param message Дополнительное сообщение от функций валидации.
     void loginPage(std::string message = std::string());
-
     void validateLogin();
 
-    void validateLoginFail();
-
-    void validateLoginSuccess();
+    /// @brief Страница регистрации
+    /// @param message Дополнительное сообщение от функций валидации.
+    void registrationPage(std::string message = std::string());
+    void validateRegistration();
 };

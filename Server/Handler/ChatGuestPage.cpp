@@ -37,6 +37,20 @@ void ChatGuestPage::run()
         return;
     }
 
+    // если пользователь выбрал login
+    if (page_text.compare("GUEST_PAGE") == 0 && cmd_text.compare("reg") == 0)
+    {
+        registrationPage();
+        return;
+    }
+
+    // пользователь ввел данные на странице авторизации
+    if (page_text.compare("INPUT_REGISTRATION_PAGE") == 0)
+    {
+        validateRegistration();
+        return;
+    }
+
     // если команды пользователя не подходят ни под один фильтр
     offerRegisterOrLogin();
     return;
@@ -52,8 +66,7 @@ void ChatGuestPage::offerRegisterOrLogin(std::string message)
                     "reg - зарегистрироваться;\n"
                     "Введите команду: ";
     Misc::writeStringBuffer(str, data_buffer);
-    Misc::writeStringBuffer("S", cmd_buffer, 0, false);
-    clearConsole(true);
+    cmd_buffer[0] = netOptions.create(sv::get_string, sv::clear_console);
     writeBuffer();
 }
 
@@ -64,8 +77,7 @@ void ChatGuestPage::loginPage(std::string message)
     str = message + "Введите логин и пароль разделив их двоеточием (логин:пароль).\n"
                     "Введите команду: ";
     Misc::writeStringBuffer(str, data_buffer);
-    inputClient('S');
-    clearConsole(false);
+    cmd_buffer[0] = netOptions.create(sv::get_string);
     writeBuffer();
 }
 
@@ -93,12 +105,55 @@ void ChatGuestPage::validateLogin()
 
     user->setSessionKey(session_key);
     login = user->getLogin();
-    page_text = "PUBLIC_CHAT_PAGE";
+    page_text = "MAIN_PAGE";
     std::string str;
     str = "Вы успешно авторизовались в чате.\n"
-          "Введите команду chat: ";
+          "Введите команду /chat: ";
     Misc::writeStringBuffer(str, data_buffer);
-    inputClient('S');
-    clearConsole(true);
+    cmd_buffer[0] = netOptions.create(sv::get_string, sv::clear_console);
     writeBuffer();
+}
+
+void ChatGuestPage::registrationPage(std::string message)
+{
+    page_text = "INPUT_REGISTRATION_PAGE";
+    std::string str;
+    str = message + "Введите имя, логин и пароль разделив их двоеточием (имя:логин:пароль).\n"
+                    "Введите команду: ";
+    Misc::writeStringBuffer(str, data_buffer);
+    cmd_buffer[0] = netOptions.create(sv::get_string);
+    writeBuffer();
+}
+
+void ChatGuestPage::validateRegistration()
+{
+    std::vector<std::string> name_login_pass = Misc::stringExplode(cmd_text, ":");
+    if (name_login_pass.size() != 3)
+    {
+        registrationPage("Вы ввели неверные данные\n");
+        return;
+    }
+
+    std::shared_ptr<User> user = usersDB.getUserByLogin(name_login_pass[1]);
+    if (user != nullptr)
+    {
+        registrationPage("Логин " + name_login_pass[1] + " занят\n");
+        return;
+    }
+
+    if (user == nullptr)
+    {
+        user = usersDB.addUser(name_login_pass[1], name_login_pass[0], name_login_pass[2]);
+        session_key = Misc::getRandomKey();
+        user->setSessionKey(session_key);
+        login = user->getLogin();
+        std::string str;
+        page_text = "MAIN_PAGE";
+        str = "Вы успешно зарегистрировались и авторизовались в чате.\n"
+              "Введите команду /chat: ";
+        Misc::writeStringBuffer(str, data_buffer);
+        cmd_buffer[0] = netOptions.create(sv::get_string, sv::clear_console, sv::write_session);
+        Misc::writeUlongBuffer(session_key, cmd_buffer, 2);
+        writeBuffer();
+    }
 }

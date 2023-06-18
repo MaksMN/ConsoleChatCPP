@@ -60,6 +60,7 @@ void ServerHandler::Run()
     // Запишем в буфер данные на случай если при обработке данные не изменятся.
     Misc::writeStringBuffer("Вы ввели неизвестную команду.\nВведите команду: ", data_buffer);
 
+    /* Общие команды чата, которые срабатывают в любом месте */
     if (cmd_text == "/hello")
     {
         Misc::writeStringBuffer("Привет, " + login + "! Я сервер, я живой.\nВведите команду: ", data_buffer);
@@ -81,11 +82,16 @@ void ServerHandler::Run()
         return;
     }
 
+    // это позволяет игнорировать произвольный ввод и реагировать только на команды
     if (page_text == "MAIN_PAGE" && cmd_text != "/chat")
         return;
     if (cmd_text == "/chat")
+    {
         page_text == "MAIN_PAGE";
+        writeBuffer(login, page_text, cmd_text);
+    }
 
+    /* Авторизация и регистрация */
     user = usersDB.getUserByLogin(login);
     if ((user != nullptr && user->getSessionKey() != session_key) || user == nullptr)
     {
@@ -100,6 +106,9 @@ void ServerHandler::Run()
         return;
     }
 
+    /* Команды чата которые срабатывают если пользователь авторизован */
+
+    // закрыть сервер (только админ)
     if (cmd_text.compare("/sv_quit") == 0)
     {
         if (user != nullptr && user->isAdmin())
@@ -112,6 +121,13 @@ void ServerHandler::Run()
             Misc::writeStringBuffer("Вы ввели команду доступную только администраторам.\nВведите команду: ", data_buffer);
             clearConsole(false);
         }
+        return;
+    }
+
+    // главная страница чата
+    if (page_text == "MAIN_PAGE" && cmd_text == "/chat")
+    {
+        Misc::writeStringBuffer("Это типа главная страница авторизованного пользователя. ", data_buffer);
         return;
     }
 
@@ -138,10 +154,20 @@ void ServerHandler::quit()
 
 void ServerHandler::clearConsole(bool status)
 {
-    cmd_buffer[1] = status;
+    if (status)
+    {
+        cmd_buffer[0] = netOptions.add(cmd_buffer[0], sv::clear_console);
+    }
+    else
+    {
+        cmd_buffer[0] = netOptions.remove(cmd_buffer[0], sv::clear_console);
+    }
 }
 
-void ServerHandler::inputClient(char input)
+void ServerHandler::writeBuffer(std::string &login, std::string &page_text, std::string &cmd_text)
 {
-    cmd_buffer[0] = input;
+    // Динамические данные
+    Misc::writeStringBuffer(login, cmd_buffer, 10);
+    Misc::writeStringBuffer(page_text, cmd_buffer, Misc::findDynamicData(cmd_buffer, 10, 1));
+    Misc::writeStringBuffer(cmd_text, cmd_buffer, Misc::findDynamicData(cmd_buffer, 10, 2));
 }

@@ -1,5 +1,6 @@
 #pragma once
 #include "../../Misc/Misc.h"
+#include "../../Misc/NetworkOptions.h"
 #include <vector>
 #include <string>
 
@@ -45,19 +46,13 @@ private:
 
     bool work = true;
 
+    NetworkOptions netOptions;
+
 public:
     ClientHandler(char (&_data_buffer)[DATA_BUFFER], char (&_cmd_buffer)[CMD_BUFFER]);
     ~ClientHandler() = default;
     void Initialise();
     void Run();
-
-    /// @brief Дает команду клиенту очистить консоль
-    /// @param status
-    void clearConsole(bool status = true);
-
-    /// @brief Тип ввода на клиенте
-    /// @param input I - число; S - строка;
-    void inputClient(char input = 'S');
 
     /// @brief Получает статус работы сервера;
     /// @return

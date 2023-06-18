@@ -49,8 +49,10 @@ public:
     bool hasFlag(int sourceFlags, int flag);
 
     T removeFlag(T sourceFlags, int flag);
+    T removeFlag(T &sourceFlags, int &flag);
 
     T addFlag(T sourceFlags, int flag);
+    T addFlag(T &sourceFlags, int &flag);
 };
 
 template <typename T>
@@ -96,7 +98,19 @@ inline T Flags<T>::removeFlag(T sourceFlags, int flag)
 }
 
 template <typename T>
+inline T Flags<T>::removeFlag(T &sourceFlags, int &flag)
+{
+    return (T)(sourceFlags & ~flag);
+}
+
+template <typename T>
 inline T Flags<T>::addFlag(T sourceFlags, int flag)
+{
+    return (T)(sourceFlags | flag);
+}
+
+template <typename T>
+inline T Flags<T>::addFlag(T &sourceFlags, int &flag)
 {
     return (T)(sourceFlags | flag);
 }

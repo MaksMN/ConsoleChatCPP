@@ -7,6 +7,7 @@
 #include "../../DB/Headers.h"
 #include "IChatInterface.h"
 #include "ChatGuestPage.h"
+#include "../../Misc/NetworkOptions.h"
 
 #define DATA_BUFFER 4096 // Размер буфера для данных
 #define CMD_BUFFER 1024  // Размер буфера команд и заголовков
@@ -27,6 +28,7 @@ private:
     std::shared_ptr<User> user;
 
     bool work = true;
+    NetworkOptions netOptions;
 
 public:
     ServerHandler(char (&_data_buffer)[DATA_BUFFER], char (&_cmd_buffer)[CMD_BUFFER]);
@@ -45,7 +47,5 @@ public:
     /// @param status
     void clearConsole(bool status = true);
 
-    /// @brief Тип ввода на клиенте
-    /// @param input I - число; S - строка;
-    void inputClient(char input = 'S');
+    void writeBuffer(std::string &login, std::string &page_text, std::string &cmd_text);
 };
