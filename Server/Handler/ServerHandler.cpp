@@ -19,41 +19,30 @@ void ServerHandler::InitialiseDB()
 
 void ServerHandler::Run()
 {
-    /*
+    auto session_key = buffer.getSessionKey();
 
-    Командный пакет
-    |Запрос у клиента I/S (1)|clear 0-1 (1)|session_key (8)|login_size(4)|login|page_size(4)|PAGE_TEXT|cmd_size(4)|CMD_TEXT|
-    0                        1             2               10                  1                      2
-    |  static                                              | dynamic
-    Запрос у клиента: I - число S - строка
-    Если ожидается ввод числа, записываем его в блок cmd_size
-
-    */
-
-    auto session_key = Misc::getLong(cmd_buffer, 2);
-
-    auto login_size = Misc::getInt(cmd_buffer, 10);
-    if (login_size >= CMD_BUFFER)
+    auto login_size = buffer.getDynDataSize(LOGIN_COUNT);
+    if (login_size >= CMD_BUFFER || login_size == 0)
     {
         badRequest();
         return;
     }
 
-    auto page_pos = Misc::findDynamicData(cmd_buffer, 10, 1);
-    if (page_pos == 0)
+    auto page_size = buffer.getDynDataSize(PAGE_TEXT_COUNT);
+    if (page_size == 0 || page_size >= CMD_BUFFER)
     {
         badRequest();
         return;
     }
 
-    auto cmd_pos = Misc::findDynamicData(cmd_buffer, 10, 2);
-    if (cmd_pos == 0)
+    auto cmd_size = buffer.getDynDataSize(CMD_TEXT_COUNT);
+    if (cmd_size == 0 || cmd_size >= CMD_BUFFER)
     {
         badRequest();
         return;
     }
 
-    auto login = Misc::getString(cmd_buffer, 10);
+    auto login = buffer.getDynData(LOGIN_COUNT);
     auto page_text = Misc::getString(cmd_buffer, page_pos);
     auto cmd_text = Misc::getString(cmd_buffer, cmd_pos);
 

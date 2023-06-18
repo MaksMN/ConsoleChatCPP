@@ -1,6 +1,6 @@
 #pragma once
 #include "../../Misc/Misc.h"
-#include "../../Misc/NetworkOptions.h"
+#include "../../Misc/BufferActions.h"
 #include <vector>
 #include <string>
 
@@ -46,7 +46,7 @@ private:
 
     bool work = true;
 
-    NetworkOptions netOptions;
+    BufferActions buffer{cmd_buffer};
 
 public:
     ClientHandler(char (&_data_buffer)[DATA_BUFFER], char (&_cmd_buffer)[CMD_BUFFER]);

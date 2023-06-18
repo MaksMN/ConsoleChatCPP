@@ -14,13 +14,12 @@ void ClientHandler::Initialise()
     }
 
     // Статические данные
-    cmd_buffer[0] = sv::get_string;
-    Misc::writeUlongBuffer(session_key, cmd_buffer, 2);
+    buffer.createFlags(sv::get_string);
+    cmd_buffer[DYN_DATA_PTR_ADDR] = DYN_DATA_ADDR;
+    buffer.setSessionKey(session_key);
 
     // Динамические данные
-    Misc::writeStringBuffer(login, cmd_buffer, 10);
-    Misc::writeStringBuffer("MAIN_PAGE", cmd_buffer, Misc::findDynamicData(cmd_buffer, 10, 1));
-    Misc::writeStringBuffer("NONE", cmd_buffer, Misc::findDynamicData(cmd_buffer, 10, 2));
+    buffer.writeDynData(login, "MAIN_PAGE", "NONE");
 
     std::string data =
         "Вы запустили клиент чата.\n"
@@ -33,24 +32,13 @@ void ClientHandler::Initialise()
 
 void ClientHandler::Run()
 {
-    /*
-
-    Командный пакет
-    |флаги(1)|NONE(1)|session_key (8)|login_size(4)|login|page_size(4)|PAGE_TEXT|cmd_size(4)|CMD_TEXT|
-    0        1       2               10                  1                      2
-    |  static                        | dynamic
-
-
-    */
-
-    if (netOptions.is(cmd_buffer[0], sv::clear_console))
+    if (buffer.hasFlag(sv::clear_console))
         system(clear);
-    cmd_buffer[0] = netOptions.remove(cmd_buffer[0], sv::clear_console);
+    buffer.removeFlag(sv::clear_console);
 
-    if (netOptions.is(cmd_buffer[0], sv::write_session))
+    if (buffer.hasFlag(sv::write_session))
     {
-        session_key = Misc::getLong(cmd_buffer, 2);
-        Misc::writeUlongBuffer(session_key, cmd_buffer, 2);
+        session_key = buffer.getSessionKey();
     }
 
     if (Misc::getInt(data_buffer) > DATA_BUFFER)
@@ -65,17 +53,15 @@ void ClientHandler::Run()
     // запишем в буфер текст который отобразится если сервер отвалится
     Misc::writeStringBuffer("Сервер не ответил на ваш запрос.\nВведите команду: ", data_buffer);
 
-    uint cmd_pos = Misc::findDynamicData(cmd_buffer, 10, 2);
-
-    if (netOptions.is(cmd_buffer[0], sv::get_int))
+    if (buffer.hasFlag(sv::get_int))
     {
         uint n = userInputInt.getThroughIO();
-        Misc::writeIntBuffer(n, cmd_buffer, cmd_pos);
+        buffer.writeDynDataPos(n, CMD_TEXT_COUNT);
     }
     else
     {
         std::string s = userInputStr.getStringIO();
-        Misc::writeStringBuffer(s, cmd_buffer, cmd_pos);
+        buffer.writeDynDataPos(s, CMD_TEXT_COUNT);
 
         if (s == "/quit")
         {

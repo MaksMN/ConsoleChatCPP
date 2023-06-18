@@ -64,8 +64,8 @@ namespace Misc
 
     /// @brief Ищет позицию блока динамических данных в буфере
     /// @param buffer
-    /// @param offset
-    /// @param offset_data
+    /// @param offset Адрес блока динамических данных
+    /// @param offset_data Номер блока динамических данных
     /// @return
     uint findDynamicData(char buffer[], uint offset = 0, uint offset_data = 0, uint max_size = 1024);
 
