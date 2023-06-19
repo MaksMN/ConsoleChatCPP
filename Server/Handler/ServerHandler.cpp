@@ -73,7 +73,7 @@ void ServerHandler::Run()
 
     /* Авторизация и регистрация */
     user = usersDB.getUserByLogin(login);
-    if ((user != nullptr && user->getSessionKey() != session_key) || user == nullptr)
+    if ((user != nullptr && user->getSessionKey() != session_key && session_key != 0) || user == nullptr)
     {
         user = nullptr;
         login = "Guest";
@@ -81,12 +81,18 @@ void ServerHandler::Run()
 
     if (user == nullptr)
     {
-        // это позволяет игнорировать произвольный ввод и реагировать только на команды
-        if ((cmd_text == "/chat") || (cmd_text == "reg") || (cmd_text == "login"))
-        {
-            ChatGuestPage guestPage{pubMessagesDB, privMessagesDB, complaintsDB, usersDB, page_text, cmd_text, login, session_key, data_buffer, cmd_buffer};
-            guestPage.run();
-        }
+        ChatGuestPage guestPage{pubMessagesDB,
+                                privMessagesDB,
+                                complaintsDB,
+                                usersDB,
+                                page_text,
+                                cmd_text,
+                                login,
+                                session_key,
+                                data_buffer,
+                                cmd_buffer};
+        guestPage.run();
+
         return;
     }
 
@@ -108,6 +114,17 @@ void ServerHandler::Run()
         return;
     }
 
+    // Выйти
+    if (cmd_text == "/logout")
+    {
+        user->setSessionKey(0);
+        buffer.setSessionKey(Misc::getRandomKey());
+        buffer.createFlags(sv::get_string, sv::clear_console, sv::write_session);
+        buffer.writeDynData("Guest", "MAIN_PAGE", "/login");
+        Misc::writeStringBuffer("Вы вышли из чата. Введите команду /chat: ", data_buffer);
+        return;
+    }
+
     // главная страница чата
     if (page_text == "MAIN_PAGE" && cmd_text == "/chat")
     {
@@ -123,7 +140,8 @@ void ServerHandler::Run()
 
 void ServerHandler::badRequest()
 {
-    Misc::writeStringBuffer("Что-то пошло не так. На сервер пришли данные неверной длинны.", data_buffer);
+    Misc::writeStringBuffer("Сообщение от сервера: Что-то пошло не так. На сервер пришли данные неверной длинны.", data_buffer);
+    Misc::writeStringBuffer("BAD_REQUEST", cmd_buffer, 0, false);
 }
 
 bool ServerHandler::getWork()

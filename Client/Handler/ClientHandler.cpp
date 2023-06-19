@@ -41,9 +41,18 @@ void ClientHandler::Run()
         session_key = buffer.getSessionKey();
     }
 
-    if (Misc::getInt(data_buffer) > DATA_BUFFER)
+    if (Misc::getInt(data_buffer) > DATA_BUFFER || Misc::getString(cmd_buffer, 11, 0) == "BAD_REQUEST")
     {
-        Misc::printMessage("Что-то пошло не так. От сервера пришли данные неверной длинны.", false);
+        Misc::printMessage("Сообщение от клиента: ", true);
+        Misc::printMessage("Что-то пошло не так. От сервера пришли данные неверной длинны.", true);
+        Misc::printMessage("Мы попробуем восстановить сессию но возможно она будет сброшена.", true);
+        Misc::printMessage("В будущем мы попробуем научить чат более корректно реагировать на сбои сервера.", true);
+        Misc::printMessage("Введите команду /chat, чтобы продолжить: ", true);
+
+        buffer.createFlags(sv::get_string);
+        cmd_buffer[DYN_DATA_PTR_ADDR] = DYN_DATA_ADDR;
+        buffer.setSessionKey(session_key);
+        buffer.writeDynData(login, "MAIN_PAGE", "NONE");
     }
     else
     {
@@ -53,6 +62,7 @@ void ClientHandler::Run()
     // запишем в буфер текст который отобразится если сервер отвалится
     Misc::writeStringBuffer("Сервер не ответил на ваш запрос.\nВведите команду: ", data_buffer);
 
+    // пишем ответ серверу
     if (buffer.hasFlag(sv::get_int))
     {
         uint n = userInputInt.getThroughIO();
@@ -61,7 +71,14 @@ void ClientHandler::Run()
     else
     {
         std::string s = userInputStr.getStringIO();
-        buffer.writeDynDataPos(s, CMD_TEXT_COUNT);
+        if (s.size() == 0)
+        {
+            buffer.writeDynDataPos("NONE", CMD_TEXT_COUNT);
+        }
+        else
+        {
+            buffer.writeDynDataPos(s, CMD_TEXT_COUNT);
+        }
 
         if (s == "/quit")
         {

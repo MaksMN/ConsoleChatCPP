@@ -53,6 +53,15 @@ std::string Misc::getString(char buffer[], uint offset)
     return s;
 }
 
+std::string Misc::getString(char buffer[], uint len, uint offset)
+{
+    char buf[len];
+    for (int i{0}; i < len; i++)
+        buf[i] = buffer[offset++];
+    std::string s(buf, len);
+    return s;
+}
+
 void Misc::writeIntBuffer(uint num, char buffer[], uint offset)
 {
     mempcpy(&buffer[offset], &num, 4);

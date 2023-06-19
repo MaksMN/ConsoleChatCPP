@@ -44,6 +44,13 @@ namespace Misc
     /// @return
     std::string getString(char buffer[], uint offset = 0);
 
+    /// @brief Читает строку из буфера. Чтение начинается с offset на длину len.
+    /// @param buffer
+    /// @param len
+    /// @param offset
+    /// @return
+    std::string getString(char buffer[], uint len, uint offset);
+
     /// @brief Записывает int в буфер
     /// @param num
     /// @param buffer

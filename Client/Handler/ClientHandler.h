@@ -27,18 +27,8 @@ private:
     char (&data_buffer)[DATA_BUFFER];
     char (&cmd_buffer)[CMD_BUFFER];
 
-    std::string pageText = "MAIN_PAGE";
-    uint pagePos;
-    uint pageSize = 9;
-
-    std::string dataText;
-
-    std::string cmdText = "HELLO";
-    uint cmdPos;
-    uint cmdSize = 5;
-
     ullong session_key = 0;
-    uint login_size = 5;
+
     std::string login = "Guest";
 
     UserInput<int, int> userInputInt;

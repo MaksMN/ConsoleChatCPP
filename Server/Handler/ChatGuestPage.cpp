@@ -24,7 +24,7 @@ ChatGuestPage::ChatGuestPage(DBmessages &_pubMessagesDB,
 void ChatGuestPage::run()
 {
     // если пользователь выбрал login
-    if (page_text.compare("GUEST_PAGE") == 0 && cmd_text.compare("login") == 0)
+    if (page_text.compare("GUEST_PAGE") == 0 && cmd_text.compare("/login") == 0)
     {
         loginPage();
         return;
@@ -38,7 +38,7 @@ void ChatGuestPage::run()
     }
 
     // если пользователь выбрал login
-    if (page_text.compare("GUEST_PAGE") == 0 && cmd_text.compare("reg") == 0)
+    if (page_text.compare("GUEST_PAGE") == 0 && cmd_text.compare("/reg") == 0)
     {
         registrationPage();
         return;
@@ -58,12 +58,22 @@ void ChatGuestPage::run()
 
 void ChatGuestPage::offerRegisterOrLogin(std::string message)
 {
+    std::set<std::string> commands;
+    commands.emplace("/chat");
+    commands.emplace("/login");
+    commands.emplace("/reg");
+    commands.emplace("/logout");
+
+    cmd_text = buffer.getDynDataS(CMD_TEXT_COUNT);
+    if (!commands.contains(cmd_text))
+        return;
+
     page_text = "GUEST_PAGE";
     std::string str;
     str = message + "Вы не авторизованы.\n"
                     "Доступные команды:\n"
-                    "login - авторизоваться;\n"
-                    "reg - зарегистрироваться;\n"
+                    "/login - авторизоваться;\n"
+                    "/reg - зарегистрироваться;\n"
                     "Введите команду: ";
     Misc::writeStringBuffer(str, data_buffer);
     buffer.addFlags(sv::get_string, sv::clear_console);
