@@ -80,13 +80,24 @@ void Misc::writeStringBuffer(std::string str, char buffer[], uint offset, bool a
 
 uint Misc::findDynamicData(char buffer[], uint offset, uint offset_data, uint max_size)
 {
-    for (uint i{0}; i < offset_data; i++)
+    uint size;
+    if (offset_data == 0)
     {
-        uint size = getInt(buffer, offset) + 4;
+        size = getInt(buffer, offset);
         if (size > max_size)
             return 0;
-        offset += size;
     }
+    else
+    {
+        for (uint i{0}; i < offset_data; i++)
+        {
+            size = getInt(buffer, offset);
+            if (size > max_size)
+                return 0;
+            offset += size + 4;
+        }
+    }
+
     return offset;
 }
 

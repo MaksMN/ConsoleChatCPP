@@ -93,28 +93,14 @@ void BufferActions::setPgEnd(uint value)
 
 uint BufferActions::getDynDataSize(uint blockCount)
 {
-    if (blockCount == 0)
-    {
-        return Misc::getInt(cmd_buffer, DYN_DATA_ADDR);
-    }
-    else
-    {
-        uint value = Misc::findDynamicData(cmd_buffer, DYN_DATA_ADDR, blockCount);
-        if (value == 0)
-            return value;
-        return Misc::getInt(cmd_buffer, value);
-    }
+    return Misc::findDynamicData(cmd_buffer, DYN_DATA_ADDR, blockCount);
 }
 
 std::string BufferActions::getDynData(uint blockCount)
 {
-    if (blockCount == 0)
-    {
-         Misc::getInt(cmd_buffer, DYN_DATA_ADDR);
-    }
-    uint value = Misc::findDynamicData(cmd_buffer, DYN_DATA_ADDR, blockCount);
-    if (value == 0)
+    uint addr = Misc::findDynamicData(cmd_buffer, DYN_DATA_ADDR, blockCount);
+    if (addr == 0)
         return "Запрошены данные за пределом буфера";
 
-    return Misc::getString(cmd_buffer, value);
+    return Misc::getString(cmd_buffer, addr);
 }
