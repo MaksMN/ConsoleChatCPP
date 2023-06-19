@@ -71,15 +71,6 @@ void ServerHandler::Run()
         return;
     }
 
-    // это позволяет игнорировать произвольный ввод и реагировать только на команды
-    if (page_text == "MAIN_PAGE" && cmd_text != "/chat")
-        return;
-    if (cmd_text == "/chat")
-    {
-        page_text == "MAIN_PAGE";
-        buffer.writeDynData(login, page_text, cmd_text);
-    }
-
     /* Авторизация и регистрация */
     user = usersDB.getUserByLogin(login);
     if ((user != nullptr && user->getSessionKey() != session_key) || user == nullptr)
@@ -90,8 +81,12 @@ void ServerHandler::Run()
 
     if (user == nullptr)
     {
-        ChatGuestPage guestPage{pubMessagesDB, privMessagesDB, complaintsDB, usersDB, page_text, cmd_text, login, session_key, data_buffer, cmd_buffer};
-        guestPage.run();
+        // это позволяет игнорировать произвольный ввод и реагировать только на команды
+        if ((cmd_text == "/chat") || (cmd_text == "reg") || (cmd_text == "login"))
+        {
+            ChatGuestPage guestPage{pubMessagesDB, privMessagesDB, complaintsDB, usersDB, page_text, cmd_text, login, session_key, data_buffer, cmd_buffer};
+            guestPage.run();
+        }
         return;
     }
 
