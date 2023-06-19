@@ -115,7 +115,8 @@ public:
 
     uint getDynDataSize(uint blockCount);
 
-    std::string getDynData(uint blockCount);
+    std::string getDynDataS(uint blockCount);
+    uint getDynDataI(uint blockCount);
 };
 
 /// @brief Добавляет в буфер флаги, очищает буфер флагов
@@ -171,14 +172,8 @@ inline void BufferActions::addFlags(T value, Args... args)
 template <typename T, typename... Args>
 inline void BufferActions::writeDynData(T value, Args... args)
 {
-    if (dyndata_count == 0)
-    {
-        Misc::writeStringBuffer(value, cmd_buffer, DYN_DATA_ADDR);
-    }
-    if (dyndata_count > 0)
-    {
-        Misc::writeStringBuffer(value, cmd_buffer, Misc::findDynamicData(cmd_buffer, DYN_DATA_ADDR, dyndata_count));
-    }
+
+    Misc::writeStringBuffer(value, cmd_buffer, Misc::findDynamicData(cmd_buffer, DYN_DATA_ADDR, dyndata_count));
     dyndata_count++;
     writeDynData(args...);
     dyndata_count = 0;

@@ -14,26 +14,12 @@ bool BufferActions::hasFlag(sv::options option)
 
 void BufferActions::writeDynDataPos(std::string data, uint blockCount)
 {
-    if (blockCount == 0)
-    {
-        Misc::writeStringBuffer(data, cmd_buffer, DYN_DATA_ADDR);
-    }
-    else
-    {
-        Misc::writeStringBuffer(data, cmd_buffer, Misc::findDynamicData(cmd_buffer, DYN_DATA_ADDR, blockCount));
-    }
+    Misc::writeStringBuffer(data, cmd_buffer, Misc::findDynamicData(cmd_buffer, DYN_DATA_ADDR, blockCount));
 }
 
 void BufferActions::writeDynDataPos(uint value, uint blockCount)
 {
-    if (blockCount == 0)
-    {
-        Misc::writeIntBuffer(value, cmd_buffer, DYN_DATA_ADDR);
-    }
-    else
-    {
-        Misc::writeIntBuffer(value, cmd_buffer, Misc::findDynamicData(cmd_buffer, DYN_DATA_ADDR, blockCount));
-    }
+    Misc::writeIntBuffer(value, cmd_buffer, Misc::findDynamicData(cmd_buffer, DYN_DATA_ADDR, blockCount));
 }
 
 char BufferActions::getDynDataAddr()
@@ -93,14 +79,26 @@ void BufferActions::setPgEnd(uint value)
 
 uint BufferActions::getDynDataSize(uint blockCount)
 {
-    return Misc::findDynamicData(cmd_buffer, DYN_DATA_ADDR, blockCount);
+    uint addr = Misc::findDynamicData(cmd_buffer, DYN_DATA_ADDR, blockCount);
+    if (addr == 0)
+        return addr;
+    return Misc::getInt(cmd_buffer, addr);
 }
 
-std::string BufferActions::getDynData(uint blockCount)
+std::string BufferActions::getDynDataS(uint blockCount)
 {
     uint addr = Misc::findDynamicData(cmd_buffer, DYN_DATA_ADDR, blockCount);
     if (addr == 0)
         return "Запрошены данные за пределом буфера";
 
     return Misc::getString(cmd_buffer, addr);
+}
+
+uint BufferActions::getDynDataI(uint blockCount)
+{
+    uint addr = Misc::findDynamicData(cmd_buffer, DYN_DATA_ADDR, blockCount);
+    if (addr == 0)
+        return addr;
+
+    return Misc::getInt(cmd_buffer, addr);
 }
