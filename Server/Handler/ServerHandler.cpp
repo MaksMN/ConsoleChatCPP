@@ -42,9 +42,9 @@ void ServerHandler::Run()
         return;
     }
 
-    auto login = buffer.getDynData(LOGIN_COUNT);
-    auto page_text = Misc::getString(cmd_buffer, page_pos);
-    auto cmd_text = Misc::getString(cmd_buffer, cmd_pos);
+    auto login = buffer.getDynDataS(LOGIN_COUNT);
+    auto page_text = buffer.getDynDataS(PAGE_TEXT_COUNT);
+    auto cmd_text = buffer.getDynDataS(CMD_TEXT_COUNT);
 
     // Запишем в буфер данные на случай если при обработке данные не изменятся.
     Misc::writeStringBuffer("Вы ввели неизвестную команду.\nВведите команду: ", data_buffer);
@@ -77,7 +77,7 @@ void ServerHandler::Run()
     if (cmd_text == "/chat")
     {
         page_text == "MAIN_PAGE";
-        writeBuffer(login, page_text, cmd_text);
+        buffer.writeDynData(login, page_text, cmd_text);
     }
 
     /* Авторизация и регистрация */
@@ -145,18 +145,10 @@ void ServerHandler::clearConsole(bool status)
 {
     if (status)
     {
-        cmd_buffer[0] = netOptions.add(cmd_buffer[0], sv::clear_console);
+        buffer.addFlags(sv::clear_console);
     }
     else
     {
-        cmd_buffer[0] = netOptions.remove(cmd_buffer[0], sv::clear_console);
+        buffer.removeFlag(sv::clear_console);
     }
-}
-
-void ServerHandler::writeBuffer(std::string &login, std::string &page_text, std::string &cmd_text)
-{
-    // Динамические данные
-    Misc::writeStringBuffer(login, cmd_buffer, 10);
-    Misc::writeStringBuffer(page_text, cmd_buffer, Misc::findDynamicData(cmd_buffer, 10, 1));
-    Misc::writeStringBuffer(cmd_text, cmd_buffer, Misc::findDynamicData(cmd_buffer, 10, 2));
 }

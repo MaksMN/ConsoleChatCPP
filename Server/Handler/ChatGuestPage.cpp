@@ -66,8 +66,8 @@ void ChatGuestPage::offerRegisterOrLogin(std::string message)
                     "reg - зарегистрироваться;\n"
                     "Введите команду: ";
     Misc::writeStringBuffer(str, data_buffer);
-    cmd_buffer[0] = netOptions.create(sv::get_string, sv::clear_console);
-    writeBuffer();
+    buffer.addFlags(sv::get_string, sv::clear_console);
+    buffer.writeDynData(login, page_text, cmd_text);
 }
 
 void ChatGuestPage::loginPage(std::string message)
@@ -77,8 +77,8 @@ void ChatGuestPage::loginPage(std::string message)
     str = message + "Введите логин и пароль разделив их двоеточием (логин:пароль).\n"
                     "Введите команду: ";
     Misc::writeStringBuffer(str, data_buffer);
-    cmd_buffer[0] = netOptions.create(sv::get_string);
-    writeBuffer();
+    buffer.createFlags(sv::get_string);
+    buffer.writeDynData(login, page_text, cmd_text);
 }
 
 void ChatGuestPage::validateLogin()
@@ -110,8 +110,8 @@ void ChatGuestPage::validateLogin()
     str = "Вы успешно авторизовались в чате.\n"
           "Введите команду /chat: ";
     Misc::writeStringBuffer(str, data_buffer);
-    cmd_buffer[0] = netOptions.create(sv::get_string, sv::clear_console);
-    writeBuffer();
+    buffer.createFlags(sv::get_string, sv::clear_console);
+    buffer.writeDynData(login, page_text, cmd_text);
 }
 
 void ChatGuestPage::registrationPage(std::string message)
@@ -121,8 +121,8 @@ void ChatGuestPage::registrationPage(std::string message)
     str = message + "Введите имя, логин и пароль разделив их двоеточием (имя:логин:пароль).\n"
                     "Введите команду: ";
     Misc::writeStringBuffer(str, data_buffer);
-    cmd_buffer[0] = netOptions.create(sv::get_string);
-    writeBuffer();
+    buffer.createFlags(sv::get_string);
+    buffer.writeDynData(login, page_text, cmd_text);
 }
 
 void ChatGuestPage::validateRegistration()
@@ -152,8 +152,8 @@ void ChatGuestPage::validateRegistration()
         str = "Вы успешно зарегистрировались и авторизовались в чате.\n"
               "Введите команду /chat: ";
         Misc::writeStringBuffer(str, data_buffer);
-        cmd_buffer[0] = netOptions.create(sv::get_string, sv::clear_console, sv::write_session);
-        Misc::writeUlongBuffer(session_key, cmd_buffer, 2);
-        writeBuffer();
+        buffer.createFlags(sv::get_string, sv::clear_console, sv::write_session);
+        buffer.setSessionKey(session_key);
+        buffer.writeDynData(login, page_text, cmd_text);
     }
 }

@@ -20,11 +20,3 @@ IChatInterface::IChatInterface(DBmessages &_pubMessagesDB,
       session_key(_session_key),
       data_buffer(_data_buffer),
       cmd_buffer(_cmd_buffer) {}
-
-void IChatInterface::writeBuffer()
-{
-  // Динамические данные
-  Misc::writeStringBuffer(login, cmd_buffer, 10);
-  Misc::writeStringBuffer(page_text, cmd_buffer, Misc::findDynamicData(cmd_buffer, 10, 1));
-  Misc::writeStringBuffer(cmd_text, cmd_buffer, Misc::findDynamicData(cmd_buffer, 10, 2));
-}

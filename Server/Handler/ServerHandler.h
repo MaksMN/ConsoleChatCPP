@@ -46,6 +46,4 @@ public:
     /// @brief Дает команду клиенту очистить консоль
     /// @param status
     void clearConsole(bool status = true);
-
-    void writeBuffer(std::string &login, std::string &page_text, std::string &cmd_text);
 };

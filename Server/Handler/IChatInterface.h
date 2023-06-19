@@ -26,7 +26,7 @@ protected:
     std::string &login;
     ullong &session_key;
 
-    NetworkOptions netOptions;
+    BufferActions buffer{cmd_buffer};
 
 public:
     virtual ~IChatInterface() = default;
@@ -41,6 +41,4 @@ public:
                    char (&_data_buffer)[DATA_BUFFER],
                    char (&_cmd_buffer)[CMD_BUFFER]);
     virtual void run() = 0;
-
-    void writeBuffer();
 };
