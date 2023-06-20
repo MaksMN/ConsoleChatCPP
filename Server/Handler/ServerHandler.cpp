@@ -19,8 +19,7 @@ void ServerHandler::InitialiseDB()
 
 void ServerHandler::Run()
 {
-    auto session_key = buffer.getSessionKey();
-
+    /* проверка данных буфера */
     auto login_size = buffer.getDynDataSize(LOGIN_COUNT);
     if (login_size >= CMD_BUFFER || login_size == 0)
     {
@@ -42,14 +41,22 @@ void ServerHandler::Run()
         return;
     }
 
+    /* получение данных из буфера */
     auto login = buffer.getDynDataS(LOGIN_COUNT);
     auto page_text = buffer.getDynDataS(PAGE_TEXT_COUNT);
     auto cmd_text = buffer.getDynDataS(CMD_TEXT_COUNT);
+    auto session_key = buffer.getSessionKey();
 
     // Запишем в буфер данные на случай если при обработке данные не изменятся.
     Misc::writeStringBuffer("Вы ввели неизвестную команду.\nВведите команду: ", data_buffer);
 
-    /* Общие команды чата, которые срабатывают в любом месте */
+    /* Общие команды чата, которые срабатывают в любом месте для всех */
+    if (cmd_text == "/chat")
+    {
+        buffer.writeDynData(login, MAIN_PAGE, CHAT);
+        page_text = MAIN_PAGE;
+    }
+
     if (cmd_text == "/hello")
     {
         Misc::writeStringBuffer("Привет, " + login + "! Я сервер, я живой.\nВведите команду: ", data_buffer);
@@ -59,19 +66,25 @@ void ServerHandler::Run()
     if (cmd_text == "/help")
     {
         std::string str =
+            "\nКоманды, которые можно вызвать в любое время:\n"
             "Команда /chat - перейти на главную страницу из любого раздела;\n"
-            "Команда /help - справка;\n"
             "Команда /hello - опрос сервера;\n"
-            "Команда /logout - выйти;\n"
-            "Команда /quit - закрыть программу;\n"
-            "Команды администратора:"
-            "Команда /sv_quit - завершить работу сервера;\n";
+            "Команда /help - справка;\n"
+            "Команда /quit - закрыть клиент;\n"
+            "\n"
+            "Команды, которые можно вызвать в любое время авторизованным пользователям:\n"
+            "Команда /logout - выйти из чата;\n"
+            "Команда /sv_quit - (admin)завершить работу сервера;\n";
         Misc::writeStringBuffer(str + "\nВведите команду: ", data_buffer);
         clearConsole(false);
         return;
     }
 
+    /* проверка соответствия команд карте чата */
+    if (!chatMap.checkPage(page_text, cmd_text))
+        return;
     /* Авторизация и регистрация */
+    /* Сюда попадает любой неавторизованный пользователь */
     user = usersDB.getUserByLogin(login);
     if ((user != nullptr && user->getSessionKey() != session_key && session_key != 0) || user == nullptr)
     {
@@ -133,7 +146,7 @@ void ServerHandler::Run()
     }
 
     // Запишем в буфер данные если ни одна из команд не попала под условия обработки.
-    Misc::writeStringBuffer("Не найдена страница для вашей команды.\nВведите команду: ", data_buffer);
+    Misc::writeStringBuffer("Не найдена страница для вашей команды.\nВведите команду /chat: ", data_buffer);
     clearConsole(false);
     return;
 }

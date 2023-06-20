@@ -3,11 +3,14 @@
 #include <cstring>
 #include <memory>
 #include <vector>
+#include <map>
+#include <set>
 #include "../../Misc/Misc.h"
 #include "../../DB/Headers.h"
 #include "IChatInterface.h"
 #include "ChatGuestPage.h"
 #include "../../Misc/BufferActions.h"
+#include "ServerChatMap.h"
 
 #define DATA_BUFFER 4096 // Размер буфера для данных
 #define CMD_BUFFER 1024  // Размер буфера команд и заголовков
@@ -29,6 +32,8 @@ private:
 
     bool work = true;
     BufferActions buffer{cmd_buffer};
+
+    ServerChatMap chatMap;
 
 public:
     ServerHandler(char (&_data_buffer)[DATA_BUFFER], char (&_cmd_buffer)[CMD_BUFFER]);

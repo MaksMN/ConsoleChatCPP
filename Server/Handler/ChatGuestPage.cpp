@@ -58,16 +58,6 @@ void ChatGuestPage::run()
 
 void ChatGuestPage::offerRegisterOrLogin(std::string message)
 {
-    std::set<std::string> commands;
-    commands.emplace("/chat");
-    commands.emplace("/login");
-    commands.emplace("/reg");
-    commands.emplace("/logout");
-
-    cmd_text = buffer.getDynDataS(CMD_TEXT_COUNT);
-    if (!commands.contains(cmd_text))
-        return;
-
     page_text = "GUEST_PAGE";
     std::string str;
     str = message + "Вы не авторизованы.\n"
