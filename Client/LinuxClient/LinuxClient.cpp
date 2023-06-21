@@ -7,7 +7,7 @@ struct sockaddr_in serveraddress;
 
 int client_socket(char server_address[], char port[])
 {
-    ClientHandler handler(data_buffer, cmd_buffer);
+    ClientHandler handler(cmd_buffer);
     handler.Initialise();
 
     // Укажем адрес сервера
@@ -41,8 +41,14 @@ int client_socket(char server_address[], char port[])
         // получение команды от сервера
         recvfrom(socket_descriptor, cmd_buffer, sizeof(cmd_buffer), 0, nullptr, nullptr);
 
-        // получение данных с сервера
-        recvfrom(socket_descriptor, data_buffer, sizeof(data_buffer), 0, nullptr, nullptr);
+        std::string data_text;
+        for (unsigned char i{0}; i < cmd_buffer[1]; i++)
+        {
+            // получение данных с сервера
+            recvfrom(socket_descriptor, data_buffer, sizeof(data_buffer), 0, nullptr, nullptr);
+            data_text += Misc::getString(data_buffer);
+        }
+        handler.setDataText(data_text);
     }
     // закрываем сокет, завершаем соединение
     close(socket_descriptor);

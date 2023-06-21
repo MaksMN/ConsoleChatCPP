@@ -23,13 +23,14 @@ typedef unsigned long long ullong;
 /*
 
     Командный пакет
-    |флаги(1)|DYN DATA(1)|session_key (8)|pg_mode(1)|pg_start(4)|pg_perPage(4)|pg_end(4)|login_size(4)|login|page_size(4)|PAGE_TEXT|cmd_size(4)|CMD_TEXT|
-    0        1           2               10         11          15            19        23
+    |флаги(1)|data packets (1)|session_key (8)|pg_mode(1)|pg_start(4)|pg_perPage(4)|pg_end(4)|login_size(4)|login|page_size(4)|PAGE_TEXT|cmd_size(4)|CMD_TEXT|
+    0        1                2               10         11          15            19        23
     |___________________________________________________________________________________|
     |                                  ^                                                |
     |                               static                                              |  dynamic
 
     1 байт указывает где находятся динамические данные, но пока эта концепция не нашла применения.
+    data packets - количество пакетов с текстом отправляемых клиенту
 */
 
 namespace sv
@@ -94,10 +95,6 @@ public:
     /// @param value
     /// @param blockCount
     void writeDynDataPos(uint value, uint blockCount);
-
-    /// @brief получает адрес начала блока динамических данных
-    /// @return
-    char getDynDataAddr();
 
     ullong getSessionKey();
     void setSessionKey(ullong key);

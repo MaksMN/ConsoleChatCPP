@@ -4,27 +4,14 @@ ChatPublicPage::ChatPublicPage(DBmessages &_pubMessagesDB,
                                DBmessages &_privMessagesDB,
                                DBcomplaints &_complaintsDB,
                                DBusers &_usersDB,
-                               std::string &_page_text,
-                               std::string &_cmd_text,
-                               std::string &_login,
-                               ullong &_session_key,
-                               char (&_data_buffer)[DATA_BUFFER],
+
                                char (&_cmd_buffer)[CMD_BUFFER])
     : IChatInterface(_pubMessagesDB,
                      _privMessagesDB,
                      _complaintsDB,
                      _usersDB,
-                     _page_text,
-                     _cmd_text,
-                     _login,
-                     _session_key,
-                     _data_buffer,
                      _cmd_buffer)
 {
-    pg_start = buffer.getPgStart();
-    pg_per_page = buffer.getPgPerPage();
-    pg_end = buffer.getPgEnd();
-    pg_mode = buffer.getPaginationMode();
 }
 
 void ChatPublicPage::run()
@@ -38,7 +25,7 @@ void ChatPublicPage::run()
         // если не авторизован, выбрасываем на главную
         buffer.createFlags(sv::clear_console, sv::get_string);
         buffer.writeDynData(login, MAIN_PAGE, NONE);
-        Misc::writeStringBuffer("Вы не авторизованы. Введите команду /chat: ", data_buffer);
+        data_text = "Вы не авторизованы. Введите команду /chat: ";
         return;
     }
 
@@ -81,16 +68,8 @@ void ChatPublicPage::run()
     data_text += "Вы: " + authorized_user->getData();
     data_text += commands_list;
 
-    if (data_text.size() > DATA_BUFFER - 4)
-    {
-        std::string cutText = "Воспользуйтесь командой /m чтобы прочитать предыдущие сообщения\n\n";
-        data_text = Misc::ltrimString(data_text, DATA_BUFFER - 4 - cutText.size());
-        data_text = cutText += data_text;
-    }
-
     buffer.createFlags(sv::get_string, sv::clear_console);
     buffer.writeDynData(login, PUBLIC_PAGE_INPUT, cmd_text);
-    Misc::writeStringBuffer(data_text, data_buffer);
 }
 
 bool ChatPublicPage::commandHandler()

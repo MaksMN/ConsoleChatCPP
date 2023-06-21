@@ -4,48 +4,40 @@ ChatGuestPage::ChatGuestPage(DBmessages &_pubMessagesDB,
                              DBmessages &_privMessagesDB,
                              DBcomplaints &_complaintsDB,
                              DBusers &_usersDB,
-                             std::string &_page_text,
-                             std::string &_cmd_text,
-                             std::string &_login,
-                             ullong &_session_key,
-                             char (&_data_buffer)[DATA_BUFFER],
                              char (&_cmd_buffer)[CMD_BUFFER])
     : IChatInterface(_pubMessagesDB,
                      _privMessagesDB,
                      _complaintsDB,
                      _usersDB,
-                     _page_text,
-                     _cmd_text,
-                     _login,
-                     _session_key,
-                     _data_buffer,
-                     _cmd_buffer) {}
+                     _cmd_buffer)
+{
+}
 
 void ChatGuestPage::run()
 {
     // если пользователь выбрал login
-    if (page_text.compare("GUEST_PAGE") == 0 && cmd_text.compare("/login") == 0)
+    if (page_text.compare(GUEST_PAGE) == 0 && cmd_text.compare(LOGIN) == 0)
     {
         loginPage();
         return;
     }
 
     // пользователь ввел данные на странице авторизации
-    if (page_text.compare("INPUT_LOGIN_PAGE") == 0)
+    if (page_text.compare(INPUT_LOGIN_PAGE) == 0)
     {
         validateLogin();
         return;
     }
 
     // если пользователь выбрал login
-    if (page_text.compare("GUEST_PAGE") == 0 && cmd_text.compare("/reg") == 0)
+    if (page_text.compare(GUEST_PAGE) == 0 && cmd_text.compare(REG) == 0)
     {
         registrationPage();
         return;
     }
 
     // пользователь ввел данные на странице авторизации
-    if (page_text.compare("INPUT_REGISTRATION_PAGE") == 0)
+    if (page_text.compare(INPUT_REGISTRATION_PAGE) == 0)
     {
         validateRegistration();
         return;
@@ -58,25 +50,25 @@ void ChatGuestPage::run()
 
 void ChatGuestPage::offerRegisterOrLogin(std::string message)
 {
-    page_text = "GUEST_PAGE";
+    page_text = GUEST_PAGE;
     std::string str;
     str = message + "Вы не авторизованы.\n"
                     "Доступные команды:\n"
                     "/login - авторизоваться;\n"
                     "/reg - зарегистрироваться;\n"
                     "Введите команду: ";
-    Misc::writeStringBuffer(str, data_buffer);
+    data_text = str;
     buffer.addFlags(sv::get_string, sv::clear_console);
     buffer.writeDynData(login, page_text, cmd_text);
 }
 
 void ChatGuestPage::loginPage(std::string message)
 {
-    page_text = "INPUT_LOGIN_PAGE";
+    page_text = INPUT_LOGIN_PAGE;
     std::string str;
     str = message + "Введите логин и пароль разделив их двоеточием (логин:пароль).\n"
                     "Введите команду: ";
-    Misc::writeStringBuffer(str, data_buffer);
+    data_text = str;
     buffer.createFlags(sv::get_string);
     buffer.writeDynData(login, page_text, cmd_text);
 }
@@ -105,23 +97,22 @@ void ChatGuestPage::validateLogin()
 
     user->setSessionKey(session_key);
     login = user->getLogin();
-    page_text = "PUBLIC_CHAT";
-    cmd_text = "/chat";
+    page_text = PUBLIC_PAGE;
+    cmd_text = CHAT;
     std::string str;
-    str = "Вы успешно авторизовались в чате.\n"
-          "Введите команду /chat: ";
-    Misc::writeStringBuffer(str, data_buffer);
-    buffer.createFlags(sv::get_string, sv::clear_console);
+    data_text = "Вы успешно авторизовались в чате.\n";
+
+    buffer.createFlags(sv::get_string, sv::clear_console, sv::no_input);
     buffer.writeDynData(login, page_text, cmd_text);
 }
 
 void ChatGuestPage::registrationPage(std::string message)
 {
-    page_text = "INPUT_REGISTRATION_PAGE";
+    page_text = INPUT_REGISTRATION_PAGE;
     std::string str;
     str = message + "Введите имя, логин и пароль разделив их двоеточием (имя:логин:пароль).\n"
                     "Введите команду: ";
-    Misc::writeStringBuffer(str, data_buffer);
+    data_text = str;
     buffer.createFlags(sv::get_string);
     buffer.writeDynData(login, page_text, cmd_text);
 }
@@ -149,12 +140,12 @@ void ChatGuestPage::validateRegistration()
         user->setSessionKey(session_key);
         login = user->getLogin();
         std::string str;
-        page_text = "PUBLIC_CHAT";
-        cmd_text = "/chat";
+        page_text = PUBLIC_PAGE;
+        cmd_text = CHAT;
         str = "Вы успешно зарегистрировались и авторизовались в чате.\n"
               "Введите команду /chat: ";
-        Misc::writeStringBuffer(str, data_buffer);
-        buffer.createFlags(sv::get_string, sv::clear_console, sv::write_session);
+        data_text = str;
+        buffer.createFlags(sv::get_string, sv::clear_console, sv::write_session, sv::no_input);
         buffer.setSessionKey(session_key);
         buffer.writeDynData(login, page_text, cmd_text);
     }

@@ -1,6 +1,6 @@
 #include "ClientHandler.h"
 
-ClientHandler::ClientHandler(char (&_data_buffer)[DATA_BUFFER], char (&_cmd_buffer)[CMD_BUFFER]) : data_buffer(_data_buffer), cmd_buffer(_cmd_buffer) {}
+ClientHandler::ClientHandler(char (&_cmd_buffer)[CMD_BUFFER]) : cmd_buffer(_cmd_buffer) {}
 
 void ClientHandler::Initialise()
 {
@@ -25,13 +25,12 @@ void ClientHandler::Initialise()
     // Динамические данные
     buffer.writeDynData(login, "MAIN_PAGE", "NONE");
 
-    std::string data =
+    data_text =
         "Вы запустили клиент чата.\n"
         "Введите команду /chat чтобы начать общение.\n"
         "Команда /help - справка.\n"
         "Команда /hello - опрос сервера.\n"
         "Введите команду: ";
-    Misc::writeStringBuffer(data, data_buffer);
 }
 
 void ClientHandler::Run()
@@ -45,33 +44,30 @@ void ClientHandler::Run()
         session_key = buffer.getSessionKey();
     }
 
-    if (Misc::getInt(data_buffer) > DATA_BUFFER || Misc::getString(cmd_buffer, 11, 0) == "BAD_REQUEST")
-    {
-        Misc::printMessage("Сообщение от клиента: ", true);
-        Misc::printMessage("Что-то пошло не так. От сервера пришли данные неверной длинны.", true);
-        Misc::printMessage("Мы попробуем восстановить сессию но возможно она будет сброшена.", true);
-        Misc::printMessage("В будущем мы попробуем научить чат более корректно реагировать на сбои сервера.", true);
-        Misc::printMessage("Введите команду /chat, чтобы продолжить: ", true);
+    // if (Misc::getInt(data_buffer) > DATA_BUFFER || Misc::getString(cmd_buffer, 11, 0) == "BAD_REQUEST")
+    // {
+    //     Misc::printMessage("Сообщение от клиента: ", true);
+    //     Misc::printMessage("Что-то пошло не так. От сервера пришли данные неверной длинны.", true);
+    //     Misc::printMessage("Сессия будет сброшена.", true);
+    //     Misc::printMessage("В будущем мы попробуем научить чат более корректно реагировать на сбои сервера.", true);
+    //     Misc::printMessage("Введите команду /chat, чтобы продолжить: ", true);
 
-        // Статические данные
-        buffer.createFlags(sv::get_string);
-        cmd_buffer[DYN_DATA_PTR_ADDR] = DYN_DATA_ADDR;
-        buffer.setSessionKey(session_key);
-        buffer.setPaginationMode(sv::last_page);
-        buffer.setPgPerPage(10);
-        buffer.setPgStart(0);
-        buffer.setPgEnd(0);
+    //     // Статические данные
+    //     buffer.setSessionKey(Misc::getRandomKey());
+    //     buffer.createFlags(sv::get_string);
+    //     cmd_buffer[DYN_DATA_PTR_ADDR] = DYN_DATA_ADDR;
+    //     buffer.setPaginationMode(sv::last_page);
+    //     buffer.setPgPerPage(10);
+    //     buffer.setPgStart(1);
+    //     buffer.setPgEnd(0);
+    //     // Динамические данные
+    //     buffer.writeDynData("Guest", "MAIN_PAGE", "NONE");
+    // }
 
-        // Динамические данные
-        buffer.writeDynData(login, "MAIN_PAGE", "NONE");
-    }
-    else
-    {
-        Misc::printMessage(Misc::getString(data_buffer), false);
-    }
+    Misc::printMessage(data_text, false);
 
     // запишем в буфер текст который отобразится если сервер отвалится
-    Misc::writeStringBuffer("Сервер не ответил на ваш запрос.\nВведите команду: ", data_buffer);
+    data_text = "Сервер не ответил на ваш запрос.\nВведите команду: ";
 
     // пишем ответ серверу
     if (buffer.hasFlag(sv::no_input))
@@ -110,4 +106,9 @@ bool ClientHandler::getWork()
 void ClientHandler::quit()
 {
     work = false;
+}
+
+void ClientHandler::setDataText(std::string &text)
+{
+    data_text = text;
 }

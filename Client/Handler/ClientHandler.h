@@ -24,7 +24,6 @@ const extern char clear[];
 class ClientHandler
 {
 private:
-    char (&data_buffer)[DATA_BUFFER];
     char (&cmd_buffer)[CMD_BUFFER];
 
     ullong session_key = 0;
@@ -38,8 +37,10 @@ private:
 
     BufferActions buffer{cmd_buffer};
 
+    std::string data_text;
+
 public:
-    ClientHandler(char (&_data_buffer)[DATA_BUFFER], char (&_cmd_buffer)[CMD_BUFFER]);
+    ClientHandler(char (&_cmd_buffer)[CMD_BUFFER]);
     ~ClientHandler() = default;
     void Initialise();
     void Run();
@@ -49,4 +50,5 @@ public:
     bool getWork();
     /// @brief дает команду завершить работу сервера
     void quit();
+    void setDataText(std::string &text);
 };

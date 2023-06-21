@@ -18,15 +18,14 @@ protected:
     DBcomplaints &complaintsDB;
     DBusers &usersDB;
 
-    char (&data_buffer)[DATA_BUFFER];
     char (&cmd_buffer)[CMD_BUFFER];
 
     std::shared_ptr<User> AuthorizedUser = nullptr;
 
-    std::string &page_text;
-    std::string &cmd_text;
-    std::string &login;
-    ullong &session_key;
+    std::string page_text;
+    std::string cmd_text;
+    std::string login;
+    ullong session_key;
 
     BufferActions buffer{cmd_buffer};
     ServerChatMap chatMap;
@@ -44,16 +43,12 @@ public:
                    DBmessages &_privMessagesDB,
                    DBcomplaints &_complaintsDB,
                    DBusers &_usersDB,
-                   std::string &_page_text,
-                   std::string &_cmd_text,
-                   std::string &_login,
-                   ullong &_session_key,
-                   char (&_data_buffer)[DATA_BUFFER],
                    char (&_cmd_buffer)[CMD_BUFFER]);
     virtual void run() = 0;
 
     template <typename T>
     std::string getList(std::vector<std::shared_ptr<T>> &t, const std::string &&emptyMsg, const std::string &&beforeMsg, const uint &start, bool user_info = true) const;
+    std::string getDataText();
 };
 
 template <typename T>

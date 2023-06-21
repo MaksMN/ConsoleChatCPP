@@ -67,6 +67,7 @@ namespace Misc
     /// @param buffer
     /// @param offset
     /// @param add_size true - добавить размер блока в начале
+    /// @param max_size усечет строку спереди если она больше этого размера
     void writeStringBuffer(std::string &str, char buffer[], uint offset = 0, bool add_size = true, uint max_size = 4092);
     void writeStringBuffer(std::string &&str, char buffer[], uint offset = 0, bool add_size = true, uint max_size = 4092);
 
@@ -101,6 +102,8 @@ namespace Misc
     /// @return Если в строке нет делителя или он по краям строки, возвращает исходную строку
     std::vector<std::string> stringExplode(std::string const &str, std::string delimeter);
     std::vector<std::string> stringExplode(std::string const &str, char delimeter);
+
+    std::vector<std::string> stringExplode(std::string const &str, const uint &size = 4096);
 
     std::string ltrimString(std::string &string, uint max);
 

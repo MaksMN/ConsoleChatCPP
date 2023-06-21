@@ -1,6 +1,6 @@
 #include "ServerHandler.h"
 
-ServerHandler::ServerHandler(char (&_data_buffer)[DATA_BUFFER], char (&_cmd_buffer)[CMD_BUFFER]) : data_buffer(_data_buffer), cmd_buffer(_cmd_buffer) {}
+ServerHandler::ServerHandler(char (&_cmd_buffer)[CMD_BUFFER]) : cmd_buffer(_cmd_buffer) {}
 
 void ServerHandler::InitialiseDB()
 {
@@ -47,8 +47,16 @@ void ServerHandler::Run()
     auto cmd_text = buffer.getDynDataS(CMD_TEXT_COUNT);
     auto session_key = buffer.getSessionKey();
 
+    // данные пользователя
+    user = usersDB.getUserByLogin(login);
+    if ((user != nullptr && user->getSessionKey() != session_key && session_key != 0) || user == nullptr)
+    {
+        user = nullptr;
+        login = "Guest";
+    }
+
     // Запишем в буфер данные на случай если при обработке данные не изменятся.
-    Misc::writeStringBuffer("Вы ввели неизвестную команду.\nВведите команду: ", data_buffer);
+    data_buffer_text = "Вы ввели неизвестную команду.\nВведите команду: ";
 
     /* Общие команды чата, которые срабатывают в любом месте для всех */
     if (cmd_text == "/chat")
@@ -59,7 +67,7 @@ void ServerHandler::Run()
 
     if (cmd_text == "/hello")
     {
-        Misc::writeStringBuffer("Привет, " + login + "! Я сервер, я живой.\nВведите команду: ", data_buffer);
+        data_buffer_text = "Привет, " + login + "! Я сервер, я живой.\nВведите команду: ";
         clearConsole(false);
         return;
     }
@@ -75,7 +83,7 @@ void ServerHandler::Run()
             "Команды, которые можно вызвать в любое время авторизованным пользователям:\n"
             "Команда /logout - выйти из чата;\n"
             "Команда /sv_quit - (admin)завершить работу сервера;\n";
-        Misc::writeStringBuffer(str + "\nВведите команду: ", data_buffer);
+        data_buffer_text = str + "\nВведите команду: ";
         clearConsole(false);
         return;
     }
@@ -83,29 +91,18 @@ void ServerHandler::Run()
     /* проверка соответствия команд карте чата */
     if (!chatMap.checkPage(page_text, cmd_text))
         return;
+
     /* Авторизация и регистрация */
     /* Сюда попадает любой неавторизованный пользователь */
-    user = usersDB.getUserByLogin(login);
-    if ((user != nullptr && user->getSessionKey() != session_key && session_key != 0) || user == nullptr)
-    {
-        user = nullptr;
-        login = "Guest";
-    }
-
     if (user == nullptr)
     {
         ChatGuestPage guestPage{pubMessagesDB,
                                 privMessagesDB,
                                 complaintsDB,
                                 usersDB,
-                                page_text,
-                                cmd_text,
-                                login,
-                                session_key,
-                                data_buffer,
                                 cmd_buffer};
         guestPage.run();
-
+        data_buffer_text = guestPage.getDataText();
         return;
     }
 
@@ -117,11 +114,11 @@ void ServerHandler::Run()
         if (user != nullptr && user->isAdmin())
         {
             quit();
-            Misc::writeStringBuffer("Сервер завершил свою работу.\nВведите команду /quit чтобы завершить работу клиента\nили команду chat когда запустите сервер: ", data_buffer);
+            data_buffer_text = "Сервер завершил свою работу.\nВведите команду /quit чтобы завершить работу клиента\nили команду chat когда запустите сервер: ";
         }
         else
         {
-            Misc::writeStringBuffer("Вы ввели команду доступную только администраторам.\nВведите команду: ", data_buffer);
+            data_buffer_text = "Вы ввели команду доступную только администраторам.\nВведите команду: ";
             clearConsole(false);
         }
         return;
@@ -130,11 +127,8 @@ void ServerHandler::Run()
     // Выйти
     if (cmd_text == "/logout")
     {
-        user->setSessionKey(0);
-        buffer.setSessionKey(Misc::getRandomKey());
-        buffer.createFlags(sv::get_string, sv::clear_console, sv::write_session);
-        buffer.writeDynData("Guest", MAIN_PAGE, LOGIN);
-        Misc::writeStringBuffer("Вы вышли из чата. Введите команду /chat: ", data_buffer);
+        clearBuffer();
+        "Вы вышли из чата. Введите команду /chat: ";
         return;
     }
 
@@ -149,26 +143,22 @@ void ServerHandler::Run()
                                   privMessagesDB,
                                   complaintsDB,
                                   usersDB,
-                                  page_text,
-                                  cmd_text,
-                                  login,
-                                  session_key,
-                                  data_buffer,
                                   cmd_buffer};
         publicPage.run();
+        data_buffer_text = publicPage.getDataText();
         return;
     }
 
     // Запишем в буфер данные если ни одна из команд не попала под условия обработки.
-    Misc::writeStringBuffer("Не найдена страница для вашей команды.\nВведите команду /chat: ", data_buffer);
+    data_buffer_text = "Не найдена страница для вашей команды.\nВведите команду /chat: ";
     clearConsole(false);
     return;
 }
 
 void ServerHandler::badRequest()
 {
-    Misc::writeStringBuffer("Сообщение от сервера: Что-то пошло не так. На сервер пришли данные неверной длинны.", data_buffer);
-    Misc::writeStringBuffer("BAD_REQUEST", cmd_buffer, 0, false);
+    data_buffer_text = "Сообщение от сервера: Что-то пошло не так. На сервер пришли данные неверной длинны.";
+    clearBuffer();
 }
 
 bool ServerHandler::getWork()
@@ -191,4 +181,24 @@ void ServerHandler::clearConsole(bool status)
     {
         buffer.removeFlag(sv::clear_console);
     }
+}
+
+void ServerHandler::clearBuffer()
+{
+    // Статические данные
+    user->setSessionKey(0);
+    buffer.setSessionKey(Misc::getRandomKey());
+    buffer.createFlags(sv::get_string);
+    cmd_buffer[DYN_DATA_PTR_ADDR] = DYN_DATA_ADDR;
+    buffer.setPaginationMode(sv::last_page);
+    buffer.setPgPerPage(10);
+    buffer.setPgStart(1);
+    buffer.setPgEnd(0);
+    // Динамические данные
+    buffer.writeDynData("Guest", "MAIN_PAGE", "NONE");
+}
+
+std::string &ServerHandler::getDataText()
+{
+    return data_buffer_text;
 }

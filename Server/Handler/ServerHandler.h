@@ -21,7 +21,6 @@ typedef unsigned long long ullong;
 class ServerHandler
 {
 private:
-    char (&data_buffer)[DATA_BUFFER];
     char (&cmd_buffer)[CMD_BUFFER];
 
     DBmessages pubMessagesDB{"pub_messages"};
@@ -38,8 +37,10 @@ private:
 
     std::set<std::string> pages_set;
 
+    std::string data_buffer_text;
+
 public:
-    ServerHandler(char (&_data_buffer)[DATA_BUFFER], char (&_cmd_buffer)[CMD_BUFFER]);
+    ServerHandler(char (&_cmd_buffer)[CMD_BUFFER]);
     ~ServerHandler() = default;
     void InitialiseDB();
     void Run();
@@ -54,4 +55,8 @@ public:
     /// @brief Дает команду клиенту очистить консоль
     /// @param status
     void clearConsole(bool status = true);
+
+    void clearBuffer();
+
+    std::string &getDataText();
 };

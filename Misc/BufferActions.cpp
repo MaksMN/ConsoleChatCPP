@@ -22,11 +22,6 @@ void BufferActions::writeDynDataPos(uint value, uint blockCount)
     Misc::writeIntBuffer(value, cmd_buffer, Misc::findDynamicData(cmd_buffer, DYN_DATA_ADDR, blockCount));
 }
 
-char BufferActions::getDynDataAddr()
-{
-    return cmd_buffer[DYN_DATA_PTR_ADDR];
-}
-
 ullong BufferActions::getSessionKey()
 {
     return Misc::getLong(cmd_buffer, SESSION_KEY_ADDR);
