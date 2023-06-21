@@ -19,8 +19,8 @@ void ClientHandler::Initialise()
     buffer.setSessionKey(session_key);
     buffer.setPaginationMode(sv::last_page);
     buffer.setPgPerPage(10);
-    buffer.setPgStart(1);
-    buffer.setPgEnd(1);
+    buffer.setPgStart(0);
+    buffer.setPgEnd(0);
 
     // Динамические данные
     buffer.writeDynData(login, "MAIN_PAGE", "NONE");
@@ -53,9 +53,16 @@ void ClientHandler::Run()
         Misc::printMessage("В будущем мы попробуем научить чат более корректно реагировать на сбои сервера.", true);
         Misc::printMessage("Введите команду /chat, чтобы продолжить: ", true);
 
+        // Статические данные
         buffer.createFlags(sv::get_string);
         cmd_buffer[DYN_DATA_PTR_ADDR] = DYN_DATA_ADDR;
         buffer.setSessionKey(session_key);
+        buffer.setPaginationMode(sv::last_page);
+        buffer.setPgPerPage(10);
+        buffer.setPgStart(0);
+        buffer.setPgEnd(0);
+
+        // Динамические данные
         buffer.writeDynData(login, "MAIN_PAGE", "NONE");
     }
     else
@@ -67,6 +74,8 @@ void ClientHandler::Run()
     Misc::writeStringBuffer("Сервер не ответил на ваш запрос.\nВведите команду: ", data_buffer);
 
     // пишем ответ серверу
+    if (buffer.hasFlag(sv::no_input))
+        return;
     if (buffer.hasFlag(sv::get_int))
     {
         uint n = userInputInt.getThroughIO();

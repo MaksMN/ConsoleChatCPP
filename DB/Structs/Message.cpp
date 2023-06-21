@@ -163,3 +163,8 @@ void Message::writeData()
         std::filesystem::perms::owner_all & ~(std::filesystem::perms::group_all |
                                               std::filesystem::perms::others_all));
 }
+
+uint Message::getOwnerID()
+{
+    return _author_id;
+}

@@ -91,17 +91,16 @@ namespace Misc
     /// @return
     std::vector<char> writeVectorBuffer(std::string str);
 
-    /// @brief (в разработке)Обрезает строку в начале
-    /// @param str
-    /// @param max_len
-    /// @return
-    std::string cutBeginString(std::string str, const uint max_len = 4092);
-
     /// @brief Генерирует случайное число 8 байт
     /// @return
     ullong getRandomKey();
 
+    /// @brief Разбивает строку делителем.
+    /// @param str
+    /// @param delimeter
+    /// @return Если в строке нет делителя или он по краям строки, возвращает исходную строку
     std::vector<std::string> stringExplode(std::string const &str, std::string delimeter);
+    std::vector<std::string> stringExplode(std::string const &str, char delimeter);
 
     std::string ltrimString(std::string &string, uint max);
 

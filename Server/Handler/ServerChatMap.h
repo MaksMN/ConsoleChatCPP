@@ -8,6 +8,12 @@
 
 #define MAIN_PAGE "MAIN_PAGE"
 #define PUBLIC_PAGE "PUBLIC_PAGE"
+#define PUBLIC_PAGE_INPUT "PUBLIC_PAGE_INPUT"
+#define GUEST_PAGE "GUEST_PAGE"
+#define INPUT_LOGIN_PAGE "INPUT_LOGIN_PAGE"
+#define INPUT_REGISTRATION_PAGE "INPUT_REGISTRATION_PAGE"
+#define PRIVATE_PAGE "PRIVATE_PAGE"
+#define PRIVATE_PAGE_INPUT "PRIVATE_PAGE_INPUT"
 
 #define ALL "ALL"
 #define CHAT "/chat"
@@ -19,6 +25,8 @@
 #define QUIT "/quit"
 #define REG "/reg"
 #define SV_QUIT "/sv_quit"
+#define NONE "NONE"
+#define ADMIN "/admin"
 
 class ServerChatMap
 {
@@ -31,4 +39,6 @@ public:
 
     bool checkPage(std::string &page, std::string &command);
     bool checkPage(std::string &&page, std::string &&command);
+
+    bool checkPage(std::string &&page, std::string &command);
 };

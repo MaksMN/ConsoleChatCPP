@@ -142,19 +142,6 @@ std::vector<char> Misc::writeVectorBuffer(std::string str)
     return vector;
 }
 
-std::string Misc::cutBeginString(std::string str, const uint max_len)
-{
-    char buf[max_len];
-    auto buf2 = str.data();
-    if (str.size() > max_len)
-    {
-
-        memcpy(buf, &buf2[max_len - str.size()], max_len);
-    }
-    std::string s(buf, max_len);
-    return s;
-}
-
 ullong Misc::getRandomKey()
 {
     char buf[8];
@@ -170,6 +157,20 @@ ullong Misc::getRandomKey()
 }
 
 std::vector<std::string> Misc::stringExplode(std::string const &str, std::string delimeter)
+{
+    std::vector<std::string> out;
+    size_t start;
+    size_t end = 0;
+
+    while ((start = str.find_first_not_of(delimeter, end)) != std::string::npos)
+    {
+        end = str.find(delimeter, start);
+        out.push_back(str.substr(start, end - start));
+    }
+    return out;
+}
+
+std::vector<std::string> Misc::stringExplode(std::string const &str, char delimeter)
 {
     std::vector<std::string> out;
     size_t start;

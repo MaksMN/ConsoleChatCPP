@@ -93,4 +93,6 @@ public:
 
     /// @brief Записывает в файл данные сообщения
     void writeData();
+
+    uint getOwnerID();
 };

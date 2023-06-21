@@ -143,7 +143,7 @@ void User::printData()
 std::string User::getData()
 {
     std::string s1 =
-        _name + "[" + _login + "] [userid " + std::to_string(_id) + "] \n";
+        _name + "[" + _login + "] [userid " + std::to_string(_id) + "] ";
 
     if (isAdmin())
         s1 += "[group admin] ";

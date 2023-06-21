@@ -78,4 +78,6 @@ public:
     void printData();
 
     std::string getData();
+
+    uint getOwnerID();
 };

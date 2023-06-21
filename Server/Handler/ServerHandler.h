@@ -9,6 +9,7 @@
 #include "../../DB/Headers.h"
 #include "IChatInterface.h"
 #include "ChatGuestPage.h"
+#include "ChatPublicPage.h"
 #include "../../Misc/BufferActions.h"
 #include "ServerChatMap.h"
 
@@ -34,6 +35,8 @@ private:
     BufferActions buffer{cmd_buffer};
 
     ServerChatMap chatMap;
+
+    std::set<std::string> pages_set;
 
 public:
     ServerHandler(char (&_data_buffer)[DATA_BUFFER], char (&_cmd_buffer)[CMD_BUFFER]);

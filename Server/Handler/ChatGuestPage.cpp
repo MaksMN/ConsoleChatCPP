@@ -136,7 +136,7 @@ void ChatGuestPage::validateRegistration()
     }
 
     std::shared_ptr<User> user = usersDB.getUserByLogin(name_login_pass[1]);
-    if (user != nullptr)
+    if (user != nullptr || name_login_pass[1] == "Guest")
     {
         registrationPage("Логин " + name_login_pass[1] + " занят\n");
         return;

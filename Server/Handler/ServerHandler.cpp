@@ -133,15 +133,29 @@ void ServerHandler::Run()
         user->setSessionKey(0);
         buffer.setSessionKey(Misc::getRandomKey());
         buffer.createFlags(sv::get_string, sv::clear_console, sv::write_session);
-        buffer.writeDynData("Guest", "MAIN_PAGE", "/login");
+        buffer.writeDynData("Guest", MAIN_PAGE, LOGIN);
         Misc::writeStringBuffer("Вы вышли из чата. Введите команду /chat: ", data_buffer);
         return;
     }
 
     // главная страница чата
-    if (chatMap.checkPage(PUBLIC_PAGE, CHAT))
+    pages_set.clear();
+    pages_set.insert(PUBLIC_PAGE);
+    pages_set.insert(MAIN_PAGE);
+    pages_set.insert(PUBLIC_PAGE_INPUT);
+    if (pages_set.contains(page_text))
     {
-        Misc::writeStringBuffer("Это типа главная страница авторизованного пользователя. ", data_buffer);
+        ChatPublicPage publicPage{pubMessagesDB,
+                                  privMessagesDB,
+                                  complaintsDB,
+                                  usersDB,
+                                  page_text,
+                                  cmd_text,
+                                  login,
+                                  session_key,
+                                  data_buffer,
+                                  cmd_buffer};
+        publicPage.run();
         return;
     }
 

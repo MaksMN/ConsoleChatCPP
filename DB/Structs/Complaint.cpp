@@ -102,3 +102,8 @@ std::string Complaint::getData()
     s1 += "\n" + _complaintText + "\n";
     return s1;
 }
+
+uint Complaint::getOwnerID()
+{
+    return _applicantUID;
+}
