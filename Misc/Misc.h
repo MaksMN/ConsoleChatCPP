@@ -67,7 +67,8 @@ namespace Misc
     /// @param buffer
     /// @param offset
     /// @param add_size true - добавить размер блока в начале
-    void writeStringBuffer(std::string str, char buffer[], uint offset = 0, bool add_size = true);
+    void writeStringBuffer(std::string &str, char buffer[], uint offset = 0, bool add_size = true, uint max_size = 4092);
+    void writeStringBuffer(std::string &&str, char buffer[], uint offset = 0, bool add_size = true, uint max_size = 4092);
 
     /// @brief Ищет позицию блока динамических данных в буфере
     /// @param buffer
@@ -101,5 +102,7 @@ namespace Misc
     ullong getRandomKey();
 
     std::vector<std::string> stringExplode(std::string const &str, std::string delimeter);
+
+    std::string ltrimString(std::string &string, uint max);
 
 }

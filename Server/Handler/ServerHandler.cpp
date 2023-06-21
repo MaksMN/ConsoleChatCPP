@@ -139,7 +139,7 @@ void ServerHandler::Run()
     }
 
     // главная страница чата
-    if (page_text == "MAIN_PAGE" && cmd_text == "/chat")
+    if (chatMap.checkPage(PUBLIC_PAGE, CHAT))
     {
         Misc::writeStringBuffer("Это типа главная страница авторизованного пользователя. ", data_buffer);
         return;

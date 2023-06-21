@@ -17,6 +17,10 @@ void ClientHandler::Initialise()
     buffer.createFlags(sv::get_string);
     cmd_buffer[DYN_DATA_PTR_ADDR] = DYN_DATA_ADDR;
     buffer.setSessionKey(session_key);
+    buffer.setPaginationMode(sv::last_page);
+    buffer.setPgPerPage(10);
+    buffer.setPgStart(1);
+    buffer.setPgEnd(1);
 
     // Динамические данные
     buffer.writeDynData(login, "MAIN_PAGE", "NONE");

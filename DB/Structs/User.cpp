@@ -140,6 +140,21 @@ void User::printData()
     std::cout << std::endl;
 }
 
+std::string User::getData()
+{
+    std::string s1 =
+        _name + "[" + _login + "] [userid " + std::to_string(_id) + "] \n";
+
+    if (isAdmin())
+        s1 += "[group admin] ";
+    if (isBanned())
+        s1 += "[status banned] ";
+    if (isUser())
+        s1 += "[group user] ";
+    s1 += "Рег." + Misc::StampToTime(_timestamp) + "\n";
+    return s1;
+}
+
 void User::setPass(std::string &pass)
 {
     setSalt(abs(pass[0]));

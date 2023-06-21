@@ -89,6 +89,8 @@ public:
     /// @brief Выводит на экран данные сообщения.
     void printData();
 
+    std::string getData();
+
     /// @brief Записывает в файл данные сообщения
     void writeData();
 };

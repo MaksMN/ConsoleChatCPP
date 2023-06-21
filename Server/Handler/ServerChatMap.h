@@ -7,6 +7,7 @@
 #include <set>
 
 #define MAIN_PAGE "MAIN_PAGE"
+#define PUBLIC_PAGE "PUBLIC_PAGE"
 
 #define ALL "ALL"
 #define CHAT "/chat"
@@ -29,4 +30,5 @@ public:
     ServerChatMap();
 
     bool checkPage(std::string &page, std::string &command);
+    bool checkPage(std::string &&page, std::string &&command);
 };

@@ -11,6 +11,8 @@ ServerChatMap::ServerChatMap()
     pages["INPUT_LOGIN_PAGE"].insert(ALL);
     pages["INPUT_REGISTRATION_PAGE"].insert(ALL);
 
+    pages[PUBLIC_PAGE];
+
     // команды для всех страниц
     for (auto it = pages.begin(); it != pages.end(); it++)
     {
@@ -28,4 +30,9 @@ bool ServerChatMap::checkPage(std::string &page, std::string &command)
     if (!pages.contains(page))
         return false;
     return pages[page].contains(command) || pages[page].contains(ALL);
+}
+
+bool ServerChatMap::checkPage(std::string &&page, std::string &&command)
+{
+    return checkPage(page, command);
 }

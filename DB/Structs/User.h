@@ -98,6 +98,8 @@ public:
     /// @brief Выводит на экран данные пользователя
     void printData();
 
+    std::string getData();
+
     /// @brief Изменяет пароль пользователя
     void setPass(std::string &pass);
 

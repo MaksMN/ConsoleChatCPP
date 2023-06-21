@@ -104,6 +104,13 @@ void Message::printData()
     std::cout << std::endl;
 }
 
+std::string Message::getData()
+{
+    return "Инфо: [msgid " + std::to_string(getID()) + "] Опубликовано: " + Misc::StampToTime(_timestamp) + "\n"
+                                                                                                            "Текст: " +
+           (isHidden() ? "Сообщение скрыто администратором" : _text);
+}
+
 void Message::writeData()
 {
     /*

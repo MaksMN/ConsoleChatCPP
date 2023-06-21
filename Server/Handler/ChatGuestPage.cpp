@@ -105,7 +105,8 @@ void ChatGuestPage::validateLogin()
 
     user->setSessionKey(session_key);
     login = user->getLogin();
-    page_text = "MAIN_PAGE";
+    page_text = "PUBLIC_CHAT";
+    cmd_text = "/chat";
     std::string str;
     str = "Вы успешно авторизовались в чате.\n"
           "Введите команду /chat: ";
@@ -148,7 +149,8 @@ void ChatGuestPage::validateRegistration()
         user->setSessionKey(session_key);
         login = user->getLogin();
         std::string str;
-        page_text = "MAIN_PAGE";
+        page_text = "PUBLIC_CHAT";
+        cmd_text = "/chat";
         str = "Вы успешно зарегистрировались и авторизовались в чате.\n"
               "Введите команду /chat: ";
         Misc::writeStringBuffer(str, data_buffer);

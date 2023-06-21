@@ -72,8 +72,9 @@ void Misc::writeUlongBuffer(unsigned long long num, char buffer[], uint offset)
     mempcpy(&buffer[offset], &num, 8);
 }
 
-void Misc::writeStringBuffer(std::string str, char buffer[], uint offset, bool add_size)
+void Misc::writeStringBuffer(std::string &str, char buffer[], uint offset, bool add_size, uint max_size)
 {
+    str = ltrimString(str, max_size);
     const uint size = str.size();
     auto d = str.data();
     if (add_size)
@@ -85,6 +86,11 @@ void Misc::writeStringBuffer(std::string str, char buffer[], uint offset, bool a
     {
         mempcpy(&buffer[offset], &d[0], size);
     }
+}
+
+void Misc::writeStringBuffer(std::string &&str, char buffer[], uint offset, bool add_size, uint max_size)
+{
+    writeStringBuffer(str, buffer, offset, add_size, max_size);
 }
 
 uint Misc::findDynamicData(char buffer[], uint offset, uint offset_data, uint max_size)
@@ -175,4 +181,13 @@ std::vector<std::string> Misc::stringExplode(std::string const &str, std::string
         out.push_back(str.substr(start, end - start));
     }
     return out;
+}
+
+std::string Misc::ltrimString(std::string &string, uint max)
+{
+    if (string.size() > max)
+    {
+        string.erase(0, string.size() - max);
+    }
+    return string;
 }

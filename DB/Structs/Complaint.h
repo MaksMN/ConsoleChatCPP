@@ -76,4 +76,6 @@ public:
 
     /// @brief Выводит на экран данные жалобы
     void printData();
+
+    std::string getData();
 };

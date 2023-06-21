@@ -86,3 +86,19 @@ void Complaint::printData()
     std::cout << _complaintText << std::endl;
     std::cout << std::endl;
 }
+
+std::string Complaint::getData()
+{
+    std::string s1 = "[complaint ID " + std::to_string(_id) + "] Дата подачи жалобы: " + Misc::StampToTime(_timestamp) + " ";
+    if (isOpen())
+    {
+        s1 += " [status open]";
+    }
+    if (isComplete())
+    {
+        s1 += " [status complete]";
+    }
+
+    s1 += "\n" + _complaintText + "\n";
+    return s1;
+}
