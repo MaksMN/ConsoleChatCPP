@@ -255,6 +255,11 @@ void User::setSessionKey(ullong key)
     session_key = key;
 }
 
+uint User::getOwnerID()
+{
+    return getID();
+}
+
 void User::bytesForHash(const std::string &pass, char message[])
 {
     int half_length = _pass_bytes / 2;

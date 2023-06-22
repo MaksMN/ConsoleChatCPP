@@ -112,6 +112,8 @@ public:
     ullong getSessionKey();
     void setSessionKey(ullong key);
 
+    uint getOwnerID();
+
 private:
     /// @brief генерирует данные для хеширования
     void bytesForHash(const std::string &pass, char message[]);

@@ -9,8 +9,9 @@
 #define PG_START_ADDR 11
 #define PG_PERPAGE_ADDR 15
 #define PG_END_ADDR 19
+#define PM_USER_ID 23
 
-#define DYN_DATA_ADDR 23
+#define DYN_DATA_ADDR 31
 #define LOGIN_COUNT 0
 #define PAGE_TEXT_COUNT 1
 #define CMD_TEXT_COUNT 2
@@ -23,13 +24,12 @@ typedef unsigned long long ullong;
 /*
 
     Командный пакет
-    |флаги(1)|data packets (1)|session_key (8)|pg_mode(1)|pg_start(4)|pg_perPage(4)|pg_end(4)|login_size(4)|login|page_size(4)|PAGE_TEXT|cmd_size(4)|CMD_TEXT|
-    0        1                2               10         11          15            19        23
-    |___________________________________________________________________________________|
-    |                                  ^                                                |
-    |                               static                                              |  dynamic
+    |флаги(1)|data packets (1)|session_key (8)|pg_mode(1)|pg_start(4)|pg_perPage(4)|pg_end(4)| pm_user_id (8) |login_size(4)|login|page_size(4)|PAGE_TEXT|cmd_size(4)|CMD_TEXT|
+    0        1                2               10         11          15            19        23               31
+    |_________________________________________________________________________________________________________|
+    |                                  ^                                                                      |
+    |                               static                                                                    |  dynamic
 
-    1 байт указывает где находятся динамические данные, но пока эта концепция не нашла применения.
     data packets - количество пакетов с текстом отправляемых клиенту
 */
 
@@ -115,6 +115,21 @@ public:
 
     std::string getDynDataS(uint blockCount);
     uint getDynDataI(uint blockCount);
+
+    /// @brief Получить ID собеседника ЛС
+    /// @return
+    ullong getPmUserID();
+
+    /// @brief Изменить ID собеседника ЛС
+    /// @param id
+    void setPmUserID(ullong id);
+    /// @brief Записывает в блок собеседника ЛС информацию если он не найден
+    void PmUserIDNoFound();
+    /// @brief Обнуляет блок собеседника ЛС
+    void clearPmUserID();
+    /// @brief проверяет метку блока собеседника ЛС помечена ли она как не найдено.
+    /// @return
+    bool isNotFoundPmUserID();
 };
 
 /// @brief Добавляет в буфер флаги, очищает буфер флагов

@@ -1,19 +1,13 @@
-#include "ChatPublicPage.h"
+#include "ChatPrivatePageMessages.h"
 
-ChatPublicPage::ChatPublicPage(DBmessages &_pubMessagesDB,
-                               DBmessages &_privMessagesDB,
-                               DBcomplaints &_complaintsDB,
-                               DBusers &_usersDB,
-                               char (&_cmd_buffer)[CMD_BUFFER])
+ChatPrivatePageMessages::ChatPrivatePageMessages(DBmessages &_pubMessagesDB, DBmessages &_privMessagesDB, DBcomplaints &_complaintsDB, DBusers &_usersDB, char (&_cmd_buffer)[CMD_BUFFER])
     : IChatInterface(_pubMessagesDB,
                      _privMessagesDB,
                      _complaintsDB,
                      _usersDB,
-                     _cmd_buffer)
-{
-}
+                     _cmd_buffer) {}
 
-void ChatPublicPage::run()
+void ChatPrivatePageMessages::run()
 {
     // Проверка авторизации
     AuthorizedUser = usersDB.getUserByLogin(login);
@@ -28,14 +22,28 @@ void ChatPublicPage::run()
         return;
     }
 
+    ullong pm_user_id = atoll(cmd_text.data());
+    discussant = usersDB.getUserByID(pm_user_id);
+    if (discussant == nullptr)
+    {
+        buffer.setPaginationMode(sv::last_page);
+        buffer.setPgPerPage(10);
+        buffer.setPgStart(1);
+        buffer.setPgEnd(1);
+        buffer.createFlags(sv::no_input, sv::clear_console);
+        buffer.writeDynData(login, PRIVATE_PAGE_USERS, PM);
+        buffer.PmUserIDNoFound();
+        return;
+    }
+
     pg_start = buffer.getPgStart();
     pg_per_page = buffer.getPgPerPage();
     pg_mode = buffer.getPaginationMode();
 
-    data_text += "Вы находитесь в публичном чате.\n\n";
+    data_text += "Вы находитесь на странице личных сообщений.\n\n";
 
     // Обработка команд ввода
-    if (page_text == PUBLIC_PAGE_INPUT)
+    if (page_text == PRIVATE_PAGE_MESSAGES_INPUT)
     {
         // commandHandler() либо изменит параметры страницы либо примет решение о выходе
         if (commandHandler())
@@ -45,34 +53,38 @@ void ChatPublicPage::run()
     if (pg_mode == sv::pagination::last_page)
     {
         // последние 10 сообщений
-        auto m = pubMessagesDB.listLast(pg_start, pg_per_page, pg_end);
-        data_text += getList(m, "В этом чате нет сообщений. Начните общение первым.", ">>>Сообщение №", pg_start);
+        auto m = privMessagesDB.getPrivateMsgList(AuthorizedUser->getID(), discussant->getID(), pg_start, pg_per_page, pg_end);
+        data_text += getList(m, "В этом чате нет сообщений. Начните общение первым.\n", ">>>Сообщение №", pg_start);
     }
 
     if (pg_mode == sv::pagination::message)
     {
         // список от указанного сообщения
-        auto m = pubMessagesDB.list(pg_start, pg_per_page, pg_end);
-        data_text += getList(m, "В этом чате нет сообщений. Начните общение первым.", ">>>Сообщение №", pg_start);
+        auto m = privMessagesDB.getPrivateMsgList(AuthorizedUser->getID(), discussant->getID(), pg_start, pg_per_page, pg_end, false);
+        data_text += getList(m, "В этом чате нет сообщений. Начните общение первым.\n", ">>>Сообщение №", pg_start);
     }
 
-    if (!pubMessagesDB.empty())
+    if (!privMessagesDB.empty())
     {
-        data_text += "Показаны сообщения " + std::to_string(pg_start + 1) + " - " + std::to_string(pg_end) + " из " + std::to_string(pubMessagesDB.getCount()) + "\n";
+        data_text += "Показаны сообщения " + std::to_string(pg_start + 1) + " - " + std::to_string(pg_end) + " из " + std::to_string(privMessagesDB.getCount()) + "\n";
     }
-    if (pg_mode == sv::pagination::message && pg_start + pg_per_page < pubMessagesDB.getCount())
+    if (pg_mode == sv::pagination::message && pg_start + pg_per_page < privMessagesDB.getCount())
     {
         data_text += "Внимание. Вы не увидите последние сообщения потому-что они находятся за диапазоном отображения.\n";
     }
 
-    data_text += "Вы: " + AuthorizedUser->getData();
+    data_text += "\nВы: " + AuthorizedUser->getData();
+    data_text += "Собеседник: " + discussant->getData() + "\n";
+    if (AuthorizedUser->getID() == discussant->getID())
+        data_text += "Вы ведете беседу с самим собой.\n";
+
     data_text += commands_list;
 
     buffer.createFlags(sv::get_string, sv::clear_console);
-    buffer.writeDynData(login, PUBLIC_PAGE_INPUT, cmd_text);
+    buffer.writeDynData(login, PRIVATE_PAGE_MESSAGES_INPUT, cmd_text);
 }
 
-bool ChatPublicPage::commandHandler()
+bool ChatPrivatePageMessages::commandHandler()
 {
     auto cmd = Misc::stringExplode(cmd_text, ":");
     if (cmd.empty())
@@ -92,8 +104,8 @@ bool ChatPublicPage::commandHandler()
         if (pg_start == 0)
             pg_start = 1;
 
-        if (pg_start > pubMessagesDB.getCount())
-            pg_start = pubMessagesDB.getCount();
+        if (pg_start > privMessagesDB.getCount())
+            pg_start = privMessagesDB.getCount();
 
         pg_start -= 1;
         pg_mode = sv::message;
@@ -141,12 +153,11 @@ bool ChatPublicPage::commandHandler()
         buffer.setPgEnd(1);
         buffer.createFlags(sv::no_input, sv::clear_console);
         buffer.writeDynData(login, PRIVATE_PAGE_USERS, PM);
-        buffer.clearPmUserID();
         return true;
     }
 
     // если не отработала ни одна команда, значит введен текст сообщения
 
-    pubMessagesDB.addMessage(AuthorizedUser->getID(), 0, cmd_text, msg::public_);
+    privMessagesDB.addMessage(AuthorizedUser->getID(), discussant->getID(), cmd_text, msg::public_);
     return false;
 }

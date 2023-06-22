@@ -1,7 +1,7 @@
 #pragma once
 #include "IChatInterface.h"
 
-class ChatPublicPage final : public IChatInterface
+class ChatPrivatePageMessages final : public IChatInterface
 {
 private:
     std::string commands_list =
@@ -10,20 +10,22 @@ private:
         "Команда: /p:число - количество сообщений на странице (/p:5 - пять сообщений на странице);\n"
         "Команда: /l - режим: всегда последние 10 сообщений;\n"
         "Команда: /pm - перейти в личные сообщения;\n"
+        "Команда: /chat - перейти в общий чат;\n"
         "Команда: /logout - выйти из чата;\n"
         "Команда: /help - справка;\n"
         "Команда: /u - обновить страницу для получения новых сообщений;\n"
         "Введите текст сообщения или команду: ";
 
+    std::shared_ptr<User> discussant = nullptr;
+
 public:
-    ChatPublicPage(DBmessages &_pubMessagesDB,
-                   DBmessages &_privMessagesDB,
-                   DBcomplaints &_complaintsDB,
-                   DBusers &_usersDB,
-                   char (&_cmd_buffer)[CMD_BUFFER]);
-    ~ChatPublicPage() = default;
+    ChatPrivatePageMessages(DBmessages &_pubMessagesDB,
+                            DBmessages &_privMessagesDB,
+                            DBcomplaints &_complaintsDB,
+                            DBusers &_usersDB,
+                            char (&_cmd_buffer)[CMD_BUFFER]);
+    ~ChatPrivatePageMessages() = default;
 
     void run();
-
     bool commandHandler();
 };

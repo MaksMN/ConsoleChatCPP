@@ -10,6 +10,8 @@
 #include "IChatInterface.h"
 #include "ChatGuestPage.h"
 #include "ChatPublicPage.h"
+#include "ChatPrivatePageUsers.h"
+#include "ChatPrivatePageMessages.h"
 #include "../../Misc/BufferActions.h"
 #include "ServerChatMap.h"
 
@@ -31,7 +33,6 @@ private:
     std::shared_ptr<User> user;
 
     bool work = true;
-    BufferActions buffer{cmd_buffer};
 
     ServerChatMap chatMap;
 
@@ -57,6 +58,6 @@ public:
     void clearConsole(bool status = true);
 
     void clearBuffer();
-
     std::string &getDataText();
+    BufferActions buffer{cmd_buffer};
 };

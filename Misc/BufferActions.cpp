@@ -97,3 +97,28 @@ uint BufferActions::getDynDataI(uint blockCount)
 
     return Misc::getInt(cmd_buffer, addr);
 }
+
+ullong BufferActions::getPmUserID()
+{
+    return Misc::getLong(cmd_buffer, PM_USER_ID);
+}
+
+void BufferActions::setPmUserID(ullong id)
+{
+    Misc::writeUlongBuffer(id, cmd_buffer, PM_USER_ID);
+}
+
+void BufferActions::PmUserIDNoFound()
+{
+    Misc::writeStringBuffer("NOT_USER", cmd_buffer, PM_USER_ID, false);
+}
+
+void BufferActions::clearPmUserID()
+{
+    setPmUserID(0);
+}
+
+bool BufferActions::isNotFoundPmUserID()
+{
+    return Misc::getString(cmd_buffer, 8, PM_USER_ID) == "NOT_USER";
+}

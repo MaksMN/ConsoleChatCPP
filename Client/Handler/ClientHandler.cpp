@@ -15,15 +15,15 @@ void ClientHandler::Initialise()
 
     // Статические данные
     buffer.createFlags(sv::get_string);
-    cmd_buffer[DYN_DATA_PTR_ADDR] = DYN_DATA_ADDR;
     buffer.setSessionKey(session_key);
     buffer.setPaginationMode(sv::last_page);
     buffer.setPgPerPage(10);
     buffer.setPgStart(0);
     buffer.setPgEnd(0);
+    buffer.clearPmUserID();
 
     // Динамические данные
-    buffer.writeDynData(login, "MAIN_PAGE", "NONE");
+    buffer.writeDynData(login, "MAIN_PAGE", "/chat");
 
     data_text =
         "Вы запустили клиент чата.\n"
@@ -71,7 +71,10 @@ void ClientHandler::Run()
 
     // пишем ответ серверу
     if (buffer.hasFlag(sv::no_input))
+    {
+        buffer.createFlags(sv::get_string);
         return;
+    }
     if (buffer.hasFlag(sv::get_int))
     {
         uint n = userInputInt.getThroughIO();
@@ -82,7 +85,7 @@ void ClientHandler::Run()
         std::string s = userInputStr.getStringIO();
         if (s.size() == 0)
         {
-            buffer.writeDynDataPos("NONE", CMD_TEXT_COUNT);
+            buffer.writeDynDataPos("/update", CMD_TEXT_COUNT);
         }
         else
         {

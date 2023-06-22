@@ -56,7 +56,9 @@ void ServerHandler::Run()
     }
 
     // Запишем в буфер данные на случай если при обработке данные не изменятся.
-    data_buffer_text = "Вы ввели неизвестную команду.\nВведите команду: ";
+    data_buffer_text = "Вы ввели неизвестную команду.\nВведите команду /chat: ";
+    // изменим флаги чтобы при неизвестной команде клиент встал с запросом
+    buffer.createFlags(sv::get_string);
 
     /* Общие команды чата, которые срабатывают в любом месте для всех */
     if (cmd_text == "/chat")
@@ -73,7 +75,7 @@ void ServerHandler::Run()
     }
     if (cmd_text == "/help")
     {
-        std::string str =
+        data_buffer_text =
             "\nКоманды, которые можно вызвать в любое время:\n"
             "Команда /chat - перейти на главную страницу из любого раздела;\n"
             "Команда /hello - опрос сервера;\n"
@@ -82,8 +84,8 @@ void ServerHandler::Run()
             "\n"
             "Команды, которые можно вызвать в любое время авторизованным пользователям:\n"
             "Команда /logout - выйти из чата;\n"
-            "Команда /sv_quit - (admin)завершить работу сервера;\n";
-        data_buffer_text = str + "\nВведите команду: ";
+            "Команда /sv_quit - (admin)завершить работу сервера;\n"
+            "\nВведите команду: ";
         clearConsole(false);
         return;
     }
@@ -128,7 +130,8 @@ void ServerHandler::Run()
     if (cmd_text == "/logout")
     {
         clearBuffer();
-        "Вы вышли из чата. Введите команду /chat: ";
+        clearConsole(true);
+        data_buffer_text = "Вы вышли из чата. Введите команду /chat: ";
         return;
     }
 
@@ -149,8 +152,41 @@ void ServerHandler::Run()
         return;
     }
 
+    // Список пользователей в приватном чате
+    pages_set.clear();
+    pages_set.insert(PRIVATE_PAGE_USERS);
+    pages_set.insert(PRIVATE_PAGE_USERS_INPUT);
+    if (pages_set.contains(page_text))
+    {
+        ChatPrivatePageUsers privateUsersPage{pubMessagesDB,
+                                              privMessagesDB,
+                                              complaintsDB,
+                                              usersDB,
+                                              cmd_buffer};
+        privateUsersPage.run();
+        data_buffer_text = privateUsersPage.getDataText();
+        return;
+    }
+
+    // Сообщения в приватном чате
+    pages_set.clear();
+    pages_set.insert(PRIVATE_PAGE_MESSAGES);
+    pages_set.insert(PRIVATE_PAGE_MESSAGES_INPUT);
+    if (pages_set.contains(page_text))
+    {
+        ChatPrivatePageMessages privateMessagesPage{pubMessagesDB,
+                                                    privMessagesDB,
+                                                    complaintsDB,
+                                                    usersDB,
+                                                    cmd_buffer};
+        privateMessagesPage.run();
+        data_buffer_text = privateMessagesPage.getDataText();
+        return;
+    }
+
     // Запишем в буфер данные если ни одна из команд не попала под условия обработки.
     data_buffer_text = "Не найдена страница для вашей команды.\nВведите команду /chat: ";
+    buffer.createFlags(sv::get_string);
     clearConsole(false);
     return;
 }
@@ -189,7 +225,6 @@ void ServerHandler::clearBuffer()
     user->setSessionKey(0);
     buffer.setSessionKey(Misc::getRandomKey());
     buffer.createFlags(sv::get_string);
-    cmd_buffer[DYN_DATA_PTR_ADDR] = DYN_DATA_ADDR;
     buffer.setPaginationMode(sv::last_page);
     buffer.setPgPerPage(10);
     buffer.setPgStart(1);

@@ -11,11 +11,14 @@ ServerChatMap::ServerChatMap()
     pages[INPUT_LOGIN_PAGE].insert(ALL);
     pages[INPUT_REGISTRATION_PAGE].insert(ALL);
 
-    pages[PUBLIC_PAGE];
+    pages[PUBLIC_PAGE].insert(ALL);
     pages[PUBLIC_PAGE_INPUT].insert(ALL);
 
-    pages[PRIVATE_PAGE];
-    pages[PRIVATE_PAGE_INPUT].insert(ALL);
+    pages[PRIVATE_PAGE_USERS].insert(PM);
+    pages[PRIVATE_PAGE_USERS_INPUT].insert(ALL);
+
+    pages[PRIVATE_PAGE_MESSAGES].insert(ALL);
+    pages[PRIVATE_PAGE_MESSAGES_INPUT].insert(ALL);
 
     // команды для всех страниц
     for (auto it = pages.begin(); it != pages.end(); it++)
@@ -27,6 +30,7 @@ ServerChatMap::ServerChatMap()
         pages[it->first].insert(HELLO);
         pages[it->first].insert(CHAT);
         pages[it->first].insert(ADMIN);
+        pages[it->first].insert(UPDATE);
     }
 }
 

@@ -1,15 +1,7 @@
 #include "IChatInterface.h"
 
-IChatInterface::IChatInterface(DBmessages &_pubMessagesDB,
-                               DBmessages &_privMessagesDB,
-                               DBcomplaints &_complaintsDB,
-                               DBusers &_usersDB,
-                               char (&_cmd_buffer)[CMD_BUFFER])
-    : pubMessagesDB(_pubMessagesDB),
-      privMessagesDB(_privMessagesDB),
-      complaintsDB(_complaintsDB),
-      usersDB(_usersDB),
-      cmd_buffer(_cmd_buffer)
+IChatInterface::IChatInterface(DBmessages &_pubMessagesDB, DBmessages &_privMessagesDB, DBcomplaints &_complaintsDB, DBusers &_usersDB, char (&_cmd_buffer)[CMD_BUFFER])
+    : pubMessagesDB(_pubMessagesDB), privMessagesDB(_privMessagesDB), complaintsDB(_complaintsDB), usersDB(_usersDB), cmd_buffer(_cmd_buffer)
 {
   login = buffer.getDynDataS(LOGIN_COUNT);
   session_key = buffer.getSessionKey();
@@ -24,4 +16,12 @@ IChatInterface::IChatInterface(DBmessages &_pubMessagesDB,
 std::string IChatInterface::getDataText()
 {
   return data_text;
+}
+
+void IChatInterface::clearPagination()
+{
+  buffer.setPaginationMode(sv::last_page);
+  buffer.setPgPerPage(10);
+  buffer.setPgStart(1);
+  buffer.setPgEnd(1);
 }

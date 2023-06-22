@@ -49,6 +49,7 @@ public:
     template <typename T>
     std::string getList(std::vector<std::shared_ptr<T>> &t, const std::string &&emptyMsg, const std::string &&beforeMsg, const uint &start, bool user_info = true) const;
     std::string getDataText();
+    void clearPagination();
 };
 
 template <typename T>
