@@ -51,4 +51,5 @@ public:
     /// @brief дает команду завершить работу сервера
     void quit();
     void setDataText(std::string &text);
+    void setDataText(std::string &&text);
 };

@@ -115,3 +115,8 @@ void ClientHandler::setDataText(std::string &text)
 {
     data_text = text;
 }
+
+void ClientHandler::setDataText(std::string &&text)
+{
+    setDataText(text);
+}

@@ -3,7 +3,7 @@
 #include "Misc.h"
 
 #define FLAGS_ADDR 0
-#define DYN_DATA_PTR_ADDR 1
+#define DATA_PACKETS_ADDR 1
 #define SESSION_KEY_ADDR 2
 #define PG_MODE_ADDR 10
 #define PG_START_ADDR 11
@@ -42,7 +42,9 @@ namespace sv
         get_int = 2,       // Сообщает клиенту: надо ввести число
         write_session = 4, // Сообщает клиенту: записать в буфер сессионный ключ, пришедший с сервера.
         clear_console = 8, // Сообщает клиенту: очистить окно консоли
-        no_input = 16      // Сообщает клиенту: не производить ввод данных
+        no_input = 16,     // Сообщает клиенту: не производить ввод данных
+        cmd_buffer = 32,   // Сообщает сокету, что это пакет команд
+        data_buffer = 64   // Сообщает сокету что это пакет данных
     };
 
     enum pagination
@@ -130,6 +132,9 @@ public:
     /// @brief проверяет метку блока собеседника ЛС помечена ли она как не найдено.
     /// @return
     bool isNotFoundPmUserID();
+
+    /// @brief Записывает количество пакетов с текстовыми данными
+    void setDataPacketsCount(unsigned char value);
 };
 
 /// @brief Добавляет в буфер флаги, очищает буфер флагов
@@ -165,16 +170,8 @@ inline void BufferActions::createFlags(T value, Args... args)
 template <typename T, typename... Args>
 inline void BufferActions::addFlags(T value, Args... args)
 {
-    flags = f.addFlag(flags, value);
-
-    if (value == sv::get_string)
-        flags = f.removeFlag(flags, sv::get_int);
-
-    if (value == sv::get_int)
-        flags = f.removeFlag(flags, sv::get_string);
-
+    cmd_buffer[FLAGS_ADDR] = (char)f.addFlag((T)cmd_buffer[FLAGS_ADDR], value);
     addFlags(args...);
-    cmd_buffer[FLAGS_ADDR] = (char)flags;
 }
 
 /// @brief Записывает в буфер динамические данные в порядке их следования от первого блока

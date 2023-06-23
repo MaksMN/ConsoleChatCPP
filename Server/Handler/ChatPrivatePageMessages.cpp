@@ -22,7 +22,7 @@ void ChatPrivatePageMessages::run()
         return;
     }
 
-    ullong pm_user_id = atoll(cmd_text.data());
+    uint pm_user_id = buffer.getPmUserID();
     discussant = usersDB.getUserByID(pm_user_id);
     if (discussant == nullptr)
     {

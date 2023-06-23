@@ -87,7 +87,7 @@ void ChatPrivatePageUsers::run()
         data_text += "Команда: /unadm:userid - снять с должности администратора (/adm:5 - сделать администратором [userid 5] )\n";
     }
 
-    data_text += "Введите команду или userid чтобы начать ним беседу: ";
+    data_text += "Введите команду или userid чтобы начать с ним беседу: ";
 
     buffer.createFlags(sv::get_string, sv::clear_console);
     buffer.writeDynData(login, PRIVATE_PAGE_USERS_INPUT, cmd_text);
@@ -175,7 +175,7 @@ bool ChatPrivatePageUsers::commandHandler()
         {
             buffer.createFlags(sv::get_string);
             data_text = "\nНеприменимо для сервисного администратора\n";
-            data_text += "Введите команду или userid чтобы начать ним беседу: ";
+            data_text += "Введите команду или userid чтобы начать с ним беседу: ";
             return true;
         }
 
@@ -217,6 +217,8 @@ bool ChatPrivatePageUsers::commandHandler()
 
     // если не отработала ни одна команда, значит введен userid
     clearPagination();
+    uint uid = atoi(cmd_text.data());
+    buffer.setPmUserID(uid);
     buffer.createFlags(sv::no_input, sv::clear_console);
     buffer.writeDynData(login, PRIVATE_PAGE_MESSAGES, cmd_text);
     return true;

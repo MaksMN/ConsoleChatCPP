@@ -10,6 +10,8 @@ int client_socket(char server_address[], char port[])
     ClientHandler handler(cmd_buffer);
     handler.Initialise();
 
+    BufferActions buffer(cmd_buffer);
+
     // Укажем адрес сервера
     serveraddress.sin_addr.s_addr = inet_addr(server_address);
     // Зададим номер порта для соединения с сервером
@@ -26,7 +28,7 @@ int client_socket(char server_address[], char port[])
         exit(1);
     }
     struct timeval tv;
-    tv.tv_sec = 3600;
+    tv.tv_sec = 5;
     tv.tv_usec = 0;
     auto in = setsockopt(socket_descriptor, SOL_SOCKET, SO_RCVTIMEO, (const char *)&tv, sizeof tv);
     while (handler.getWork())
@@ -35,18 +37,50 @@ int client_socket(char server_address[], char port[])
         if (!handler.getWork())
             break;
 
+        // добавляем в буфер флаг, что это командный буфер
+        buffer.addFlags(sv::cmd_buffer);
         // отправка команды на сервер
-        sendto(socket_descriptor, cmd_buffer, CMD_BUFFER, 0, nullptr, sizeof(serveraddress));
+        auto s = sendto(socket_descriptor, cmd_buffer, CMD_BUFFER, 0, nullptr, sizeof(serveraddress));
 
         // получение команды от сервера
-        recvfrom(socket_descriptor, cmd_buffer, sizeof(cmd_buffer), 0, nullptr, nullptr);
+        auto result = recvfrom(socket_descriptor, cmd_buffer, sizeof(cmd_buffer), 0, nullptr, nullptr);
+
+        // запишем в буфер текст который отобразится если сервер отвалится
+        if (result == -1)
+        {
+            handler.setDataText("Сервер не ответил на ваш запрос.\nВведите команду: ");
+            continue;
+        }
+        // убеждаемся что это был командный буфер
+        if (!buffer.hasFlag(sv::cmd_buffer))
+        {
+            Misc::printMessage("Client: от сервера пришли поврежденные данные командного буфера. Сессия будет сброшена.");
+            handler.Initialise();
+            continue;
+        }
+        buffer.removeFlag(sv::cmd_buffer);
 
         std::string data_text;
         for (unsigned char i{0}; i < cmd_buffer[1]; i++)
         {
             // получение данных с сервера
             recvfrom(socket_descriptor, data_buffer, sizeof(data_buffer), 0, nullptr, nullptr);
-            data_text += Misc::getString(data_buffer);
+
+            // убеждаемся что это буфер данных
+            if (data_buffer[0] != sv::data_buffer)
+            {
+                Misc::printMessage("Client: от сервера пришли поврежденные текстовые данные. Сессия будет сброшена.");
+                handler.Initialise();
+                continue;
+            }
+            // убедимся что размер данных не превышает длину буфера
+            if (Misc::getInt(data_buffer, 1) > DATA_BUFFER - 5)
+            {
+                Misc::printMessage("Client: от сервера пришли поврежденные текстовые данные неверной длины. Сессия будет сброшена.");
+                handler.Initialise();
+                continue;
+            }
+            data_text += Misc::getString(data_buffer, 1);
         }
         handler.setDataText(data_text);
     }

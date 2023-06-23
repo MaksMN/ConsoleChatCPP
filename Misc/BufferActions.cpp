@@ -100,12 +100,12 @@ uint BufferActions::getDynDataI(uint blockCount)
 
 ullong BufferActions::getPmUserID()
 {
-    return Misc::getLong(cmd_buffer, PM_USER_ID);
+    return Misc::getInt(cmd_buffer, PM_USER_ID);
 }
 
 void BufferActions::setPmUserID(ullong id)
 {
-    Misc::writeUlongBuffer(id, cmd_buffer, PM_USER_ID);
+    Misc::writeIntBuffer(id, cmd_buffer, PM_USER_ID);
 }
 
 void BufferActions::PmUserIDNoFound()
@@ -121,4 +121,9 @@ void BufferActions::clearPmUserID()
 bool BufferActions::isNotFoundPmUserID()
 {
     return Misc::getString(cmd_buffer, 8, PM_USER_ID) == "NOT_USER";
+}
+
+void BufferActions::setDataPacketsCount(unsigned char value)
+{
+    cmd_buffer[DATA_PACKETS_ADDR] = value;
 }
