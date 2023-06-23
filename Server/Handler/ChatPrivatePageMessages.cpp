@@ -50,23 +50,28 @@ void ChatPrivatePageMessages::run()
             return;
     }
 
+    uint all;
     if (pg_mode == sv::pagination::last_page)
     {
         // последние 10 сообщений
-        auto m = privMessagesDB.getPrivateMsgList(AuthorizedUser->getID(), discussant->getID(), pg_start, pg_per_page, pg_end);
+        auto m = privMessagesDB.getPrivateMsgList(AuthorizedUser->getID(), discussant->getID(), pg_start, pg_per_page, pg_end, all);
         data_text += getList(m, "В этом чате нет сообщений. Начните общение первым.\n", ">>>Сообщение №", pg_start);
     }
 
     if (pg_mode == sv::pagination::message)
     {
         // список от указанного сообщения
-        auto m = privMessagesDB.getPrivateMsgList(AuthorizedUser->getID(), discussant->getID(), pg_start, pg_per_page, pg_end, false);
+        auto m = privMessagesDB.getPrivateMsgList(AuthorizedUser->getID(), discussant->getID(), pg_start, pg_per_page, pg_end, all, false);
         data_text += getList(m, "В этом чате нет сообщений. Начните общение первым.\n", ">>>Сообщение №", pg_start);
     }
 
-    if (!privMessagesDB.empty())
+    if (all > 0)
     {
-        data_text += "Показаны сообщения " + std::to_string(pg_start + 1) + " - " + std::to_string(pg_end) + " из " + std::to_string(privMessagesDB.getCount()) + "\n";
+        data_text += "Показаны сообщения " + std::to_string(pg_start + 1) + " - " + std::to_string(pg_end) + " из " + std::to_string(all) + "\n";
+    }
+    else
+    {
+        data_text += "Показаны сообщения 0 из " + std::to_string(all) + "\n";
     }
     if (pg_mode == sv::pagination::message && pg_start + pg_per_page < privMessagesDB.getCount())
     {

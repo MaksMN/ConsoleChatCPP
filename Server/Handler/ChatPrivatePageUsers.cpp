@@ -63,7 +63,7 @@ void ChatPrivatePageUsers::run()
 
     if (!privMessagesDB.empty())
     {
-        data_text += "Показаны пользователи " + std::to_string(pg_start + 1) + " - " + std::to_string(pg_end) + " из " + std::to_string(privMessagesDB.getCount()) + "\n";
+        data_text += "Показаны пользователи " + std::to_string(pg_start + 1) + " - " + std::to_string(pg_end) + " из " + std::to_string(usersDB.getCount()) + "\n";
     }
     if (pg_mode == sv::pagination::message && pg_start + pg_per_page < usersDB.getCount())
     {

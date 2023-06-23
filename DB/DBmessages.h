@@ -25,7 +25,8 @@ public:
     /// @param end Параметр пагинации
     /// @param last (bool) true - вычислят список последних perPage сообщений. false - perPage от указанного сообщения.
     /// @return
-    std::vector<std::shared_ptr<Message>> getPrivateMsgList(uint &&author_id, uint &&recipient_id, uint &start, const uint &perPage, uint &end, bool last = true);
+    std::vector<std::shared_ptr<Message>> getPrivateMsgList(uint &&author_id, uint &&recipient_id, uint &start, const uint &perPage, uint &end, uint &all, bool last = true);
+    uint getPrivateMsgCount(uint &&author_id, uint &&recipient_id);
 
     /// @brief Удаляет сообщение из базы
     /// @param id
