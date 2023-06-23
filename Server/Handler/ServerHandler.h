@@ -12,6 +12,7 @@
 #include "ChatPublicPage.h"
 #include "ChatPrivatePageUsers.h"
 #include "ChatPrivatePageMessages.h"
+#include "ChatEditProfile.h"
 #include "../../Misc/BufferActions.h"
 #include "ServerChatMap.h"
 

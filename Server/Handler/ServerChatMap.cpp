@@ -15,10 +15,14 @@ ServerChatMap::ServerChatMap()
     pages[PUBLIC_PAGE_INPUT].insert(ALL);
 
     pages[PRIVATE_PAGE_USERS].insert(PM);
+    pages[PRIVATE_PAGE_USERS].insert(USERS);
     pages[PRIVATE_PAGE_USERS_INPUT].insert(ALL);
 
     pages[PRIVATE_PAGE_MESSAGES].insert(ALL);
     pages[PRIVATE_PAGE_MESSAGES_INPUT].insert(ALL);
+
+    pages[PROFILE_PAGE].insert(ALL);
+    pages[PROFILE_PAGE_INPUT].insert(ALL);
 
     // команды для всех страниц
     for (auto it = pages.begin(); it != pages.end(); it++)

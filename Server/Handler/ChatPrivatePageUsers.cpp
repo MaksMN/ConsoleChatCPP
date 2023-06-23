@@ -31,7 +31,14 @@ void ChatPrivatePageUsers::run()
     pg_per_page = buffer.getPgPerPage();
     pg_mode = buffer.getPaginationMode();
 
-    data_text += "Вы находитесь на странице личных сообщений.\n\n";
+    if (AuthorizedUser->isAdmin())
+    {
+        data_text += "Вы находитесь на странице управления пользователями.\n\n";
+    }
+    else
+    {
+        data_text += "Вы находитесь на странице выбора пользователей для личных сообщений.\n\n";
+    }
 
     // Обработка команд ввода
     if (page_text == PRIVATE_PAGE_USERS_INPUT && commandHandler())
@@ -68,6 +75,19 @@ void ChatPrivatePageUsers::run()
     if (buffer.isNotFoundPmUserID())
         data_text += "\nПользователь для личных сообщений не найден.\n\n";
     data_text += commands_list;
+    if (AuthorizedUser->isAdmin())
+    {
+        data_text += "Команда: /ban:userid - заблокировать пользователя (/ban:5 - заблокировать [userid 5] )\n";
+        data_text += "Команда: /unban:userid - разблокировать пользователя (/unban:5 - разблокировать [userid 5] )\n";
+    }
+
+    if (AuthorizedUser->isAdmin() && AuthorizedUser->getID() == 0)
+    {
+        data_text += "Команда: /adm:userid - сделать пользователя администратором (/adm:5 - сделать администратором [userid 5] )\n";
+        data_text += "Команда: /unadm:userid - снять с должности администратора (/adm:5 - сделать администратором [userid 5] )\n";
+    }
+
+    data_text += "Введите команду или userid чтобы начать ним беседу: ";
 
     buffer.createFlags(sv::get_string, sv::clear_console);
     buffer.writeDynData(login, PRIVATE_PAGE_USERS_INPUT, cmd_text);
@@ -132,6 +152,66 @@ bool ChatPrivatePageUsers::commandHandler()
     }
     if (cmd[0] == "/u" || cmd[0] == "/update")
     {
+        return false;
+    }
+
+    if (cmd[0] == "/ban" || cmd[0] == "/unban" || cmd[0] == "/adm" || cmd[0] == "/unadm")
+    {
+        if (!AuthorizedUser->isAdmin())
+        {
+            return false;
+        }
+        uint userid;
+        if (cmd.size() > 1)
+        {
+            userid = atoi(cmd[1].data());
+        }
+        else
+        {
+            return false;
+        }
+
+        if (userid == 0)
+        {
+            buffer.createFlags(sv::get_string);
+            data_text = "\nНеприменимо для сервисного администратора\n";
+            data_text += "Введите команду или userid чтобы начать ним беседу: ";
+            return true;
+        }
+
+        auto user = usersDB.getUserByID(userid);
+
+        if (user == nullptr)
+        {
+            buffer.createFlags(sv::get_string);
+            data_text = "\nВы ввели неверный userid\n";
+            data_text += "Введите текст сообщения или команду: ";
+            return true;
+        }
+        if (cmd[0] == "/ban")
+        {
+            user->ban();
+            usersDB.updateFiles();
+            return false;
+        }
+        else if (cmd[0] == "/unban")
+        {
+            user->unBan();
+            usersDB.updateFiles();
+            return false;
+        }
+        else if (cmd[0] == "/adm" || AuthorizedUser->getID() == 0)
+        {
+            user->toAdmin();
+            usersDB.updateFiles();
+            return false;
+        }
+        else if (cmd[0] == "/unadm" || AuthorizedUser->getID() == 0)
+        {
+            user->toUser();
+            usersDB.updateFiles();
+            return false;
+        }
         return false;
     }
 

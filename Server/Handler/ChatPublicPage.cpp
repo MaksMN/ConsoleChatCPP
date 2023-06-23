@@ -152,7 +152,7 @@ bool ChatPublicPage::commandHandler()
         buffer.setPgStart(1);
         buffer.setPgEnd(1);
         buffer.createFlags(sv::no_input, sv::clear_console);
-        buffer.writeDynData(login, PRIVATE_PAGE_USERS, PM);
+        buffer.writeDynData(login, PRIVATE_PAGE_USERS, USERS);
         buffer.clearPmUserID();
         return true;
     }

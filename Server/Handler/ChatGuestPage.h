@@ -27,4 +27,5 @@ public:
     /// @param message Дополнительное сообщение от функций валидации.
     void registrationPage(std::string message = std::string());
     void validateRegistration();
+    bool commandHandler() { return false; };
 };

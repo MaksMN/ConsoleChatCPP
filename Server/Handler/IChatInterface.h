@@ -45,6 +45,7 @@ public:
                    DBusers &_usersDB,
                    char (&_cmd_buffer)[CMD_BUFFER]);
     virtual void run() = 0;
+    virtual bool commandHandler() = 0;
 
     template <typename T>
     std::string getList(std::vector<std::shared_ptr<T>> &t, const std::string &&emptyMsg, const std::string &&beforeMsg, const uint &start, bool user_info = true) const;

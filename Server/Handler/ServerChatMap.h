@@ -16,6 +16,8 @@
 #define PRIVATE_PAGE_USERS_INPUT "PRIVATE_PAGE_USERS_INPUT"
 #define PRIVATE_PAGE_MESSAGES "PRIVATE_PAGE_MESSAGES"
 #define PRIVATE_PAGE_MESSAGES_INPUT "PRIVATE_PAGE_INPUT"
+#define PROFILE_PAGE "PROFILE_PAGE"
+#define PROFILE_PAGE_INPUT "PROFILE_PAGE_INPUT"
 
 #define ALL "ALL"
 #define CHAT "/chat"
@@ -31,6 +33,8 @@
 #define ADMIN "/admin"
 #define UPDATE "/update"
 #define PM "/pm"
+#define USERS "/users"
+#define PROFILE "/profile"
 
 class ServerChatMap
 {
@@ -43,6 +47,5 @@ public:
 
     bool checkPage(std::string &page, std::string &command);
     bool checkPage(std::string &&page, std::string &&command);
-
     bool checkPage(std::string &&page, std::string &command);
 };

@@ -61,19 +61,19 @@ void ServerHandler::Run()
     buffer.createFlags(sv::get_string);
 
     /* Общие команды чата, которые срабатывают в любом месте для всех */
-    if (cmd_text == "/chat")
+    if (cmd_text == CHAT)
     {
         buffer.writeDynData(login, MAIN_PAGE, CHAT);
         page_text = MAIN_PAGE;
     }
 
-    if (cmd_text == "/hello")
+    if (cmd_text == HELLO)
     {
         data_buffer_text = "Привет, " + login + "! Я сервер, я живой.\nВведите команду: ";
         clearConsole(false);
         return;
     }
-    if (cmd_text == "/help")
+    if (cmd_text == HELP)
     {
         data_buffer_text =
             "\nКоманды, которые можно вызвать в любое время:\n"
@@ -111,7 +111,7 @@ void ServerHandler::Run()
     /* Команды чата которые срабатывают если пользователь авторизован */
 
     // закрыть сервер (только админ)
-    if (cmd_text.compare("/sv_quit") == 0)
+    if (cmd_text.compare(SV_QUIT) == 0)
     {
         if (user != nullptr && user->isAdmin())
         {
@@ -127,11 +127,27 @@ void ServerHandler::Run()
     }
 
     // Выйти
-    if (cmd_text == "/logout")
+    if (cmd_text == LOGOUT)
     {
         clearBuffer();
         clearConsole(true);
         data_buffer_text = "Вы вышли из чата. Введите команду /chat: ";
+        return;
+    }
+
+    // профиль пользователя
+    pages_set.clear();
+    pages_set.insert(PROFILE_PAGE);
+    pages_set.insert(PROFILE_PAGE_INPUT);
+    if (cmd_text == PROFILE || pages_set.contains(page_text))
+    {
+        ChatEditProfile editProfile{pubMessagesDB,
+                                    privMessagesDB,
+                                    complaintsDB,
+                                    usersDB,
+                                    cmd_buffer};
+        editProfile.run();
+        data_buffer_text = editProfile.getDataText();
         return;
     }
 

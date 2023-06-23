@@ -12,8 +12,7 @@ private:
         "Команда: /chat - перейти в общий чат;\n"
         "Команда: /logout - выйти из чата;\n"
         "Команда: /help - справка;\n"
-        "Команда: /u - обновить страницу;\n"
-        "Введите userid или команду: ";
+        "Команда: /u - обновить страницу;\n";
 
 public:
     ChatPrivatePageUsers(DBmessages &_pubMessagesDB,
