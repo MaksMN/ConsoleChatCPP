@@ -68,6 +68,18 @@ void ChatPublicPage::run()
     data_text += "Вы: " + AuthorizedUser->getData();
     data_text += commands_list;
 
+    if (AuthorizedUser->isAdmin())
+    {
+        data_text += "Команда: /users - список пользователей для администрирования и личных сообщений;\n";
+        data_text += "Команда: /h:msgid - скрыть сообщение (/h:5 - скрыть сообщение [msgid 5]);\n";
+    }
+    else
+    {
+        data_text += "Команда: /users - выбор пользователя для личных сообщений;\n";
+    }
+
+    data_text += "Введите текст сообщения или команду: ";
+
     buffer.createFlags(sv::get_string, sv::clear_console);
     buffer.writeDynData(login, PUBLIC_PAGE_INPUT, cmd_text);
 }
@@ -133,7 +145,7 @@ bool ChatPublicPage::commandHandler()
     {
         return false;
     }
-    if (cmd[0] == "/pm")
+    if (cmd[0] == "/users")
     {
         buffer.setPaginationMode(sv::last_page);
         buffer.setPgPerPage(10);
@@ -143,6 +155,36 @@ bool ChatPublicPage::commandHandler()
         buffer.writeDynData(login, PRIVATE_PAGE_USERS, PM);
         buffer.clearPmUserID();
         return true;
+    }
+
+    if (cmd[0] == "/h")
+    {
+        if (!AuthorizedUser->isAdmin())
+        {
+            return false;
+        }
+        uint msgid = 0;
+        if (cmd.size() > 1)
+        {
+            msgid = atoll(cmd[1].data());
+        }
+        else
+        {
+            return false;
+        }
+        auto msg = pubMessagesDB.getMessageByID(msgid);
+        if (msg != nullptr)
+        {
+            msg->hide();
+            return false;
+        }
+        else
+        {
+            buffer.createFlags(sv::get_string);
+            data_text = "\nВы ввели неверный msgid\n";
+            data_text += "Введите текст сообщения или команду: ";
+            return true;
+        }
     }
 
     // если не отработала ни одна команда, значит введен текст сообщения
