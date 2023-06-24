@@ -13,6 +13,7 @@ private:
         "Команда: /logout - выйти из чата;\n"
         "Команда: /help - справка;\n"
         "Команда: /u - обновить страницу;\n";
+    std::string additional_message;
 
 public:
     ChatPrivatePageUsers(DBmessages &_pubMessagesDB,

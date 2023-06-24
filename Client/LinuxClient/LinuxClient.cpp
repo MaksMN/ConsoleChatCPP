@@ -7,6 +7,8 @@ struct sockaddr_in serveraddress;
 
 int client_socket(char server_address[], char port[])
 {
+    for (int i{0}; i < CMD_BUFFER; i++)
+        cmd_buffer[i] = '\0';
     ClientHandler handler(cmd_buffer);
     handler.Initialise();
 

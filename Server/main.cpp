@@ -15,12 +15,12 @@ typedef unsigned int uint;
 
 int main(int argc, const char *argv[])
 {
-
-#if defined(_WIN64) || defined(_WIN32)
-
-#endif
+    /**
+     * Порт можно указать в параметрах запуска
+     * Если ничего не указано, порт = 7777
+     */
     std::string port_s;
-    if (argc == 2)
+    if (argc >= 2)
     {
         port_s = argv[1];
     }

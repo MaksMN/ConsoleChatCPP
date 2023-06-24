@@ -74,6 +74,8 @@ void ChatPrivatePageUsers::run()
 
     if (buffer.isNotFoundPmUserID())
         data_text += "\nПользователь для личных сообщений не найден.\n\n";
+    data_text += additional_message;
+    additional_message.clear();
     data_text += commands_list;
     if (AuthorizedUser->isAdmin())
     {
@@ -190,7 +192,15 @@ bool ChatPrivatePageUsers::commandHandler()
         }
         if (cmd[0] == "/ban")
         {
+            if (user->getID() == AuthorizedUser->getID())
+            {
+                buffer.createFlags(sv::get_string);
+                data_text = "\nВы не можете забанить себя являясь администратором. Обратитесь к другому администратору.\n";
+                data_text += "Введите текст сообщения или команду: ";
+                return true;
+            }
             user->ban();
+
             usersDB.updateFiles();
             return false;
         }

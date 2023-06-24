@@ -10,6 +10,8 @@ socklen_t length;
 struct sockaddr_in serveraddress, client;
 int server_socket(char port[])
 {
+    ffor(int i{0}; i < CMD_BUFFER; i++)
+        cmd_buffer[i] = '\0';
     ServerHandler handler(cmd_buffer);
     handler.InitialiseDB();
     BufferActions buffer(cmd_buffer);

@@ -25,9 +25,13 @@ int main(int argc, char **argv)
     _setmode(_fileno(stdout), _O_U16TEXT);
     _setmode(_fileno(stdin), _O_U16TEXT);
 #endif
-
+    /**
+     * программу можно запустить с 1 или 2 аргументами
+     * один аргумент - порт сервера, адрес автоматически будет 127.0.0.1
+     * два аргумента - адрес порт
+     * если ничего не указано, по умолчанию 127.0.0.1:7777
+     */
     std::string port_s;
-    // std::string server_address_s = "192.168.1.109";//windows
     std::string server_address_s = "127.0.0.1";
     if (argc == 2)
     {

@@ -24,6 +24,8 @@ ServerChatMap::ServerChatMap()
     pages[PROFILE_PAGE].insert(ALL);
     pages[PROFILE_PAGE_INPUT].insert(ALL);
 
+    pages[USER_BANNED].insert(ALL);
+
     // команды для всех страниц
     for (auto it = pages.begin(); it != pages.end(); it++)
     {

@@ -176,6 +176,7 @@ bool ChatPublicPage::commandHandler()
         if (msg != nullptr)
         {
             msg->hide();
+            pubMessagesDB.updateFiles();
             return false;
         }
         else

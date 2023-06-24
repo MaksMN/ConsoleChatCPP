@@ -135,6 +135,15 @@ void ServerHandler::Run()
         return;
     }
 
+    if (user->isBanned())
+    {
+        clearConsole(true);
+        data_buffer_text = "Вы заблокированы. Введите команду /logout: ";
+        buffer.writeDynData(login, USER_BANNED, NONE);
+        page_text = USER_BANNED;
+        return;
+    }
+
     // профиль пользователя
     pages_set.clear();
     pages_set.insert(PROFILE_PAGE);
