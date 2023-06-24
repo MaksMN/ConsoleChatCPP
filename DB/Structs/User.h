@@ -52,6 +52,9 @@ public:
     User(std::ifstream &stream, const std::string &db_file);
 
     User(const User &u);
+
+        User &operator=(const User &u);
+
     ~User();
 
     /// @brief Возвращает ID пользователя

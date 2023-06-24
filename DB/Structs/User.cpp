@@ -60,12 +60,29 @@ User::User(const User &u) : _id(u._id), _login(u._login), _pass_bytes(u._pass_by
     _status = u._status;
     flags = u.flags;
     DBfilePath = u.DBfilePath;
-    session_key = session_key;
+    session_key = u.session_key;
     _pass_hash = new uint[5];
     for (int i{0}; i < 5; i++)
     {
         _pass_hash[i] = u._pass_hash[i];
     }
+}
+
+User &User::operator=(const User &u)
+{
+    for (int i{0}; i < 5; i++)
+    {
+        _pass_salt[i] = u._pass_salt[i];
+    }
+    _status = u._status;
+    flags = u.flags;
+    DBfilePath = u.DBfilePath;
+    session_key = u.session_key;
+    for (int i{0}; i < 5; i++)
+    {
+        _pass_hash[i] = u._pass_hash[i];
+    }
+    return *this;
 }
 
 User::~User()
@@ -211,7 +228,6 @@ void User::writeData()
     const uint uintSize = sizeof(uint);
     const uint loginSize = _login.size();
     const uint nameSize = _name.size();
-    const uint pashSize = uintSize * 5;
     const uint passSaltSize = 64;
     const uint status = (int)_status;
     const uint longSize = sizeof(unsigned long long);

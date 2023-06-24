@@ -21,7 +21,7 @@ public:
                    char (&_cmd_buffer)[CMD_BUFFER]);
     ~ChatPublicPage() = default;
 
-    void run();
+    void run() override;
 
-    bool commandHandler();
+    bool commandHandler() override;
 };

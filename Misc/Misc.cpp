@@ -53,7 +53,7 @@ std::string Misc::getString(char buffer[], uint offset)
     return s;
 }
 
-std::string Misc::getString(char buffer[], uint len, uint offset)
+std::string Misc::getString(const char buffer[], uint len, uint offset)
 {
     char buf[len];
     for (int i{0}; i < len; i++)
@@ -124,7 +124,7 @@ std::vector<char> Misc::writeVectorBuffer(char buffer[], uint len)
     return v;
 }
 
-void Misc::writeVectorBuffer(char buffer[], std::vector<char> &vector)
+void Misc::writeVectorBuffer(char buffer[], const std::vector<char> &vector)
 {
     const uint len = vector.size();
     for (int i{0}; i < len; i++)

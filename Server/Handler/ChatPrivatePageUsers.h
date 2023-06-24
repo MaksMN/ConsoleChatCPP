@@ -23,6 +23,6 @@ public:
                          char (&_cmd_buffer)[CMD_BUFFER]);
     ~ChatPrivatePageUsers() = default;
 
-    void run();
-    bool commandHandler();
+    void run() override;
+    bool commandHandler() override;
 };

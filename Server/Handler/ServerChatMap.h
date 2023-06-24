@@ -46,7 +46,7 @@ public:
     ~ServerChatMap() = default;
     ServerChatMap();
 
-    bool checkPage(std::string &page, std::string &command);
-    bool checkPage(std::string &&page, std::string &&command);
-    bool checkPage(std::string &&page, std::string &command);
+    bool checkPage(const std::string &page, const std::string &command);
+    bool checkPage(const std::string &&page, const std::string &&command);
+    bool checkPage(const std::string &&page, const std::string &command);
 };

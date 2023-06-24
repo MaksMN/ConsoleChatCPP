@@ -41,7 +41,7 @@ int server_socket(char port[])
     while (handler.getWork())
     {
         // ждем запросы от клиентов
-        int iResult = recvfrom(serSocket, cmd_buffer, CMD_BUFFER, 0, (sockaddr *)&clientAddr, &iAddrlen);
+        recvfrom(serSocket, cmd_buffer, CMD_BUFFER, 0, (sockaddr *)&clientAddr, &iAddrlen);
 
         // если пришел не командный буфер - пропускаем.
         if (!buffer.hasFlag(sv::cmd_buffer))
@@ -70,7 +70,7 @@ int server_socket(char port[])
         buffer.addFlags(sv::cmd_buffer);
 
         // Отправка пакета команд
-        int iSendResult = sendto(serSocket, cmd_buffer, CMD_BUFFER, 0, (sockaddr *)&clientAddr, iAddrlen);
+        sendto(serSocket, cmd_buffer, CMD_BUFFER, 0, (sockaddr *)&clientAddr, iAddrlen);
 
         // поочередно отправляем пакет данных на клиента
         for (int i = 0; i < data_text.size(); i += DATA_BUFFER - 5)
@@ -80,7 +80,7 @@ int server_socket(char port[])
             // записываем строку в пакет
             Misc::writeStringBuffer(data_text.substr(i, DATA_BUFFER - 5), data_buffer, 1);
             // отправляем пакет клиенту, он должен ждать именно пакет данных, а не что-то другое.
-            iSendResult = sendto(serSocket, data_buffer, DATA_BUFFER, 0, (sockaddr *)&clientAddr, iAddrlen);
+            sendto(serSocket, data_buffer, DATA_BUFFER, 0, (sockaddr *)&clientAddr, iAddrlen);
         }
     }
 

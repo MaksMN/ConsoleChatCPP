@@ -1,22 +1,17 @@
-SRC = main.cpp DB/*.cpp DB/**/*.cpp Chat/*.cpp Chat/**/*.cpp
-TARGET = consolechat
+SV_SRC = /Server/*.cpp /Server/Handler/*.cpp /Server/LinuxServer/*.cpp /Server/WinServer/*.cpp /Misc/*.cpp /DB/*.cpp /DB/Structs/*.cpp
+CL_SRC = /Client/*.cpp /Client/Handler/*.cpp /Client/WinClient/*.cpp /Client/LinuxClient/*.cpp /Misc/*.cpp
+SV_TARGET = chatserver
+CL_TARGET = chatclient
 PREFIX = /usr/local/bin
 
-consolechat: miscLib
-	g++ -o _Make/$(TARGET) $(SRC) -L. -l:_Make/miscLib.a
-
-miscLib: Misc/sha1.cpp Misc/DateTime.cpp Misc/Stream.cpp
-	mkdir -p _Make
-	g++ -o _Make/sha1.o Misc/sha1.cpp -c
-	g++ -o _Make/DateTime.o Misc/DateTime.cpp -c
-	g++ -o _Make/Stream.o Misc/Stream.cpp -c
-	ar rc _Make/miscLib.a _Make/sha1.o _Make/DateTime.o _Make/Stream.o
-	
-clean:
-	rm -rf _Make/*.o _Make/*.a
+consolechat:
+	g++ -o /bin/$(SV_TARGET) $(SV_SRC)
+	g++ -o /bin/$(CL_TARGET) $(CL_SRC)
 
 install:
-	install _Make/$(TARGET) $(PREFIX)
+	install /bin/$(SV_TARGET) $(PREFIX)
+	install /bin/$(CL_TARGET) $(PREFIX)
 	
 uninstall:
-	rm -rf $(PREFIX)/$(TARGET)
+	rm -rf $(PREFIX)/$(SV_TARGET)
+	rm -rf $(PREFIX)/$(CL_TARGET)

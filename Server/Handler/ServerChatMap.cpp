@@ -40,19 +40,19 @@ ServerChatMap::ServerChatMap()
     }
 }
 
-bool ServerChatMap::checkPage(std::string &page, std::string &command)
+bool ServerChatMap::checkPage(const std::string &page, const std::string &command)
 {
     if (!pages.contains(page))
         return false;
     return pages[page].contains(command) || pages[page].contains(ALL);
 }
 
-bool ServerChatMap::checkPage(std::string &&page, std::string &&command)
+bool ServerChatMap::checkPage(const std::string &&page, const std::string &&command)
 {
     return checkPage(page, command);
 }
 
-bool ServerChatMap::checkPage(std::string &&page, std::string &command)
+bool ServerChatMap::checkPage(const std::string &&page, const std::string &command)
 {
     return checkPage(page, command);
 }

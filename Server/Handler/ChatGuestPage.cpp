@@ -99,9 +99,7 @@ void ChatGuestPage::validateLogin()
     login = user->getLogin();
     page_text = PUBLIC_PAGE;
     cmd_text = CHAT;
-    std::string str;
     data_text = "Вы успешно авторизовались в чате.\n";
-
     buffer.createFlags(sv::get_string, sv::clear_console, sv::no_input);
     buffer.writeDynData(login, page_text, cmd_text);
 }
@@ -133,20 +131,17 @@ void ChatGuestPage::validateRegistration()
         return;
     }
 
-    if (user == nullptr)
-    {
-        user = usersDB.addUser(name_login_pass[1], name_login_pass[0], name_login_pass[2]);
-        session_key = Misc::getRandomKey();
-        user->setSessionKey(session_key);
-        login = user->getLogin();
-        std::string str;
-        page_text = PUBLIC_PAGE;
-        cmd_text = CHAT;
-        str = "Вы успешно зарегистрировались и авторизовались в чате.\n"
-              "Введите команду /chat: ";
-        data_text = str;
-        buffer.createFlags(sv::get_string, sv::clear_console, sv::write_session, sv::no_input);
-        buffer.setSessionKey(session_key);
-        buffer.writeDynData(login, page_text, cmd_text);
-    }
+    user = usersDB.addUser(name_login_pass[1], name_login_pass[0], name_login_pass[2]);
+    session_key = Misc::getRandomKey();
+    user->setSessionKey(session_key);
+    login = user->getLogin();
+    std::string str;
+    page_text = PUBLIC_PAGE;
+    cmd_text = CHAT;
+    str = "Вы успешно зарегистрировались и авторизовались в чате.\n"
+          "Введите команду /chat: ";
+    data_text = str;
+    buffer.createFlags(sv::get_string, sv::clear_console, sv::write_session, sv::no_input);
+    buffer.setSessionKey(session_key);
+    buffer.writeDynData(login, page_text, cmd_text);
 }

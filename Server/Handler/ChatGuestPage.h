@@ -12,7 +12,7 @@ public:
                   char (&_cmd_buffer)[CMD_BUFFER]);
     ~ChatGuestPage() = default;
 
-    void run();
+    void run() override;
 
     /// @brief Страница с предложением авторизации или регистрации
     /// @param message Дополнительное сообщение от функций валидации.
@@ -27,5 +27,5 @@ public:
     /// @param message Дополнительное сообщение от функций валидации.
     void registrationPage(const std::string &message = std::string());
     void validateRegistration();
-    bool commandHandler() { return false; };
+    bool commandHandler() override { return false; };
 };

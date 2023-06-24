@@ -140,7 +140,6 @@ void ServerHandler::Run()
         clearConsole(true);
         data_buffer_text = "Вы заблокированы. Введите команду /logout: ";
         buffer.writeDynData(login, USER_BANNED, NONE);
-        page_text = USER_BANNED;
         return;
     }
 

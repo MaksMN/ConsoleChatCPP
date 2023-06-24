@@ -14,8 +14,6 @@
 #pragma comment(lib, "Ws2_32.lib")
 // #pragma comment (lib, "Mswsock.lib")
 
-const extern int PORT;
-
 #include "../Handler/ServerHandler.h"
 #include "../../Misc/Misc.h"
 

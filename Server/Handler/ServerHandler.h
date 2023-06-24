@@ -42,7 +42,7 @@ private:
     std::string data_buffer_text;
 
 public:
-    ServerHandler(char (&_cmd_buffer)[CMD_BUFFER]);
+    explicit ServerHandler(char (&_cmd_buffer)[CMD_BUFFER]);
     ~ServerHandler() = default;
     void InitialiseDB();
     void Run();

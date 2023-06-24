@@ -10,7 +10,7 @@ socklen_t length;
 struct sockaddr_in serveraddress, client;
 int server_socket(char port[])
 {
-    ffor(int i{0}; i < CMD_BUFFER; i++)
+    for (int i{0}; i < CMD_BUFFER; i++)
         cmd_buffer[i] = '\0';
     ServerHandler handler(cmd_buffer);
     handler.InitialiseDB();
@@ -29,7 +29,7 @@ int server_socket(char port[])
     {
         length = sizeof(client);
 
-        int iResult = recvfrom(socket_file_descriptor, cmd_buffer, sizeof(cmd_buffer), 0, (struct sockaddr *)&client, &length);
+        recvfrom(socket_file_descriptor, cmd_buffer, sizeof(cmd_buffer), 0, (struct sockaddr *)&client, &length);
 
         // если пришел не командный буфер - пропускаем.
         if (!buffer.hasFlag(sv::cmd_buffer))

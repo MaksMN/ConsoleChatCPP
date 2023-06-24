@@ -18,6 +18,6 @@ public:
                     DBusers &_usersDB,
                     char (&_cmd_buffer)[CMD_BUFFER]);
     ~ChatEditProfile() = default;
-    void run();
-    bool commandHandler();
+    void run() override;
+    bool commandHandler() override;
 };

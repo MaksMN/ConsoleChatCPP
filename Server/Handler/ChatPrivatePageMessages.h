@@ -26,6 +26,6 @@ public:
                             char (&_cmd_buffer)[CMD_BUFFER]);
     ~ChatPrivatePageMessages() = default;
 
-    void run();
-    bool commandHandler();
+    void run() override;
+    bool commandHandler() override;
 };

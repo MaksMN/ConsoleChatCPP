@@ -49,7 +49,7 @@ namespace Misc
     /// @param len
     /// @param offset
     /// @return
-    std::string getString(char buffer[], uint len, uint offset);
+    std::string getString(const char buffer[], uint len, uint offset);
 
     /// @brief Записывает int в буфер
     /// @param num
@@ -86,11 +86,11 @@ namespace Misc
     /// @brief Записывает вектор в буфер
     /// @param buffer
     /// @param vector
-    void writeVectorBuffer(char buffer[], std::vector<char> &vector);
+    void writeVectorBuffer(char buffer[], const std::vector<char> &vector);
     /// @brief Записывает сроку в вектор
     /// @param str
     /// @return
-    std::vector<char> writeVectorBuffer(std::string str);
+    std::vector<char> writeVectorBuffer(const std::string &str);
 
     /// @brief Генерирует случайное число 8 байт
     /// @return
