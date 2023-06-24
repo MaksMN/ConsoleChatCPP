@@ -6,7 +6,7 @@ class DBusers final : public DBcore<User>
 {
 private:
 public:
-    DBusers(std::string db_path);
+    explicit DBusers(const std::string &db_path);
     virtual ~DBusers() = default;
     /// @brief Проверяет уникальность логина
     /// @param login
@@ -46,5 +46,5 @@ public:
 
     /// @brief изменяет путь к файлу базы
     /// @param path
-    void setDBfilePath(std::string path);
+    void setDBfilePath(const std::string &path);
 };

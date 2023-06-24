@@ -1,6 +1,6 @@
 #include "DBusers.h"
 
-DBusers::DBusers(std::string db_path)
+DBusers::DBusers(const std::string &db_path)
 {
     DBfilePath = db_path;
 }
@@ -53,7 +53,7 @@ std::string DBusers::getDBfilePath()
     return DBfilePath;
 }
 
-void DBusers::setDBfilePath(std::string path)
+void DBusers::setDBfilePath(const std::string &path)
 {
     DBfilePath = path;
 }

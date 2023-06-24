@@ -5,7 +5,7 @@ Message::Message(const uint &id,
                  const uint &recipient_id,
                  const std::string &text,
                  msg::status status,
-                 std::string db_file)
+                 const std::string &db_file)
     : _id(id),
       _author_id(author_id),
       _recipient_id(recipient_id),
@@ -14,7 +14,7 @@ Message::Message(const uint &id,
       _timestamp(time(NULL)),
       DBfilePath(db_file) {}
 
-Message::Message(std::ifstream &stream, std::string db_file)
+Message::Message(std::ifstream &stream, const std::string &db_file)
     : _id(Stream::getUint(stream, 4)),
       _author_id(Stream::getUint(stream, 12)),
       _recipient_id(Stream::getUint(stream, 16)),

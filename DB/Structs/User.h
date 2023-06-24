@@ -36,7 +36,7 @@ public:
     /// @param name
     /// @param pass
     /// @param db_file путь к файлу базы пользователей
-    User(const uint &id, const std::string &login, const std::string &name, std::string &pass, std::string db_file);
+    User(const uint &id, const std::string &login, const std::string &name, std::string &pass, const std::string &db_file);
 
     /// @brief Создает нового пользователя
     /// @param id
@@ -44,12 +44,14 @@ public:
     /// @param name
     /// @param pass
     /// @param db_file путь к файлу базы пользователей
-    User(const uint &&id, const std::string &&login, const std::string &&name, std::string &&pass, std::string db_file);
+    User(const uint &&id, const std::string &&login, const std::string &&name, std::string &&pass, const std::string &db_file);
 
     /// @brief Создает нового пользователя из файла базы
     /// @param stream
     /// @param db_file путь к файлу базы пользователей
-    User(std::ifstream &stream, std::string db_file);
+    User(std::ifstream &stream, const std::string &db_file);
+
+    User(const User &u);
     ~User();
 
     /// @brief Возвращает ID пользователя

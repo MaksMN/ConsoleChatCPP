@@ -1,6 +1,6 @@
 #include "Misc.h"
 
-void Misc::printMessage(std::string msg, bool endl)
+void Misc::printMessage(const std::string &msg, bool endl)
 {
 #if defined(_WIN64) || defined(_WIN32)
     std::wstring wmesg = std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t>{}.from_bytes(msg.data());
@@ -131,7 +131,7 @@ void Misc::writeVectorBuffer(char buffer[], std::vector<char> &vector)
         buffer[i] = vector[i];
 }
 
-std::vector<char> Misc::writeVectorBuffer(std::string str)
+std::vector<char> Misc::writeVectorBuffer(const std::string &str)
 {
     std::vector<char> vector;
     const uint len = str.size();
@@ -156,7 +156,7 @@ ullong Misc::getRandomKey()
     return key;
 }
 
-std::vector<std::string> Misc::stringExplode(std::string const &str, std::string delimeter)
+std::vector<std::string> Misc::stringExplode(std::string const &str, const std::string &delimeter)
 {
     std::vector<std::string> out;
     size_t start;

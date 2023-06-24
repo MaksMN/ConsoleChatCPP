@@ -40,12 +40,12 @@ public:
         const uint &recipient_id,
         const std::string &text,
         msg::status _status,
-        std::string db_file);
+        const std::string &db_file);
 
     /// @brief Создает сообщение из файла
     /// @param stream
     /// @param db_file
-    Message(std::ifstream &stream, std::string db_file);
+    Message(std::ifstream &stream, const std::string &db_file);
     /// @brief Возвращает статус сообщения
     /// @return
     msg::status getStatus();

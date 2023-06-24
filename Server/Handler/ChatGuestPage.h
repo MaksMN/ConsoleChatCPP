@@ -16,16 +16,16 @@ public:
 
     /// @brief Страница с предложением авторизации или регистрации
     /// @param message Дополнительное сообщение от функций валидации.
-    void offerRegisterOrLogin(std::string message = std::string());
+    void offerRegisterOrLogin(const std::string &message = std::string());
 
     /// @brief Страница авторизации
     /// @param message Дополнительное сообщение от функций валидации.
-    void loginPage(std::string message = std::string());
+    void loginPage(const std::string &message = std::string());
     void validateLogin();
 
     /// @brief Страница регистрации
     /// @param message Дополнительное сообщение от функций валидации.
-    void registrationPage(std::string message = std::string());
+    void registrationPage(const std::string &message = std::string());
     void validateRegistration();
     bool commandHandler() { return false; };
 };

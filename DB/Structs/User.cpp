@@ -1,6 +1,6 @@
 #include "User.h"
 
-User::User(const uint &id, const std::string &login, const std::string &name, std::string &pass, std::string db_file)
+User::User(const uint &id, const std::string &login, const std::string &name, std::string &pass, const std::string &db_file)
     : _id(id),
       _login(login),
       _name(name),
@@ -11,7 +11,7 @@ User::User(const uint &id, const std::string &login, const std::string &name, st
     _status = user::user_;
 }
 
-User::User(const uint &&id, const std::string &&login, const std::string &&name, std::string &&pass, std::string db_file)
+User::User(const uint &&id, const std::string &&login, const std::string &&name, std::string &&pass, const std::string &db_file)
     : _id(id),
       _login(login),
       _name(name),
@@ -22,7 +22,7 @@ User::User(const uint &&id, const std::string &&login, const std::string &&name,
     _status = user::user_;
 }
 
-User::User(std::ifstream &stream, std::string db_file)
+User::User(std::ifstream &stream, const std::string &db_file)
     : _id(Stream::getUint(stream, 4)),
       _login(Stream::getString(stream, 104)),
       _timestamp(Stream::getLong64(stream, 96)),
@@ -48,6 +48,24 @@ User::User(std::ifstream &stream, std::string db_file)
     stream.seekg(pos += 32);
     stream.read(_pass_salt, 64);
     stream.seekg(pos += (block_size - 32) + 4);
+}
+
+User::User(const User &u) : _id(u._id), _login(u._login), _pass_bytes(u._pass_bytes), _timestamp(u._timestamp), _name(u._name)
+{
+    for (int i{0}; i < 5; i++)
+    {
+        _pass_salt[i] = u._pass_salt[i];
+    }
+
+    _status = u._status;
+    flags = u.flags;
+    DBfilePath = u.DBfilePath;
+    session_key = session_key;
+    _pass_hash = new uint[5];
+    for (int i{0}; i < 5; i++)
+    {
+        _pass_hash[i] = u._pass_hash[i];
+    }
 }
 
 User::~User()

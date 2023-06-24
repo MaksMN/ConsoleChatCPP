@@ -40,7 +40,7 @@ private:
     std::string data_text;
 
 public:
-    ClientHandler(char (&_cmd_buffer)[CMD_BUFFER]);
+    explicit ClientHandler(char (&_cmd_buffer)[CMD_BUFFER]);
     ~ClientHandler() = default;
     void Initialise();
     void Run();
@@ -50,6 +50,6 @@ public:
     bool getWork();
     /// @brief дает команду завершить работу сервера
     void quit();
-    void setDataText(std::string &text);
-    void setDataText(std::string &&text);
+    void setDataText(const std::string &text);
+    void setDataText(const std::string &&text);
 };

@@ -5,7 +5,7 @@ class DBmessages : public DBcore<Message>
 {
 private:
 public:
-    DBmessages(std::string db_path);
+    explicit DBmessages(const std::string &db_path);
     ~DBmessages() = default;
 
     std::shared_ptr<Message> addMessage(const uint &author_id,
@@ -41,5 +41,5 @@ public:
 
     /// @brief изменяет путь к файлу базы
     /// @param path
-    void setDBfilePath(std::string path);
+    void setDBfilePath(const std::string &path);
 };

@@ -65,7 +65,7 @@ private:
     char (&cmd_buffer)[CMD_BUFFER];
 
 public:
-    BufferActions(char (&_cmd_buffer)[CMD_BUFFER]);
+    explicit BufferActions(char (&_cmd_buffer)[CMD_BUFFER]);
     ~BufferActions() = default;
 
     void createFlags() {}

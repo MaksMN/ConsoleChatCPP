@@ -48,7 +48,7 @@ void ChatGuestPage::run()
     return;
 }
 
-void ChatGuestPage::offerRegisterOrLogin(std::string message)
+void ChatGuestPage::offerRegisterOrLogin(const std::string &message)
 {
     page_text = GUEST_PAGE;
     std::string str;
@@ -62,7 +62,7 @@ void ChatGuestPage::offerRegisterOrLogin(std::string message)
     buffer.writeDynData(login, page_text, cmd_text);
 }
 
-void ChatGuestPage::loginPage(std::string message)
+void ChatGuestPage::loginPage(const std::string &message)
 {
     page_text = INPUT_LOGIN_PAGE;
     std::string str;
@@ -106,7 +106,7 @@ void ChatGuestPage::validateLogin()
     buffer.writeDynData(login, page_text, cmd_text);
 }
 
-void ChatGuestPage::registrationPage(std::string message)
+void ChatGuestPage::registrationPage(const std::string &message)
 {
     page_text = INPUT_REGISTRATION_PAGE;
     std::string str;

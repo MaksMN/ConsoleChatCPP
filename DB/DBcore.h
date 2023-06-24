@@ -53,7 +53,7 @@ public:
 
     /// @brief Заполняет базу данных из файла
     /// @param marker Маркер, разделяющий элементы базы данных в файле
-    void readFromFile(std::string marker);
+    void readFromFile(const std::string &marker);
 
     /// @brief Записывает базу данных в файл
     void updateFiles();
@@ -142,7 +142,7 @@ inline void DBcore<T>::remove(uint id)
 }
 
 template <typename T>
-inline void DBcore<T>::readFromFile(std::string marker)
+inline void DBcore<T>::readFromFile(const std::string &marker)
 {
     if (!std::filesystem::exists(DBfilePath))
     {

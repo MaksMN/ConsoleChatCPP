@@ -90,8 +90,8 @@ public:
     void setMainMessage(const std::wstring &newText);
     void setFailMessage(const std::wstring &newText);
 
-    std::wstring to_wstring(std::string str);
-    std::string to_string(std::wstring wstr);
+    std::wstring to_wstring(const std::string &str);
+    std::string to_string(const std::wstring &wstr);
 };
 
 template <typename I, typename O>
@@ -266,14 +266,14 @@ inline void UserInput<I, O>::setFailMessage(const std::wstring &newText)
 }
 
 template <typename I, typename O>
-inline std::wstring UserInput<I, O>::to_wstring(std::string str)
+inline std::wstring UserInput<I, O>::to_wstring(std::string const &str)
 {
     std::wstring wstr = std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t>{}.from_bytes(str.data());
     return wstr;
 }
 
 template <typename I, typename O>
-inline std::string UserInput<I, O>::to_string(std::wstring wstr)
+inline std::string UserInput<I, O>::to_string(const std::wstring &wstr)
 {
     std::wstring_convert<std::codecvt_utf8<wchar_t>> conv1;
     std::string str = conv1.to_bytes(wstr);

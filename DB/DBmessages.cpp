@@ -1,6 +1,6 @@
 #include "DBmessages.h"
 
-DBmessages::DBmessages(std::string db_path)
+DBmessages::DBmessages(const std::string &db_path)
 {
     DBfilePath = db_path;
 }
@@ -111,7 +111,7 @@ std::string DBmessages::getDBfilePath()
     return DBfilePath;
 }
 
-void DBmessages::setDBfilePath(std::string path)
+void DBmessages::setDBfilePath(const std::string &path)
 {
     DBfilePath = path;
 }

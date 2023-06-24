@@ -111,12 +111,12 @@ void ClientHandler::quit()
     work = false;
 }
 
-void ClientHandler::setDataText(std::string &text)
+void ClientHandler::setDataText(const std::string &text)
 {
     data_text = text;
 }
 
-void ClientHandler::setDataText(std::string &&text)
+void ClientHandler::setDataText(const std::string &&text)
 {
     setDataText(text);
 }

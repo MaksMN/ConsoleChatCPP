@@ -15,7 +15,7 @@ namespace Misc
     /// @brief Выводит сообщение в консоль. Кроссплатформенная.
     /// @param wmesg Текст сообщения
     /// @param endl true - добавить перевод строки
-    void printMessage(std::string msg, bool endl = true);
+    void printMessage(const std::string &msg, bool endl = true);
 
     /// @brief Преобразует timestamp в обычное время
     /// @param timestamp
@@ -100,10 +100,8 @@ namespace Misc
     /// @param str
     /// @param delimeter
     /// @return Если в строке нет делителя или он по краям строки, возвращает исходную строку
-    std::vector<std::string> stringExplode(std::string const &str, std::string delimeter);
+    std::vector<std::string> stringExplode(std::string const &str, const std::string &delimeter);
     std::vector<std::string> stringExplode(std::string const &str, char delimeter);
-
-    std::vector<std::string> stringExplode(std::string const &str, const uint &size = 4096);
 
     std::string ltrimString(std::string &string, uint max);
 

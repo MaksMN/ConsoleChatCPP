@@ -18,7 +18,7 @@ const char clear[]{"clear"};
 
 #endif
 
-int main(int argc, char **argv)
+int main(int argc, const char **argv)
 {
 #if defined(_WIN64) || defined(_WIN32)
 
@@ -37,12 +37,7 @@ int main(int argc, char **argv)
     {
         port_s = argv[1];
     }
-    else
-    {
-        port_s = "7777";
-    }
-
-    if (argc == 3)
+    else if (argc == 3)
     {
         server_address_s = argv[1];
         port_s = argv[2];
