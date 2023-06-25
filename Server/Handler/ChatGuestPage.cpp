@@ -123,7 +123,14 @@ void ChatGuestPage::validateRegistration()
         registrationPage("Вы ввели неверные данные\n");
         return;
     }
-
+    if (name_login_pass[1].size() > 20)
+    {
+        name_login_pass[1].erase(0, name_login_pass[1].size() - 20);
+    }
+    if (name_login_pass[0].size() > 20)
+    {
+        name_login_pass[0].erase(0, name_login_pass[0].size() - 20);
+    }
     std::shared_ptr<User> user = usersDB.getUserByLogin(name_login_pass[1]);
     if (user != nullptr || name_login_pass[1] == "Guest")
     {
@@ -138,8 +145,7 @@ void ChatGuestPage::validateRegistration()
     std::string str;
     page_text = PUBLIC_PAGE;
     cmd_text = CHAT;
-    str = "Вы успешно зарегистрировались и авторизовались в чате.\n"
-          "Введите команду /chat: ";
+    str = "Вы успешно зарегистрировались и авторизовались в чате.\n";
     data_text = str;
     buffer.createFlags(sv::get_string, sv::clear_console, sv::write_session, sv::no_input);
     buffer.setSessionKey(session_key);

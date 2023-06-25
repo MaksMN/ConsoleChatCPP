@@ -5,6 +5,7 @@ CL_TARGET = chatclient
 PREFIX = /usr/local/bin
 
 consolechat:
+	mkdir -p bin
 	g++ -std=c++20 -o bin/$(SV_TARGET) $(SV_SRC)
 	g++ -std=c++20 -o bin/$(CL_TARGET) $(CL_SRC)
 

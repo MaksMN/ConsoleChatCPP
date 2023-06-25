@@ -44,26 +44,6 @@ void ClientHandler::Run()
         session_key = buffer.getSessionKey();
     }
 
-    // if (Misc::getInt(data_buffer) > DATA_BUFFER || Misc::getString(cmd_buffer, 11, 0) == "BAD_REQUEST")
-    // {
-    //     Misc::printMessage("Сообщение от клиента: ", true);
-    //     Misc::printMessage("Что-то пошло не так. От сервера пришли данные неверной длинны.", true);
-    //     Misc::printMessage("Сессия будет сброшена.", true);
-    //     Misc::printMessage("В будущем мы попробуем научить чат более корректно реагировать на сбои сервера.", true);
-    //     Misc::printMessage("Введите команду /chat, чтобы продолжить: ", true);
-
-    //     // Статические данные
-    //     buffer.setSessionKey(Misc::getRandomKey());
-    //     buffer.createFlags(sv::get_string);
-    //     cmd_buffer[DYN_DATA_PTR_ADDR] = DYN_DATA_ADDR;
-    //     buffer.setPaginationMode(sv::last_page);
-    //     buffer.setPgPerPage(10);
-    //     buffer.setPgStart(1);
-    //     buffer.setPgEnd(0);
-    //     // Динамические данные
-    //     buffer.writeDynData("Guest", "MAIN_PAGE", "NONE");
-    // }
-
     Misc::printMessage(data_text, false);
 
     // запишем в буфер текст который отобразится если сервер отвалится
@@ -89,6 +69,12 @@ void ClientHandler::Run()
         }
         else
         {
+            uint cmd_pos = Misc::findDynamicData(cmd_buffer, DYN_DATA_ADDR, CMD_TEXT_COUNT);
+            uint cmd_max_size = CMD_BUFFER - cmd_pos - 5;
+            if (s.size() > cmd_max_size)
+            {
+                s.erase(0, s.size() - cmd_max_size);
+            }
             buffer.writeDynDataPos(s, CMD_TEXT_COUNT);
         }
 
