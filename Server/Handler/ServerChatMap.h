@@ -37,6 +37,7 @@
 #define USERS "/users"
 #define PROFILE "/profile"
 
+/// @brief класс карты страниц чата
 class ServerChatMap
 {
 private:
@@ -46,6 +47,10 @@ public:
     ~ServerChatMap() = default;
     ServerChatMap();
 
+    /// @brief Проверяет есть ли такая страница в чате
+    /// @param page
+    /// @param command
+    /// @return
     bool checkPage(const std::string &page, const std::string &command);
     bool checkPage(const std::string &&page, const std::string &&command);
     bool checkPage(const std::string &&page, const std::string &command);

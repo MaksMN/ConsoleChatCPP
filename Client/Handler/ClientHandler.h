@@ -50,6 +50,9 @@ public:
     bool getWork();
     /// @brief дает команду завершить работу сервера
     void quit();
+
+    /// @brief Задает текст который пришел от сервера. Он будет выведен на печать в консоли
+    /// @param text
     void setDataText(const std::string &text);
     void setDataText(const std::string &&text);
 };

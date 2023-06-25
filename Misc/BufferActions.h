@@ -98,24 +98,52 @@ public:
     /// @param blockCount
     void writeDynDataPos(uint value, uint blockCount);
 
+    /// @brief получить сессионный ключ из буфера
+    /// @return
     ullong getSessionKey();
+    /// @brief Изменить сессионный ключ в буфере
+    /// @param key
     void setSessionKey(ullong key);
 
+    /// @brief получить состояние пагинации
+    /// @return
     sv::pagination getPaginationMode();
+    /// @brief изменить состояние пагинации
+    /// @param mode
     void setPaginationMode(sv::pagination mode);
 
+    /// @brief Первая страница в пагинации
+    /// @return
     uint getPgStart();
+    /// @brief Установить страницу в пагинации
+    /// @param value
     void setPgStart(uint value);
-
+    /// @brief Количество сообщений на страницу в пагинации
+    /// @return
     uint getPgPerPage();
+    /// @brief Изменить количество сообщений в пагинации
+    /// @param value
     void setPgPerPage(uint value);
-
+    /// @brief последний элемент в пагинации
+    /// @return
     uint getPgEnd();
+    /// @brief последний элемент в пагинации
+    /// @param value
     void setPgEnd(uint value);
 
+    /// @brief получить размер подблока динамических данных
+    /// @param blockCount номер подблока
+    /// @return
     uint getDynDataSize(uint blockCount);
 
+    /// @brief получить строку подблока динамических данных
+    /// @param blockCount
+    /// @return
     std::string getDynDataS(uint blockCount);
+
+    /// @brief получить число в адресе подблока динамических данных
+    /// @param blockCount
+    /// @return
     uint getDynDataI(uint blockCount);
 
     /// @brief Получить ID собеседника ЛС

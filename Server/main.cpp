@@ -31,6 +31,9 @@ int main(int argc, const char *argv[])
 
     const auto PORT = port_s.data();
     std::cout << "SERVER IS LISTENING THROUGH THE PORT: " << PORT << " WITHIN A LOCAL SYSTEM" << std::endl;
+    std::cout << "Сервисный администратор: логин-admin пароль-1234" << std::endl;
+    std::cout << "Авторизуйтесь в клиенте и смените пароль командой /profile" << std::endl;
+
     server_socket(PORT);
 
     return 0;

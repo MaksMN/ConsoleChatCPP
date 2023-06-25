@@ -41,6 +41,8 @@ private:
 
     std::string data_buffer_text;
 
+    BufferActions buffer{cmd_buffer};
+
 public:
     explicit ServerHandler(char (&_cmd_buffer)[CMD_BUFFER]);
     ~ServerHandler() = default;
@@ -58,7 +60,10 @@ public:
     /// @param status
     void clearConsole(bool status = true);
 
+    /// @brief задает буферу данные по умолчанию
     void clearBuffer();
+
+    /// @brief Возвращает текст который надо отправить клиенту
+    /// @return
     std::string &getDataText();
-    BufferActions buffer{cmd_buffer};
 };
