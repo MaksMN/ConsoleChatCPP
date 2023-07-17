@@ -1,0 +1,117 @@
+#include "DBmessages.h"
+
+DBmessages::DBmessages(const std::string &db_path)
+{
+    DBfilePath = db_path;
+}
+
+std::shared_ptr<Message> DBmessages::addMessage(
+    const uint &author_id,
+    const uint &recipient_id,
+    const std::string &text,
+    msg::status status)
+{
+    _DB.push_back(std::make_shared<Message>(LastElement++, author_id, recipient_id, text, status, DBfilePath));
+    _DB.back()->writeData();
+    return _DB.back();
+}
+
+std::shared_ptr<Message> DBmessages::getMessageByID(uint id)
+{
+    return operator[](id);
+}
+
+std::vector<std::shared_ptr<Message>> DBmessages::getPrivateMsgList(uint &&author_id, uint &&recipient_id, uint &start, const uint &perPage, uint &end, uint &all, bool last)
+{
+    all = 0;
+    if (_DB.empty())
+    {
+        return std::vector<std::shared_ptr<Message>>();
+    }
+    std::vector<std::shared_ptr<Message>> in;
+    std::vector<std::shared_ptr<Message>> out;
+
+    std::for_each(_DB.begin(), _DB.end(),
+                  [&author_id, &recipient_id, &in, &all](const auto &m)
+                  {
+                      bool cond = ((m->getAuthorID() == author_id) && (m->getRecipientID() == recipient_id)) ||
+                                  ((m->getAuthorID() == recipient_id) && (m->getRecipientID() == author_id));
+                      if (cond)
+                      {
+                          in.push_back(m);
+                          all++;
+                      }
+                  });
+    if (in.empty())
+    {
+        return std::vector<std::shared_ptr<Message>>();
+    }
+
+    if (last)
+    {
+        end = in.size();
+        if (perPage >= in.size())
+        {
+            start = 0;
+        }
+        else
+        {
+            start = in.size() - perPage;
+        }
+    }
+
+    end = start + perPage;
+    if (start > in.size())
+        start = 0;
+    if (end > in.size())
+        end = in.size();
+
+    for (uint i{start}; i < end; i++)
+    {
+        if (i == in.size())
+            break;
+        out.push_back(in[i]);
+    }
+    return out;
+}
+
+uint DBmessages::getPrivateMsgCount(uint &&author_id, uint &&recipient_id)
+{
+    uint i = 0;
+    std::for_each(_DB.begin(), _DB.end(),
+                  [&author_id, &recipient_id, &i](const auto &m)
+                  {
+                      bool cond = ((m->getAuthorID() == author_id) && (m->getRecipientID() == recipient_id)) ||
+                                  ((m->getAuthorID() == recipient_id) && (m->getRecipientID() == author_id));
+                      if (cond)
+                          i++;
+                  });
+    return i;
+}
+
+void DBmessages::deleteMessage(uint id)
+{
+    auto it = std::find_if(_DB.begin(), _DB.end(),
+                           [&id](const auto &m)
+                           {
+                               return m->getID() == id;
+                           });
+
+    if (_DB.end() != it)
+        _DB.erase(it);
+}
+
+void DBmessages::updateFromFile()
+{
+    readFromFile("MESG");
+}
+
+std::string DBmessages::getDBfilePath()
+{
+    return DBfilePath;
+}
+
+void DBmessages::setDBfilePath(const std::string &path)
+{
+    DBfilePath = path;
+}
