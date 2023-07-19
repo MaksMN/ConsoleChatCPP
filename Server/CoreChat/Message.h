@@ -2,7 +2,7 @@
 #include <string>
 #include <iostream>
 #include "../../Misc/Flags.h"
-#include "../Options.h"
+#include "../ChatOptions.h"
 #include "../../Misc/Misc.h"
 #include <filesystem>
 #include <fstream>

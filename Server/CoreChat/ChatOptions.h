@@ -13,15 +13,6 @@ namespace msg
     };
 };
 
-namespace complaint
-{
-    enum status
-    {
-        open_ = 1,
-        complete_ = 2
-    };
-};
-
 namespace user
 {
     enum status

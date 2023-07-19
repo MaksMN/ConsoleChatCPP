@@ -1,14 +1,9 @@
 #pragma once
 #include <string>
-#include <iostream>
-#include <filesystem>
-#include "../../Misc/sha1.h"
-#include "../../Misc/Flags.h"
-#include "../Options.h"
+#include "ChatOptions.h"
 #include "../../Misc/Misc.h"
-#include <fstream>
-#include <cstring>
-#include "../../Misc/Stream.h"
+#include "../../Misc/Flags.h"
+#include "../../Misc/SHA1.h"
 
 typedef unsigned int uint;
 typedef unsigned long long ullong;
@@ -17,45 +12,41 @@ typedef unsigned long long ullong;
 class User
 {
 private:
-    const uint _id = 0;
-    const std::string _login;
+    ullong _id = 0;
+    std::string _login;
     std::string _name;
-    uint *_pass_hash;
-    const int _pass_bytes = 128; // размер сообщения для хеширования, пароль + соль
-    char _pass_salt[64];         // соль должна быть в 2 раза меньше сообщения для хеширования
+    std::string pass_hash;
+    std::string pass_salt;
     user::status _status = user::none_;
-    const unsigned long long _timestamp; // дата регистрации
+    ullong _timestamp = 0;
+
     Flags<user::status> flags;
-    std::string DBfilePath;
     ullong session_key = 0;
+    SHA1 sha1;
 
 public:
-    /// @brief Создает нового пользователя путем указания данных в аргументах
-    /// @param id
-    /// @param login
-    /// @param name
-    /// @param pass
-    /// @param db_file путь к файлу базы пользователей
-    User(const uint &id, const std::string &login, const std::string &name, std::string &pass, const std::string &db_file);
-
     /// @brief Создает нового пользователя
     /// @param id
     /// @param login
     /// @param name
     /// @param pass
-    /// @param db_file путь к файлу базы пользователей
-    User(const uint &&id, const std::string &&login, const std::string &&name, std::string &&pass, const std::string &db_file);
+    User(const ullong &id, const std::string &login, const std::string &name, std::string &pass);
+    User(const ullong &&id, const std::string &&login, const std::string &&name, std::string &&pass);
 
-    /// @brief Создает нового пользователя из файла базы
-    /// @param stream
-    /// @param db_file путь к файлу базы пользователей
-    User(std::ifstream &stream, const std::string &db_file);
+    /// @brief Создает пользователя по id из базы данных
+    /// @param id
+    User(ullong &id);
+    User(ullong &&id);
 
-    User(const User &u);
+    ~User() = default;
 
-        User &operator=(const User &u);
+    /// @brief Пересоздает пользователя из базы данных
+    /// @param id
+    /// @return
+    User get(ullong &id);
 
-    ~User();
+    /// @brief сохраняет пользователя в БД
+    void save();
 
     /// @brief Возвращает ID пользователя
     /// @return
@@ -118,12 +109,4 @@ public:
     void setSessionKey(ullong key);
 
     uint getOwnerID();
-
-private:
-    /// @brief генерирует данные для хеширования
-    void bytesForHash(const std::string &pass, char message[]);
-    /// @brief Генерирует соль
-    void setSalt(const unsigned &seed);
-    /// @brief Удаляет данные для хеширования
-    void clearHashMessage(char message[]);
 };

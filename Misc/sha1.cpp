@@ -1,12 +1,28 @@
-#include "sha1.h"
-#include <string.h>
+#include "SHA1.h"
 
-uint cycle_shift_left(uint val, int bit_count)
+#define one_block_size_bytes 64    // количество байт в блоке
+#define one_block_size_uints 16    // количество 4байтовых  в блоке
+#define block_expend_size_uints 80 // количество 4байтовых в дополненном блоке
+
+#define SHA1HASHLENGTHBYTES 20
+#define SHA1HASHLENGTHUINTS 5
+
+typedef uint *Block;
+typedef uint ExpendBlock[block_expend_size_uints];
+
+const uint H[5] = {
+    0x67452301,
+    0xEFCDAB89,
+    0x98BADCFE,
+    0x10325476,
+    0xC3D2E1F0}; // константы, согласно стандарту
+
+uint SHA1::cycle_shift_left(uint val, int bit_count)
 {
     return (val << bit_count | val >> (32 - bit_count));
 }
 
-uint bring_to_human_view(uint val)
+uint SHA1::bring_to_human_view(uint val)
 {
     return ((val & 0x000000FF) << 24) |
            ((val & 0x0000FF00) << 8) |
@@ -14,7 +30,25 @@ uint bring_to_human_view(uint val)
            ((val & 0xFF000000) >> 24);
 }
 
-uint *sha1(char *message, uint msize_bytes)
+std::string SHA1::int_to_hex(uint i)
+{
+    std::stringstream stream;
+    stream << std::setfill('0') << std::setw(sizeof(uint) * 2)
+           << std::hex << i;
+    return stream.str();
+}
+
+std::string SHA1::hash(std::string &inStr)
+{
+    return hash(inStr.data(), inStr.size());
+}
+
+std::string SHA1::hash(std::string &&inStr)
+{
+    return hash(inStr.data(), inStr.size());
+}
+
+std::string SHA1::hash(char message[], uint msize_bytes)
 {
     // инициализация
     uint A = H[0];
@@ -130,15 +164,7 @@ uint *sha1(char *message, uint msize_bytes)
         E = E + e;
     }
 
-    // A,B,C,D,E являются выходными 32б составляющими посчитанного хэша
-    uint *digest = new uint[5];
-    digest[0] = A;
-    digest[1] = B;
-    digest[2] = C;
-    digest[3] = D;
-    digest[4] = E;
-
     // чистим за собой
     delete[] newMessage;
-    return digest;
+    return int_to_hex(A) + int_to_hex(B) + int_to_hex(C) + int_to_hex(D) + int_to_hex(E);
 }

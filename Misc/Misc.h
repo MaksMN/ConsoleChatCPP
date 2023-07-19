@@ -6,6 +6,7 @@
 #include <locale>
 #include <time.h>
 #include <vector>
+#include <fstream>
 
 typedef unsigned int uint;
 typedef unsigned long long ullong;
@@ -103,6 +104,35 @@ namespace Misc
     std::vector<std::string> stringExplode(std::string const &str, const std::string &delimeter);
     std::vector<std::string> stringExplode(std::string const &str, char delimeter);
 
+    /// @brief обрезает строку слева
+    /// @param string
+    /// @param max
+    /// @return
     std::string ltrimString(std::string &string, uint max);
 
+    /// @brief Генерирует случайную строку
+    /// @param length
+    /// @return
+    std::string getRandomStr(const unsigned char length);
+
+    std::string getConfigValue(std::string path, std::string section, std::string value);
+
+    /*
+
+    формат конфиг файла
+
+    ; комментарий
+    # комментарий
+    [Section1]
+    ; комментарий
+    var1=значение_1 ; комментарий
+    var2=значение_2 # комментарий
+
+    [Section2]
+    var1=значение_1
+    var2=значение_2
+
+    другие форматы ini файла не поддерживаются.
+
+    */
 }
