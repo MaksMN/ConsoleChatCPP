@@ -28,6 +28,7 @@ int main(int argc, const char *argv[])
     auto t = Misc::getConfigValue(config_file, "DB", "dbpass");
     DBClient d;
     d.initialise();
+    d.DBprovider->initialize();
 
 #if defined(_WIN64) || defined(_WIN32)
     system("pause");

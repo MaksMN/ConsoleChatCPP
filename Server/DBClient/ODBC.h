@@ -7,5 +7,6 @@ private:
     /* data */
 public:
     ~ODBC() = default;
+    void initialize();
     void hello();
 };

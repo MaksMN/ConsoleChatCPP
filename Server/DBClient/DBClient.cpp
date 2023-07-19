@@ -2,7 +2,7 @@
 
 void DBClient::initialise()
 {
-    if (Misc::getConfigValue(config_file, "GENERAL", "db") == "mysql")
+    if (Misc::getConfigValue(config_file, "GENERAL", "db") == "mysqlapi")
     {
         DBprovider = &mysqlapi;
     }
