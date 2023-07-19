@@ -5,13 +5,12 @@
 const extern char config_file[];
 class SQL
 {
-private:
 protected:
-    std::string server;
-    std::string port;
-    std::string dbuser;
-    std::string dbpass;
-    std::string odbcdriver;
+    const std::string server;
+    const std::string port;
+    const std::string dbuser;
+    const std::string dbpass;
+    const std::string odbcdriver;
 
 public:
     SQL();
