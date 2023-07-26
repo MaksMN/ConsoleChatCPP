@@ -4,17 +4,6 @@ ServerHandler::ServerHandler(char (&_cmd_buffer)[CMD_BUFFER]) : cmd_buffer(_cmd_
 
 void ServerHandler::InitialiseDB()
 {
-    // Сервисный админ должен быь всегда
-    if (!std::filesystem::exists(usersDB.getDBfilePath()))
-    {
-        User admin(0, "admin", "Администратор", "1234", usersDB.getDBfilePath());
-        admin.toAdmin();
-        admin.writeData();
-    }
-
-    usersDB.updateFromFile();
-    pubMessagesDB.updateFromFile();
-    privMessagesDB.updateFromFile();
 }
 
 void ServerHandler::Run()
@@ -48,7 +37,7 @@ void ServerHandler::Run()
     auto session_key = buffer.getSessionKey();
 
     // данные пользователя
-    user = usersDB.getUserByLogin(login);
+    user = dbClient.DBprovider()->getUserByLogin(login);
     if ((user != nullptr && user->getSessionKey() != session_key && session_key != 0) || user == nullptr)
     {
         user = nullptr;
@@ -99,13 +88,7 @@ void ServerHandler::Run()
     /* Сюда попадает любой неавторизованный пользователь */
     if (user == nullptr)
     {
-        ChatGuestPage guestPage{pubMessagesDB,
-                                privMessagesDB,
-                                complaintsDB,
-                                usersDB,
-                                cmd_buffer};
-        guestPage.run();
-        data_buffer_text = guestPage.getDataText();
+        data_buffer_text = "Guest page";
         return;
     }
 
@@ -150,13 +133,7 @@ void ServerHandler::Run()
     pages_set.insert(PROFILE_PAGE_INPUT);
     if (cmd_text == PROFILE || pages_set.contains(page_text))
     {
-        ChatEditProfile editProfile{pubMessagesDB,
-                                    privMessagesDB,
-                                    complaintsDB,
-                                    usersDB,
-                                    cmd_buffer};
-        editProfile.run();
-        data_buffer_text = editProfile.getDataText();
+        data_buffer_text = "edit profile page";
         return;
     }
 
@@ -167,13 +144,7 @@ void ServerHandler::Run()
     pages_set.insert(PUBLIC_PAGE_INPUT);
     if (pages_set.contains(page_text))
     {
-        ChatPublicPage publicPage{pubMessagesDB,
-                                  privMessagesDB,
-                                  complaintsDB,
-                                  usersDB,
-                                  cmd_buffer};
-        publicPage.run();
-        data_buffer_text = publicPage.getDataText();
+        data_buffer_text = "chat public main page";
         return;
     }
 
@@ -183,13 +154,7 @@ void ServerHandler::Run()
     pages_set.insert(PRIVATE_PAGE_USERS_INPUT);
     if (pages_set.contains(page_text))
     {
-        ChatPrivatePageUsers privateUsersPage{pubMessagesDB,
-                                              privMessagesDB,
-                                              complaintsDB,
-                                              usersDB,
-                                              cmd_buffer};
-        privateUsersPage.run();
-        data_buffer_text = privateUsersPage.getDataText();
+        data_buffer_text = "users list";
         return;
     }
 
@@ -199,13 +164,7 @@ void ServerHandler::Run()
     pages_set.insert(PRIVATE_PAGE_MESSAGES_INPUT);
     if (pages_set.contains(page_text))
     {
-        ChatPrivatePageMessages privateMessagesPage{pubMessagesDB,
-                                                    privMessagesDB,
-                                                    complaintsDB,
-                                                    usersDB,
-                                                    cmd_buffer};
-        privateMessagesPage.run();
-        data_buffer_text = privateMessagesPage.getDataText();
+        data_buffer_text = "private chat page";
         return;
     }
 

@@ -1,6 +1,5 @@
 #pragma once
 #include <string>
-#include "ChatOptions.h"
 #include "../../Misc/Misc.h"
 #include "../../Misc/Flags.h"
 #include "../../Misc/SHA1.h"

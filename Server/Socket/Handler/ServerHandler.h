@@ -6,15 +6,10 @@
 #include <map>
 #include <set>
 #include "../../Misc/Misc.h"
-#include "../../DB/Headers.h"
-#include "IChatInterface.h"
-#include "ChatGuestPage.h"
-#include "ChatPublicPage.h"
-#include "ChatPrivatePageUsers.h"
-#include "ChatPrivatePageMessages.h"
-#include "ChatEditProfile.h"
 #include "../../Misc/BufferActions.h"
 #include "ServerChatMap.h"
+#include "../../ChatCore/User.h"
+#include "../DBClient/DBClient.h"
 
 #define DATA_BUFFER 4096 // Размер буфера для данных
 #define CMD_BUFFER 1024  // Размер буфера команд и заголовков
@@ -26,11 +21,7 @@ class ServerHandler
 private:
     char (&cmd_buffer)[CMD_BUFFER];
 
-    DBmessages pubMessagesDB{"pub_messages"};
-    DBmessages privMessagesDB{"priv_messages"};
-    DBcomplaints complaintsDB;
-    DBusers usersDB{"users"};
-
+    DBClient dbClient;
     std::shared_ptr<User> user;
 
     bool work = true;

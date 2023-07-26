@@ -26,25 +26,16 @@ void MySQLAPI::initialize()
     // Смотрим изменилась ли кодировка на нужную, по умолчанию идёт latin1
     Misc::printMessage("connection characterset: ", false);
     Misc::printMessage(mysql_character_set_name(&mysql));
+}
 
-    mysql_query(&mysql, "SELECT * FROM `users`"); // Делаем запрос к таблице
+std::shared_ptr<User> MySQLAPI::getUserByID(ullong userID)
+{
+    return std::shared_ptr<User>();
+}
 
-    // Выводим все что есть в базе через цикл
-    if (res = mysql_store_result(&mysql))
-    {
-        while (row = mysql_fetch_row(res))
-        {
-            for (uint i = 0; i < mysql_num_fields(res); i++)
-            {
-                Misc::printMessage(row[i]);
-            }
-        }
-    }
-    else
-    {
-        Misc::printMessage("Ошибка MySql номер ", false);
-        Misc::printMessage(mysql_error(&mysql));
-    }
+std::shared_ptr<User> MySQLAPI::getUserByLogin(std::string userLogin)
+{
+    return std::shared_ptr<User>();
 }
 
 void MySQLAPI::hello()

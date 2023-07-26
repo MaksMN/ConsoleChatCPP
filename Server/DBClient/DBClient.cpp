@@ -1,15 +1,22 @@
 #include "DBClient.h"
 
+DBCore *DBClient::DBprovider()
+{
+    return _DBprovider;
+}
+
 void DBClient::initialise()
 {
-    if (Misc::getConfigValue(config_file, "GENERAL", "db") == "mysqlapi")
+    if (Misc::getConfigValue(config_file, "DB", "db") == "mysqlapi")
     {
-        DBprovider = &mysqlapi;
+        _DBprovider = &mysqlapi;
+        _DBprovider->provider = 0;
     }
     else
     {
-        DBprovider = &odbc;
+        _DBprovider = &odbc;
+        _DBprovider->provider = 1;
     }
 
-    DBprovider->hello();
+    _DBprovider->hello();
 }

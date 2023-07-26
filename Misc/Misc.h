@@ -115,10 +115,14 @@ namespace Misc
     /// @return
     std::string getRandomStr(const unsigned char length);
 
+    /// @brief читает параметры конфигурации в формате ini файла
+    /// @param path
+    /// @param section
+    /// @param value
+    /// @return
     std::string getConfigValue(std::string path, std::string section, std::string value);
 
     /*
-
     формат конфиг файла
 
     ; комментарий
@@ -133,6 +137,5 @@ namespace Misc
     var2=значение_2
 
     другие форматы ini файла не поддерживаются.
-
     */
 }

@@ -9,10 +9,12 @@ const extern char config_file[];
 class DBClient
 {
 private:
-public:
-    SQL *DBprovider;
     MySQLAPI mysqlapi;
     ODBC odbc;
+    DBCore *_DBprovider;
+
+public:
+    DBCore *DBprovider();
     ~DBClient() = default;
     void initialise();
 };
