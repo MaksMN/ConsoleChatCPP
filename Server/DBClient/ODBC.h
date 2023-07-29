@@ -5,7 +5,7 @@
 #include <sqltypes.h>
 #include <sql.h>
 
-class ODBC : public DBCore
+class ODBC final : public DBCore
 {
 private:
     std::wstring connect_data;
@@ -18,8 +18,10 @@ public:
     ~ODBC() = default;
     void initialize();
     void hello();
-    std::shared_ptr<User> getUserByID(ullong userID);
-    std::shared_ptr<User> getUserByLogin(std::string userLogin);
+    std::shared_ptr<User> getUserByID(const ullong &userID, uint &db_error_number) override;
+    std::shared_ptr<User> getUserByLogin(const std::string &userLogin, uint &db_error_number) override;
+    bool saveUser(std::shared_ptr<User> user, uint &db_error_number) override;
+    bool addUser(std::shared_ptr<User> &user, bool &login_busy, bool &email_busy, uint &db_error_number);
 
 private:
     void wrongDescriptorMsg()

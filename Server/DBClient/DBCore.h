@@ -28,8 +28,10 @@ public:
     virtual ~DBCore() = default;
     virtual void initialize() = 0;
 
-    virtual std::shared_ptr<User> getUserByID(ullong userID) = 0;
-    virtual std::shared_ptr<User> getUserByLogin(std::string userLogin) = 0;
+    virtual std::shared_ptr<User> getUserByID(const ullong &userID, uint &db_error_number) = 0;
+    virtual std::shared_ptr<User> getUserByLogin(const std::string &userLogin, uint &db_error_number) = 0;
+    virtual bool saveUser(std::shared_ptr<User> user, uint &db_error_number) = 0;
+    virtual bool addUser(std::shared_ptr<User> &user, bool &login_busy, bool &email_busy, uint &db_error_number) = 0;
 
     virtual void hello() = 0;
 };

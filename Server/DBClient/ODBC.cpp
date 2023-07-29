@@ -69,12 +69,22 @@ void ODBC::hello()
     Misc::printMessage("Hello! Im ODBC.");
 }
 
-std::shared_ptr<User> ODBC::getUserByID(ullong userID)
+std::shared_ptr<User> ODBC::getUserByID(const ullong &userID, uint &db_error_number)
 {
     return std::shared_ptr<User>();
 }
 
-std::shared_ptr<User> ODBC::getUserByLogin(std::string userLogin)
+std::shared_ptr<User> ODBC::getUserByLogin(const std::string &userLogin, uint &db_error_number)
 {
     return std::shared_ptr<User>();
+}
+
+bool ODBC::saveUser(std::shared_ptr<User> user, uint &db_error_number)
+{
+    return false;
+}
+
+bool ODBC::addUser(std::shared_ptr<User> &user, bool &login_busy, bool &email_busy, uint &db_error_number)
+{
+    return false;
 }

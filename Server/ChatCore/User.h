@@ -3,6 +3,7 @@
 #include "../../Misc/Misc.h"
 #include "../../Misc/Flags.h"
 #include "../../Misc/SHA1.h"
+#include "ChatOptions.h"
 
 typedef unsigned int uint;
 typedef unsigned long long ullong;
@@ -11,52 +12,84 @@ typedef unsigned long long ullong;
 class User
 {
 private:
-    ullong _id = 0;
+    ullong _id;
     std::string _login;
-    std::string _name;
-    std::string pass_hash;
-    std::string pass_salt;
+    std::string _email;
+    std::string _first_name;
+    std::string _last_name;
+    std::string _pass_hash;
+    std::string _pass_salt;
     user::status _status = user::none_;
-    ullong _timestamp = 0;
-
+    ullong _registered = 0;
+    ullong _session_key = 0;
     Flags<user::status> flags;
-    ullong session_key = 0;
+
+    bool _in_db = false;
+
     SHA1 sha1;
 
 public:
-    /// @brief Создает нового пользователя
-    /// @param id
-    /// @param login
-    /// @param name
-    /// @param pass
-    User(const ullong &id, const std::string &login, const std::string &name, std::string &pass);
-    User(const ullong &&id, const std::string &&login, const std::string &&name, std::string &&pass);
+    User(
+        const std::string &login,
+        const std::string &email,
+        const std::string &first_name,
+        const std::string &last_name,
+        std::string &pass);
+    User(
+        const std::string &&login,
+        const std::string &&email,
+        const std::string &&first_name,
+        const std::string &&last_name,
+        std::string &&pass);
 
-    /// @brief Создает пользователя по id из базы данных
-    /// @param id
-    User(ullong &id);
-    User(ullong &&id);
+    User(
+        const ullong &id,
+        const std::string &login,
+        const std::string &email,
+        const std::string &first_name,
+        const std::string &last_name,
+        const ullong &registered,
+        const uint &status,
+        const ullong &session_key,
+        const std::string &pass_hash,
+        const std::string &pass_salt);
 
     ~User() = default;
 
-    /// @brief Пересоздает пользователя из базы данных
-    /// @param id
+    /// @brief Имеется ли пользователь в базе?
     /// @return
-    User get(ullong &id);
+    bool InDB();
 
-    /// @brief сохраняет пользователя в БД
-    void save();
+    std::string getHash();
+    std::string getSalt();
+
+    /// @brief Обновляет статус принадлежности пользователя к базе.
+    /// @param in_db
+    void setInDB(bool in_db);
 
     /// @brief Возвращает ID пользователя
     /// @return
     uint getID();
-    /// @brief Возвращает имя пользователя
+
+    /// @brief Возвращает имя фамилию пользователя
     /// @return
     std::string getName();
 
-    /// @brief Изменяет имя пользователя
+    /// @brief Изменяет имя фамилию пользователя. Параметр с пустой строкой игнорируется.
     /// @param name
-    void setName(const std::string &name);
+    void setName(const std::string &first_name, const std::string &last_name);
+
+    std::string getFirstName();
+    std::string getLastName();
+    ullong getRegistered();
+
+    /// @brief Возвращает Email
+    /// @return
+    std::string getEmail();
+
+    /// @brief изменяет email
+    /// @param email
+    void setEmail(std::string email);
 
     /// @brief Возвращает логин пользователя
     /// @return
@@ -90,19 +123,10 @@ public:
     /// @brief Устанавливает флаг пользователя
     void toUser();
 
-    /// @brief Выводит на экран данные пользователя
-    void printData();
-
-    std::string getData();
-
     /// @brief Изменяет пароль пользователя
     void setPass(std::string &pass);
 
-    /// @brief проверяет пароль пользователя
     bool validatePass(std::string &pass);
-
-    /// @brief Записывает данные пользователя в файл
-    void writeData();
 
     ullong getSessionKey();
     void setSessionKey(ullong key);

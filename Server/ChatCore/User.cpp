@@ -1,23 +1,71 @@
 #include "User.h"
 
-User::User(const ullong &id, const std::string &login, const std::string &name, std::string &pass)
-    : _id(id),
-      _login(login),
-      _name(name),
-      _timestamp(time(NULL))
+User::User(const std::string &login, const std::string &email, const std::string &first_name, const std::string &last_name, std::string &pass)
 {
-    setPass(pass);
+    _login = login;
+    _email = email;
+    _first_name = first_name;
+    _last_name = last_name;
+    _registered = time(NULL);
     _status = user::user_;
+    setPass(pass);
+    _in_db = false;
 }
 
-User::User(const ullong &&id, const std::string &&login, const std::string &&name, std::string &&pass)
-    : _id(id),
-      _login(login),
-      _name(name),
-      _timestamp(time(NULL))
+User::User(const std::string &&login, const std::string &&email, const std::string &&first_name, const std::string &&last_name, std::string &&pass)
 {
-    setPass(pass);
+    _login = login;
+    _email = email;
+    _first_name = first_name;
+    _last_name = last_name;
+    _registered = time(NULL);
     _status = user::user_;
+    setPass(pass);
+    _in_db = false;
+}
+
+User::User(const ullong &id,
+           const std::string &login,
+           const std::string &email,
+           const std::string &first_name,
+           const std::string &last_name,
+           const ullong &registered,
+           const uint &status,
+           const ullong &session_key,
+           const std::string &pass_hash,
+           const std::string &pass_salt)
+{
+    _id = id;
+    _login = login;
+    _email = email;
+    _first_name = first_name;
+    _last_name = last_name;
+    _registered = registered;
+    _status = (user::status)status;
+    _session_key = session_key,
+    _pass_hash = pass_hash;
+    _pass_salt = pass_salt;
+    _in_db = true;
+}
+
+bool User::InDB()
+{
+    return _in_db;
+}
+
+std::string User::getHash()
+{
+    return _pass_hash;
+}
+
+std::string User::getSalt()
+{
+    return _pass_salt;
+}
+
+void User::setInDB(bool in_db)
+{
+    _in_db = in_db;
 }
 
 uint User::getID()
@@ -27,11 +75,44 @@ uint User::getID()
 
 std::string User::getName()
 {
-    return _name;
+    return _first_name + " " + _last_name;
 }
-void User::setName(const std::string &name)
+
+void User::setName(const std::string &first_name, const std::string &last_name)
 {
-    _name = name;
+    if (!first_name.empty())
+    {
+        _first_name = first_name;
+    }
+    if (!last_name.empty())
+    {
+        _last_name = last_name;
+    }
+}
+
+std::string User::getFirstName()
+{
+    return _first_name;
+}
+
+std::string User::getLastName()
+{
+    return _last_name;
+}
+
+ullong User::getRegistered()
+{
+    return _registered;
+}
+
+std::string User::getEmail()
+{
+    return _email;
+}
+
+void User::setEmail(std::string email)
+{
+    _email = email;
 }
 
 std::string User::getLogin()
@@ -91,51 +172,32 @@ void User::toAdmin()
     _status = flags.flagsReplace(_status, user::admin_, user::user_ | user::banned_);
 }
 
-void User::printData()
-{
-    std::cout << _name << "[" << _login << "] [userid " << _id << "] ";
-    if (isAdmin())
-        std::cout << "[group admin] ";
-    if (isBanned())
-        std::cout << "[status banned] ";
-    if (isUser())
-        std::cout << "[group user] ";
-
-    std::cout << "Рег." << Misc::StampToTime(_timestamp) << std::endl;
-    std::cout << std::endl;
-}
-
-std::string User::getData()
-{
-    std::string s1 =
-        _name + "[" + _login + "] [userid " + std::to_string(_id) + "] ";
-
-    if (isAdmin())
-        s1 += "[group admin] ";
-    if (isBanned())
-        s1 += "[status banned] ";
-    if (isUser())
-        s1 += "[group user] ";
-    s1 += "Рег." + Misc::StampToTime(_timestamp) + "\n";
-    return s1;
-}
-
 void User::setPass(std::string &pass)
 {
-    pass_salt = Misc::getRandomStr(40);
-    pass_hash = sha1.hash(pass + pass_salt);
+    _pass_salt = Misc::getRandomStr(40);
+    _pass_hash = sha1.hash(pass + _pass_salt);
+    // уничтожение пароля
     for (int i{0}; i < pass.size(); i++)
         pass.data()[i] = '\0';
 }
 
+bool User::validatePass(std::string &pass)
+{
+    std::string pass_hash = sha1.hash(pass + _pass_salt);
+    // уничтожение пароля
+    for (int i{0}; i < pass.size(); i++)
+        pass.data()[i] = '\0';
+    return pass_hash == _pass_hash;
+}
+
 ullong User::getSessionKey()
 {
-    return session_key;
+    return _session_key;
 }
 
 void User::setSessionKey(ullong key)
 {
-    session_key = key;
+    _session_key = key;
 }
 
 uint User::getOwnerID()
