@@ -85,7 +85,7 @@ std::string MySQLAPI::userList(ullong &start, ullong &per_page, ullong &capacity
     for (ullong i = 0; i < capacity; i++)
     {
         result += std::to_string(i + 1) + ". "; // порядковый номер
-        auto user = fetchUserRow(false);
+        auto user = fetchUserRow(0, false);
         result += user->userData();
         result += "\n";
         row = mysql_fetch_row(res);
@@ -186,7 +186,63 @@ bool MySQLAPI::addUser(std::shared_ptr<User> &user, bool &login_busy, bool &emai
 
 std::shared_ptr<Message> MySQLAPI::getMessageByID(const ullong &messageID, uint &db_error_number)
 {
+
     return std::shared_ptr<Message>();
+}
+
+bool MySQLAPI::addMessage(std::shared_ptr<Message> &message, uint &db_error_number)
+{
+    db_error_number = 0;
+    std::string query =
+        message->isPrivate()
+            ? "INSERT INTO `private_messages` (`id`, `author_id`, `recipient_id`, `text`, `published`, `status`) "
+              "VALUES (NULL, '" +
+                  std::to_string(message->getAuthorID()) + "', '" +
+                  std::to_string(message->getRecipientID()) + "', '" +
+                  message->getText() + "', '" +
+                  std::to_string(message->getPublished()) + "', '" +
+                  std::to_string(message->getStatusInt() + msg::message_delivered) + "');"
+            : "INSERT INTO `pub_messages` (`id`, `author_id`, `text`, `published`, `status`) VALUES (NULL, '" +
+                  std::to_string(message->getAuthorID()) + "', '" +
+                  message->getText() + "', '" +
+                  std::to_string(message->getPublished()) + "', '" +
+                  std::to_string(message->getStatusInt() + msg::message_delivered) + "');";
+    if (queryUpdate(query, db_error_number) != 0)
+    {
+        return false;
+    }
+    return db_error_number == 0;
+}
+
+std::string MySQLAPI::messageList(ullong reader_id, ullong &start, ullong &per_page, ullong &capacity, uint &db_error_number)
+{
+    db_error_number = 0;
+    std::string query;
+
+    ullong count = getCount("pub_messages", "1", db_error_number);
+
+    Misc::alignPaginator(start, per_page, count);
+
+    query = "SELECT * FROM `pub_messages` WHERE 1 LIMIT " + std::to_string(start - 1) + ", " + std::to_string(start + per_page) + ";";
+
+    capacity = querySelect(query, db_error_number);
+
+    std::string result;
+    for (ullong i = 0; i < capacity; i++)
+    {
+        result += std::to_string(i + 1) + ". "; // порядковый номер
+        auto user = fetchUserRow(0, false);
+        result += user->userData();
+        result += "\n";
+        row = mysql_fetch_row(res);
+    }
+    mysql_free_result(res);
+    return result;
+}
+
+std::string MySQLAPI::messageList(ullong reader_id, ullong author_id, ullong recipient_id, ullong &start, ullong &per_page, ullong &capacity, uint &db_error_number)
+{
+    return std::string();
 }
 
 void MySQLAPI::hello()
@@ -194,24 +250,25 @@ void MySQLAPI::hello()
     Misc::printMessage("Using MySQL API!");
 }
 
-std::shared_ptr<User> MySQLAPI::fetchUserRow(bool getPassData)
+std::shared_ptr<User> MySQLAPI::fetchUserRow(uint startRow, bool getPassData)
 {
     if (mysql_num_rows(res))
     {
         std::string hash;
         std::string salt;
-        ullong id = atoll(row[0]);
-        std::string login = (std::string)row[1];
-        std::string email = (std::string)row[2];
-        std::string first_name = (std::string)row[3];
-        std::string last_name = (std::string)row[4];
-        ullong registered = atoll(row[5]);
-        user::status status = (user::status)atoi(row[6]);
-        ullong session_key = atoll(row[7]);
+        ullong id = atoll(row[startRow]);
+        std::string login = (std::string)row[++startRow];
+        std::string email = (std::string)row[++startRow];
+        std::string first_name = (std::string)row[++startRow];
+        std::string last_name = (std::string)row[++startRow];
+        ullong registered = atoll(row[++startRow]);
+        user::status status = (user::status)atoi(row[++startRow]);
+        ullong session_key = atoll(row[++startRow]);
+        ++startRow;
         if (getPassData)
         {
-            hash = (std::string)row[9];
-            salt = (std::string)row[10];
+            hash = (std::string)row[++startRow];
+            salt = (std::string)row[++startRow];
         }
         else
         {
@@ -263,3 +320,8 @@ uint MySQLAPI::queryUpdate(std::string &query, uint &db_error_number)
     }
     return query_result;
 }
+/*
+UPDATE `pub_messages`
+SET `status` = `status` | 4
+WHERE `id` = 3 OR `id` = 11 OR `id` = 16;
+*/

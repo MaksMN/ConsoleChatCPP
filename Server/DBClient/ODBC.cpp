@@ -103,3 +103,18 @@ std::shared_ptr<Message> ODBC::getMessageByID(const ullong &messageID, uint &db_
 {
     return std::shared_ptr<Message>();
 }
+
+bool ODBC::addMessage(std::shared_ptr<Message> &message, uint &db_error_number)
+{
+    return false;
+}
+
+std::string ODBC::messageList(ullong reader_id, ullong &start, ullong &per_page, ullong &capacity, uint &db_error_number)
+{
+    return std::string();
+}
+
+std::string ODBC::messageList(ullong reader_id, ullong author_id, ullong recipient_id, ullong &start, ullong &per_page, ullong &capacity, uint &db_error_number)
+{
+    return std::string();
+}

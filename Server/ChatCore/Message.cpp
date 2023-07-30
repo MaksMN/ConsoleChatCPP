@@ -103,6 +103,11 @@ bool Message::isRead()
     return flags.hasFlag(msg::message_read, _status);
 }
 
+ullong Message::getPublished()
+{
+    return +_published;
+}
+
 void Message::hide()
 {
     _status = flags.addFlag(_status, msg::hidden_);

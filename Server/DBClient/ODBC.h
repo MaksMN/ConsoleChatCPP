@@ -26,6 +26,10 @@ public:
     bool addUser(std::shared_ptr<User> &user, bool &login_busy, bool &email_busy, uint &db_error_number) override;
     std::shared_ptr<Message> getMessageByID(const ullong &messageID, uint &db_error_number) override;
 
+    bool addMessage(std::shared_ptr<Message> &message, uint &db_error_number) override;
+    std::string messageList(ullong reader_id, ullong &start, ullong &per_page, ullong &capacity, uint &db_error_number) override;
+    std::string messageList(ullong reader_id, ullong author_id, ullong recipient_id, ullong &start, ullong &per_page, ullong &capacity, uint &db_error_number) override;
+
 private:
     void wrongDescriptorMsg()
     {

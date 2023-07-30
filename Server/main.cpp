@@ -36,13 +36,17 @@ int main(int argc, const char *argv[])
 
     auto u2 = d.DBprovider()->getUserByID(55, db_errno);
 
-    auto us = std::make_shared<User>("xxxxxxx", "emaiiila", "dfcza", "asdfa", "pass");
+    auto us = std::make_shared<User>("777", "emlaaaaa", "dfcza", "asdfa", "pass");
     auto tt = d.DBprovider()->addUser(us, login_busy, email_busy, db_errno);
     ullong cap;
     ullong start = 1;
     ullong per_page = 20;
     auto list = d.DBprovider()->userList(start, per_page, cap, db_errno);
     Misc::printMessage(list);
+
+    auto m = std::make_shared<Message>(4, "qqqqqqqqqqssssssssss");
+
+    auto test = d.DBprovider()->addMessage(m, db_errno);
     int a = 0;
 
 #if defined(_WIN64) || defined(_WIN32)

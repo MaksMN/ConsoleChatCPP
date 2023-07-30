@@ -72,7 +72,37 @@ public:
     /// @return
     virtual bool addUser(std::shared_ptr<User> &user, bool &login_busy, bool &email_busy, uint &db_error_number) = 0;
 
+    /// @brief Получает сообщение из базы
+    /// @param messageID
+    /// @param db_error_number
+    /// @return
     virtual std::shared_ptr<Message> getMessageByID(const ullong &messageID, uint &db_error_number) = 0;
+
+    /// @brief Добавляет новое сообщение в базу
+    /// @param message
+    /// @param db_error_number
+    /// @return
+    virtual bool addMessage(std::shared_ptr<Message> &message, uint &db_error_number) = 0;
+
+    /// @brief Получает список публичных сообщений
+    /// @param reader_id сообщение будет помечено прочитанным если этот ID не является автором сообщения.
+    /// @param start
+    /// @param per_page
+    /// @param capacity
+    /// @param db_error_number
+    /// @return
+    virtual std::string messageList(ullong reader_id, ullong &start, ullong &per_page, ullong &capacity, uint &db_error_number) = 0;
+
+    /// @brief Получает список личных сообщений
+    /// @param reader_id сообщение будет помечено прочитанным если этот ID не является автором сообщения.
+    /// @param author_id
+    /// @param recipient_id
+    /// @param start
+    /// @param per_page
+    /// @param capacity
+    /// @param db_error_number
+    /// @return
+    virtual std::string messageList(ullong reader_id, ullong author_id, ullong recipient_id, ullong &start, ullong &per_page, ullong &capacity, uint &db_error_number) = 0;
 
     /// @brief тестовая функция, указывает какой тип подключения к базе
     virtual void hello() = 0;

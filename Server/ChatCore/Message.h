@@ -72,6 +72,8 @@ public:
     void toUnread();
     bool isRead();
 
+    ullong getPublished();
+
     /// @brief Добавляет флаг скрытия
     void hide();
 

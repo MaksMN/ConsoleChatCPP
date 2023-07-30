@@ -22,13 +22,18 @@ public:
     std::string userList(ullong &start, ullong &per_page, ullong &capacity, uint &db_error_number) override;
     bool saveUser(std::shared_ptr<User> user, uint &db_error_number) override;
     bool addUser(std::shared_ptr<User> &user, bool &login_busy, bool &email_busy, uint &db_error_number) override;
-
     std::shared_ptr<Message> getMessageByID(const ullong &messageID, uint &db_error_number) override;
+
+    bool addMessage(std::shared_ptr<Message> &message, uint &db_error_number) override;
+
+    std::string messageList(ullong reader_id, ullong &start, ullong &per_page, ullong &capacity, uint &db_error_number) override;
+
+    std::string messageList(ullong reader_id, ullong author_id, ullong recipient_id, ullong &start, ullong &per_page, ullong &capacity, uint &db_error_number) override;
 
     void hello();
 
 private:
-    std::shared_ptr<User> fetchUserRow(bool getPassData = true);
+    std::shared_ptr<User> fetchUserRow(uint startRow = 0, bool getPassData = true);
 
     /// @brief Делает запрос SELECT
     /// @param query
