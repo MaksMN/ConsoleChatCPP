@@ -42,6 +42,7 @@ std::shared_ptr<User> MySQLAPI::getUserByID(const ullong &userID, uint &db_error
     {
         db_error_number = mysql_errno(&mysql);
         Misc::printMessage(mysql_error(&mysql));
+        mysql_free_result(res);
     }
 
     return nullptr;
@@ -62,9 +63,59 @@ std::shared_ptr<User> MySQLAPI::getUserByLogin(const std::string &userLogin, uin
     {
         db_error_number = mysql_errno(&mysql);
         Misc::printMessage(mysql_error(&mysql));
+        mysql_free_result(res);
     }
 
     return nullptr;
+}
+
+ullong MySQLAPI::getCount(std::string table, std::string where, uint &db_error_number)
+{
+    db_error_number = 0;
+    ullong count = 0;
+    std::string query = "SELECT COUNT(*) FROM `" + table + "` WHERE " + where + ";";
+    if (querySelect(query, db_error_number) > 0)
+    {
+        count = atoll(row[0]);
+        mysql_free_result(res);
+    }
+    return count;
+}
+
+std::string MySQLAPI::userList(ullong &start, ullong &per_page, ullong &capacity, uint &db_error_number)
+{
+    db_error_number = 0;
+    std::string query;
+
+    ullong count = getCount("users", "`id` != 0", db_error_number);
+
+    Misc::alignPaginator(start, per_page, count);
+
+    query = "SELECT * FROM `users` WHERE `id` != 0 LIMIT " + std::to_string(start - 1) + ", " + std::to_string(start + per_page) + ";";
+
+    capacity = querySelect(query, db_error_number);
+
+    std::string result;
+    for (ullong i = 0; i < capacity; i++)
+    {
+        result += std::to_string(i + 1) + ". "; // порядковый номер
+        ullong id = atoll(row[0]);
+        std::string login = (std::string)row[1];
+        std::string email = (std::string)row[2];
+        std::string first_name = (std::string)row[3];
+        std::string last_name = (std::string)row[4];
+        ullong registered = atoll(row[5]);
+        user::status status = (user::status)atoi(row[6]);
+        ullong session_key = atoll(row[7]);
+        row = mysql_fetch_row(res);
+        std::string hash = std::string();
+        std::string salt = std::string();
+        auto user = std::make_shared<User>(id, login, email, first_name, last_name, registered, status, session_key, hash, salt);
+        result += user->userData();
+        result += "\n";
+    }
+
+    return result;
 }
 
 bool MySQLAPI::saveUser(std::shared_ptr<User> user, uint &db_error_number)
@@ -96,16 +147,18 @@ bool MySQLAPI::addUser(std::shared_ptr<User> &user, bool &login_busy, bool &emai
     if (querySelect(query, db_error_number) > 0 && atoi(row[0]) > 0)
     {
         login_busy = true;
+        mysql_free_result(res);
         return false;
     }
 
     query = "SELECT COUNT(*) FROM `users` WHERE `email` LIKE '" + user->getEmail() + "';";
     if (querySelect(query, db_error_number) > 0 && atoi(row[0]) > 0)
     {
+        mysql_free_result(res);
         email_busy = true;
         return false;
     }
-
+    mysql_free_result(res);
     query = "INSERT INTO `users` (`id`, `login`, `email`, `first_name`, `last_name`, `registered`, `status`, `session_key`) "
             "VALUES (NULL, '" +
             user->getLogin() +
@@ -124,6 +177,7 @@ bool MySQLAPI::addUser(std::shared_ptr<User> &user, bool &login_busy, bool &emai
             "');";
     if (queryUpdate(query, db_error_number) != 0)
     {
+        mysql_free_result(res);
         return false;
     }
 
@@ -139,6 +193,7 @@ bool MySQLAPI::addUser(std::shared_ptr<User> &user, bool &login_busy, bool &emai
     }
     else
     {
+        mysql_free_result(res);
         Misc::printMessage("Не удалось получить автоинкрементный ID пользователя");
         return false;
     }
@@ -172,7 +227,6 @@ std::shared_ptr<User> MySQLAPI::fetchUserRow()
         ullong session_key = atoll(row[7]);
         std::string hash = (std::string)row[9];
         std::string salt = (std::string)row[10];
-        mysql_free_result(res);
         return std::make_shared<User>(
             id,
             login,
@@ -184,7 +238,9 @@ std::shared_ptr<User> MySQLAPI::fetchUserRow()
             session_key,
             hash,
             salt);
+        mysql_free_result(res);
     }
+    mysql_free_result(res);
     return nullptr;
 }
 

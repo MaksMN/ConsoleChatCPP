@@ -30,6 +30,8 @@ public:
 
     virtual std::shared_ptr<User> getUserByID(const ullong &userID, uint &db_error_number) = 0;
     virtual std::shared_ptr<User> getUserByLogin(const std::string &userLogin, uint &db_error_number) = 0;
+    virtual ullong getCount(std::string table, std::string where, uint &db_error_number) = 0;
+    virtual std::string userList(ullong &start, ullong &per_page, ullong &capacity, uint &db_error_number) = 0;
     virtual bool saveUser(std::shared_ptr<User> user, uint &db_error_number) = 0;
     virtual bool addUser(std::shared_ptr<User> &user, bool &login_busy, bool &email_busy, uint &db_error_number) = 0;
 

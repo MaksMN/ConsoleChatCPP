@@ -138,4 +138,10 @@ namespace Misc
 
     другие форматы ini файла не поддерживаются.
     */
+
+    /// @brief корректирует значения пагинации если пользователь ввел некорректные данные
+    /// @param start
+    /// @param per_page
+    /// @param count
+    void alignPaginator(ullong &start, ullong &per_page, ullong &count);
 }

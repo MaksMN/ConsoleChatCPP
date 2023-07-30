@@ -132,4 +132,6 @@ public:
     void setSessionKey(ullong key);
 
     uint getOwnerID();
+
+    std::string userData();
 };

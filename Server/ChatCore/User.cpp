@@ -204,3 +204,18 @@ uint User::getOwnerID()
 {
     return getID();
 }
+
+std::string User::userData()
+{
+    std::string s1 =
+        "[userid " + std::to_string(_id) + "] [" + _login + "] [" + getName() + "] [" + getEmail() + "] ";
+
+    if (isAdmin())
+        s1 += "[group admin] ";
+    if (isBanned())
+        s1 += "[status banned] ";
+    if (isUser())
+        s1 += "[group user] ";
+    s1 += "Рег." + Misc::StampToTime(_registered) + "\n";
+    return s1;
+}

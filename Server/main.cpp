@@ -38,7 +38,11 @@ int main(int argc, const char *argv[])
 
     auto us = std::make_shared<User>("xxxxxxx", "emaiiila", "dfcza", "asdfa", "pass");
     auto tt = d.DBprovider()->addUser(us, login_busy, email_busy, db_errno);
-
+    ullong cap;
+    ullong start = 1;
+    ullong per_page = 20;
+    auto list = d.DBprovider()->userList(start, per_page, cap, db_errno);
+    Misc::printMessage(list);
     int a = 0;
 
 #if defined(_WIN64) || defined(_WIN32)

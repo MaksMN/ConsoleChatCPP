@@ -79,6 +79,16 @@ std::shared_ptr<User> ODBC::getUserByLogin(const std::string &userLogin, uint &d
     return std::shared_ptr<User>();
 }
 
+ullong ODBC::getCount(std::string table, std::string where, uint &db_error_number)
+{
+    return ullong();
+}
+
+std::string ODBC::userList(ullong &start, ullong &per_page, ullong &capacity, uint &db_error_number)
+{
+    return std::string();
+}
+
 bool ODBC::saveUser(std::shared_ptr<User> user, uint &db_error_number)
 {
     return false;

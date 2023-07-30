@@ -299,3 +299,13 @@ std::string Misc::getConfigValue(std::string path, std::string section, std::str
     stream.close();
     return std::string();
 }
+
+void Misc::alignPaginator(ullong &start, ullong &per_page, ullong &count)
+{
+    if (per_page == 0)
+        per_page = 1;
+    if (start == 0)
+        start = 1;
+    if (start > count)
+        start = count;
+}
