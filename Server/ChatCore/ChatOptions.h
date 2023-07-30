@@ -9,7 +9,9 @@ namespace msg
         public_ = 2,   // публичное сообщение
         private_ = 4,  // личное сообщение
         complain_ = 8, // жалоба
-        author_deleted = 16
+        author_deleted = 16,
+        message_delivered = 32,
+        message_read = 64
     };
 };
 

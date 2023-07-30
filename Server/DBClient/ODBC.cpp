@@ -98,3 +98,8 @@ bool ODBC::addUser(std::shared_ptr<User> &user, bool &login_busy, bool &email_bu
 {
     return false;
 }
+
+std::shared_ptr<Message> ODBC::getMessageByID(const ullong &messageID, uint &db_error_number)
+{
+    return std::shared_ptr<Message>();
+}

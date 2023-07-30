@@ -2,57 +2,75 @@
 #include <string>
 #include <iostream>
 #include "../../Misc/Flags.h"
-#include "../ChatOptions.h"
+#include "ChatOptions.h"
 #include "../../Misc/Misc.h"
-#include <filesystem>
-#include <fstream>
-#include <cstring>
-#include "../../Misc/Stream.h"
 
 typedef unsigned int uint;
+typedef unsigned long long ullong;
 
 class Message
 {
 private:
-    const uint _id;
-    const unsigned long long _timestamp;
-    const uint _author_id;
-    const uint _recipient_id;
-    const std::string _text;
+    ullong _id;
+    ullong _author_id;
+    ullong _recipient_id;
+    std::string _text;
+    ullong _published;
     msg::status _status;
     Flags<msg::status> flags;
-
-    std::string DBfilePath;
 
 public:
     ~Message() = default;
 
-    /// @brief Создает сообщение чата путем прямого указания данных
+    /// @brief Создание нового публичного сообщения
+    /// @param author_id
+    /// @param text
+    Message(ullong author_id, std::string text);
+
+    /// @brief Создание публичного сообщения из базы
+    /// @param author_id
+    /// @param text
+    /// @param published
+    /// @param status
+    Message(ullong id, ullong author_id, std::string text, ullong published, uint status);
+
+    /// @brief Создание нового приватного сообщения
+    /// @param author_id
+    /// @param recipient_id
+    /// @param text
+    Message(ullong author_id, ullong recipient_id, std::string text);
+
+    /// @brief Создание приватного сообщения из базы
     /// @param id
     /// @param author_id
     /// @param recipient_id
     /// @param text
-    /// @param _status
-    /// @param db_file
-    Message(
-        const uint &id,
-        const uint &author_id,
-        const uint &recipient_id,
-        const std::string &text,
-        msg::status _status,
-        const std::string &db_file);
+    /// @param published
+    /// @param status
+    Message(ullong id, ullong author_id, ullong recipient_id, std::string text, ullong published, uint status);
 
-    /// @brief Создает сообщение из файла
-    /// @param stream
-    /// @param db_file
-    Message(std::ifstream &stream, const std::string &db_file);
     /// @brief Возвращает статус сообщения
     /// @return
     msg::status getStatus();
 
+    uint getStatusInt();
+
     /// @brief Изменяет статус сообщения
     /// @param status
     void setStatus(msg::status status);
+
+    /* добавление/удаление статусов */
+
+    bool isPublic();
+    bool isPrivate();
+    void toPublic();
+    void toPrivate();
+    void toDelivered();
+    void unDelivered();
+    bool isDelivered();
+    void read();
+    void toUnread();
+    bool isRead();
 
     /// @brief Добавляет флаг скрытия
     void hide();
@@ -85,14 +103,6 @@ public:
     /// @brief Возвращает текст сообщения
     /// @return
     std::string getText();
-
-    /// @brief Выводит на экран данные сообщения.
-    void printData();
-
-    std::string getData();
-
-    /// @brief Записывает в файл данные сообщения
-    void writeData();
 
     uint getOwnerID();
 };

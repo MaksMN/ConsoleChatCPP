@@ -23,10 +23,12 @@ public:
     bool saveUser(std::shared_ptr<User> user, uint &db_error_number) override;
     bool addUser(std::shared_ptr<User> &user, bool &login_busy, bool &email_busy, uint &db_error_number) override;
 
+    std::shared_ptr<Message> getMessageByID(const ullong &messageID, uint &db_error_number) override;
+
     void hello();
 
 private:
-    std::shared_ptr<User> fetchUserRow();
+    std::shared_ptr<User> fetchUserRow(bool getPassData = true);
 
     /// @brief Делает запрос SELECT
     /// @param query

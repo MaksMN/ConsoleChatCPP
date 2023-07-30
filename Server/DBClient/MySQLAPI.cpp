@@ -31,41 +31,27 @@ void MySQLAPI::initialize()
 std::shared_ptr<User> MySQLAPI::getUserByID(const ullong &userID, uint &db_error_number)
 {
     std::string query = "SELECT * FROM `users` INNER JOIN hash_tab ON `users`.id = `hash_tab`.uid WHERE `id` = '" + std::to_string(userID) + "' LIMIT 1;";
-    mysql_query(&mysql, query.data()); // Делаем запрос к таблице
-
-    if (res = mysql_store_result(&mysql))
+    if (querySelect(query, db_error_number) > 0)
     {
-        row = mysql_fetch_row(res);
-        return fetchUserRow();
-    }
-    else
-    {
-        db_error_number = mysql_errno(&mysql);
-        Misc::printMessage(mysql_error(&mysql));
+        auto user = fetchUserRow();
         mysql_free_result(res);
+        return user;
     }
-
+    mysql_free_result(res);
     return nullptr;
 }
 
 std::shared_ptr<User> MySQLAPI::getUserByLogin(const std::string &userLogin, uint &db_error_number)
 {
     std::string query = "SELECT * FROM `users` INNER JOIN hash_tab ON `users`.id = `hash_tab`.uid WHERE `login` LIKE '" + userLogin + "' LIMIT 1;";
-    mysql_query(&mysql, query.data()); // Делаем запрос к таблице
-
-    // Выводим все что есть в базе через цикл
-    if (res = mysql_store_result(&mysql))
+    querySelect(query, db_error_number);
+    if (querySelect(query, db_error_number) > 0)
     {
-        row = mysql_fetch_row(res);
-        return fetchUserRow();
-    }
-    else
-    {
-        db_error_number = mysql_errno(&mysql);
-        Misc::printMessage(mysql_error(&mysql));
+        auto user = fetchUserRow();
         mysql_free_result(res);
+        return user;
     }
-
+    mysql_free_result(res);
     return nullptr;
 }
 
@@ -99,22 +85,12 @@ std::string MySQLAPI::userList(ullong &start, ullong &per_page, ullong &capacity
     for (ullong i = 0; i < capacity; i++)
     {
         result += std::to_string(i + 1) + ". "; // порядковый номер
-        ullong id = atoll(row[0]);
-        std::string login = (std::string)row[1];
-        std::string email = (std::string)row[2];
-        std::string first_name = (std::string)row[3];
-        std::string last_name = (std::string)row[4];
-        ullong registered = atoll(row[5]);
-        user::status status = (user::status)atoi(row[6]);
-        ullong session_key = atoll(row[7]);
-        row = mysql_fetch_row(res);
-        std::string hash = std::string();
-        std::string salt = std::string();
-        auto user = std::make_shared<User>(id, login, email, first_name, last_name, registered, status, session_key, hash, salt);
+        auto user = fetchUserRow(false);
         result += user->userData();
         result += "\n";
+        row = mysql_fetch_row(res);
     }
-
+    mysql_free_result(res);
     return result;
 }
 
@@ -208,15 +184,22 @@ bool MySQLAPI::addUser(std::shared_ptr<User> &user, bool &login_busy, bool &emai
     return user != nullptr && db_error_number == 0;
 }
 
+std::shared_ptr<Message> MySQLAPI::getMessageByID(const ullong &messageID, uint &db_error_number)
+{
+    return std::shared_ptr<Message>();
+}
+
 void MySQLAPI::hello()
 {
     Misc::printMessage("Using MySQL API!");
 }
 
-std::shared_ptr<User> MySQLAPI::fetchUserRow()
+std::shared_ptr<User> MySQLAPI::fetchUserRow(bool getPassData)
 {
     if (mysql_num_rows(res))
     {
+        std::string hash;
+        std::string salt;
         ullong id = atoll(row[0]);
         std::string login = (std::string)row[1];
         std::string email = (std::string)row[2];
@@ -225,8 +208,16 @@ std::shared_ptr<User> MySQLAPI::fetchUserRow()
         ullong registered = atoll(row[5]);
         user::status status = (user::status)atoi(row[6]);
         ullong session_key = atoll(row[7]);
-        std::string hash = (std::string)row[9];
-        std::string salt = (std::string)row[10];
+        if (getPassData)
+        {
+            hash = (std::string)row[9];
+            salt = (std::string)row[10];
+        }
+        else
+        {
+            hash = std::string();
+            salt = std::string();
+        }
         return std::make_shared<User>(
             id,
             login,
@@ -238,9 +229,7 @@ std::shared_ptr<User> MySQLAPI::fetchUserRow()
             session_key,
             hash,
             salt);
-        mysql_free_result(res);
     }
-    mysql_free_result(res);
     return nullptr;
 }
 
