@@ -91,7 +91,7 @@ public:
     /// @param capacity
     /// @param db_error_number
     /// @return
-    virtual std::string messageList(ullong reader_id, ullong &start, ullong &per_page, ullong &capacity, uint &db_error_number) = 0;
+    virtual std::string messageList(ullong &reader_id, ullong &start, ullong &per_page, ullong &capacity, uint &db_error_number) = 0;
 
     /// @brief Получает список личных сообщений
     /// @param reader_id сообщение будет помечено прочитанным если этот ID не является автором сообщения.
@@ -102,7 +102,7 @@ public:
     /// @param capacity
     /// @param db_error_number
     /// @return
-    virtual std::string messageList(ullong reader_id, ullong author_id, ullong recipient_id, ullong &start, ullong &per_page, ullong &capacity, uint &db_error_number) = 0;
+    virtual std::string messageList(ullong &reader_id, ullong interlocutor_id, ullong &start, ullong &per_page, ullong &capacity, uint &db_error_number) = 0;
 
     /// @brief тестовая функция, указывает какой тип подключения к базе
     virtual void hello() = 0;

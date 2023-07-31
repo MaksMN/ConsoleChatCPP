@@ -107,4 +107,6 @@ public:
     std::string getText();
 
     uint getOwnerID();
+
+    std::string messageData();
 };

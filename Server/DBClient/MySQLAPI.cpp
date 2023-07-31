@@ -214,35 +214,95 @@ bool MySQLAPI::addMessage(std::shared_ptr<Message> &message, uint &db_error_numb
     return db_error_number == 0;
 }
 
-std::string MySQLAPI::messageList(ullong reader_id, ullong &start, ullong &per_page, ullong &capacity, uint &db_error_number)
+std::string MySQLAPI::messageList(ullong &reader_id, ullong &start, ullong &per_page, ullong &capacity, uint &db_error_number)
 {
     db_error_number = 0;
     std::string query;
+    std::string queryUpd = "UPDATE `pub_messages` SET `status` = (`status`| " + std::to_string(msg::message_read) + ") & ~ " +
+                           std::to_string(msg::message_delivered) +
+                           " WHERE (`author_id` != " + std::to_string(reader_id) + ") AND (";
 
     ullong count = getCount("pub_messages", "1", db_error_number);
 
     Misc::alignPaginator(start, per_page, count);
 
-    query = "SELECT * FROM `pub_messages` WHERE 1 LIMIT " + std::to_string(start - 1) + ", " + std::to_string(start + per_page) + ";";
+    query = "SELECT * FROM `pub_messages` INNER JOIN `users` ON `pub_messages`.`author_id` = `users`.`id` LIMIT " + std::to_string(start - 1) + ", " + std::to_string(start + per_page) + ";";
 
     capacity = querySelect(query, db_error_number);
 
     std::string result;
     for (ullong i = 0; i < capacity; i++)
     {
-        result += std::to_string(i + 1) + ". "; // порядковый номер
-        auto user = fetchUserRow(0, false);
-        result += user->userData();
-        result += "\n";
+        result += std::to_string(i + 1) + ". Сообщение\n"; // порядковый номер
+        auto message = fetchMessageRow(0, true);
+        auto user = fetchUserRow(5, false);
+
+        result += user->userData() + "\n";
+        result += message->messageData();
+        result += "\n\n";
         row = mysql_fetch_row(res);
+        queryUpd += "`id` = " + std::to_string(message->getID());
+        if (i + 1 == capacity)
+            queryUpd += ");";
+        else
+            queryUpd += " OR ";
     }
+    queryUpdate(queryUpd, db_error_number);
     mysql_free_result(res);
     return result;
 }
 
-std::string MySQLAPI::messageList(ullong reader_id, ullong author_id, ullong recipient_id, ullong &start, ullong &per_page, ullong &capacity, uint &db_error_number)
+std::string MySQLAPI::messageList(ullong &reader_id, ullong interlocutor_id, ullong &start, ullong &per_page, ullong &capacity, uint &db_error_number)
 {
-    return std::string();
+    db_error_number = 0;
+    std::string query;
+    std::string queryUpd = "UPDATE `private_messages` SET `status` = (`status`| " + std::to_string(msg::message_read) + ") & ~ " +
+                           std::to_string(msg::message_delivered) +
+                           " WHERE (`author_id` != " + std::to_string(reader_id) + ") AND (";
+
+    ullong count = getCount("private_messages", "1", db_error_number);
+
+    Misc::alignPaginator(start, per_page, count);
+
+    query = "SELECT * FROM `private_messages` INNER JOIN `users` ON `private_messages`.`author_id` = `users`.`id` "
+            "WHERE (`private_messages`.`author_id` = " +
+            std::to_string(reader_id) +
+            " AND `private_messages`.`recipient_id` = " +
+            std::to_string(interlocutor_id) +
+            ") "
+            "OR (`private_messages`.`author_id` = " +
+            std::to_string(interlocutor_id) +
+            " AND `private_messages`.`recipient_id` = " +
+            std::to_string(reader_id) +
+            ") "
+            "LIMIT " +
+            std::to_string(start - 1) + "," + std::to_string(start + per_page) + ";";
+
+    capacity = querySelect(query, db_error_number);
+
+    std::string result;
+    for (ullong i = 0; i < capacity; i++)
+    {
+        result += std::to_string(i + 1) + ". Сообщение\n"; // порядковый номер
+        auto message = fetchMessageRow(0, false);
+        auto user = fetchUserRow(6, false);
+
+        result += user->userData() + "\n";
+        result += message->messageData();
+        result += "\n\n";
+        row = mysql_fetch_row(res);
+        queryUpd += "`id` = " + std::to_string(message->getID());
+        if (i + 1 == capacity)
+        {
+            queryUpd += ");";
+            queryUpdate(queryUpd, db_error_number);
+        }
+        else
+            queryUpd += " OR ";
+    }
+
+    mysql_free_result(res);
+    return result;
 }
 
 void MySQLAPI::hello()
@@ -286,6 +346,32 @@ std::shared_ptr<User> MySQLAPI::fetchUserRow(uint startRow, bool getPassData)
             session_key,
             hash,
             salt);
+    }
+    return nullptr;
+}
+
+std::shared_ptr<Message> MySQLAPI::fetchMessageRow(uint startRow, bool pub)
+{
+    if (mysql_num_rows(res))
+    {
+        ullong id = atoll(row[startRow]);
+        ullong author_id = atoll(row[++startRow]);
+        ullong recipient_id;
+        if (!pub)
+            recipient_id = atoll(row[++startRow]);
+        std::string text = (std::string)row[++startRow];
+        ullong published = atoll(row[++startRow]);
+        msg::status status = (msg::status)atoi(row[++startRow]);
+        if (pub)
+        {
+            auto msg = std::make_shared<Message>(id, author_id, text, published, status);
+            return msg;
+        }
+        else
+        {
+            auto msg = std::make_shared<Message>(id, author_id, recipient_id, text, published, status);
+            return msg;
+        }
     }
     return nullptr;
 }

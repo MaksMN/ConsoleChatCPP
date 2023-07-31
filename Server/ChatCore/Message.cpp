@@ -150,10 +150,35 @@ uint Message::getRecipientID()
 
 std::string Message::getText()
 {
+    if (isHidden())
+        return "Текст сообщения скрыт администратором";
     return _text;
 }
 
 uint Message::getOwnerID()
 {
     return _author_id;
+}
+
+std::string Message::messageData()
+{
+    std::string s1;
+    s1 += "[msgid " + std::to_string(getID()) + "] ";
+    s1 += "Дата публикации: " + Misc::StampToTime(getPublished()) + "\n";
+    s1 += "Статус: ";
+    if (isPrivate())
+        s1 += "[личное] ";
+    if (isPublic())
+        s1 += "[публичное] ";
+    if (isHidden())
+        s1 += "[скрыто] ";
+    if (isRead())
+        s1 += "[прочитано] ";
+    else
+        s1 += "[не прочитано] ";
+    if (isDelivered())
+        s1 += "[доставлено] ";
+
+    s1 += "\nТекст: " + getText();
+    return s1;
 }

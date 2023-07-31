@@ -207,6 +207,10 @@ uint User::getOwnerID()
 
 std::string User::userData()
 {
+    if (getID() == 0)
+    {
+        return "Пользователь удален";
+    }
     std::string s1 =
         "[userid " + std::to_string(_id) + "] [" + _login + "] [" + getName() + "] [" + getEmail() + "] ";
 
@@ -216,6 +220,6 @@ std::string User::userData()
         s1 += "[status banned] ";
     if (isUser())
         s1 += "[group user] ";
-    s1 += "Рег." + Misc::StampToTime(_registered) + "\n";
+    s1 += "Рег." + Misc::StampToTime(_registered);
     return s1;
 }
