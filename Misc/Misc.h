@@ -18,6 +18,8 @@ namespace Misc
     /// @param endl true - добавить перевод строки
     void printMessage(const std::string &msg, bool endl = true);
 
+    std::wstring toWstring(std::string str);
+
     /// @brief Преобразует timestamp в обычное время
     /// @param timestamp
     /// @return

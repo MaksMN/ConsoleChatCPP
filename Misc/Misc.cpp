@@ -14,6 +14,11 @@ void Misc::printMessage(const std::string &msg, bool endl)
 #endif
 }
 
+std::wstring Misc::toWstring(std::string str)
+{
+    return std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t>{}.from_bytes(str.data());
+}
+
 std::string Misc::StampToTime(long long timestamp)
 {
     time_t tick = (time_t)(timestamp);

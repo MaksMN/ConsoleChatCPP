@@ -25,30 +25,14 @@ int main(int argc, const char *argv[])
     _setmode(_fileno(stdin), _O_U16TEXT);
 #endif
 
-    auto t = Misc::getConfigValue(config_file, "DB", "dbpass");
     DBClient d;
     d.initialise();
     d.DBprovider()->initialize();
     uint db_errno = 0;
-    bool login_busy = false;
-    bool email_busy = false;
-    auto u = d.DBprovider()->getUserByLogin("admin", db_errno);
 
-    auto u2 = d.DBprovider()->getUserByID(55, db_errno);
+    auto mmm = d.DBprovider()->getCount("users", "1", db_errno);
 
-    auto us = std::make_shared<User>("777", "emlaaaaa", "dfcza", "asdfa", "pass");
-    auto tt = d.DBprovider()->addUser(us, login_busy, email_busy, db_errno);
-    ullong cap;
-    ullong reader_id = 1;
-    ullong interlocutor_id = 3;
-    ullong start = 1;
-    ullong per_page = 20;
-    auto list = d.DBprovider()->userList(start, per_page, cap, db_errno);
-    Misc::printMessage(list);
-
-    auto mlist = d.DBprovider()->messageList(reader_id, interlocutor_id, start, per_page, cap, db_errno);
-    Misc::printMessage(mlist);
-
+    auto uuu = d.DBprovider()->getUserByID(1, db_errno);
     int a = 0;
 
 #if defined(_WIN64) || defined(_WIN32)

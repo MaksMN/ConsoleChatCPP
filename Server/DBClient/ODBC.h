@@ -14,6 +14,9 @@ private:
     SQLHANDLE sqlEnvHandle{nullptr};  // дескриптор окружения базы данных
     SQLHANDLE sqlStmtHandle{nullptr}; // дескриптор для выполнения запросов к базе данных
 
+    int SQL_RESULT_LEN = 240;
+    int SQL_RETURN_CODE_LEN = 1024;
+
 public:
     ~ODBC() = default;
     void initialize();
@@ -31,6 +34,8 @@ public:
     std::string messageList(ullong &reader_id, ullong interlocutor_id, ullong &start, ullong &per_page, ullong &capacity, uint &db_error_number) override;
 
 private:
+    int dbQuery(std::string &query, uint &db_error_number);
+
     void wrongDescriptorMsg()
     {
         Misc::printMessage("Не удалось создать дескриптор ODBC");
