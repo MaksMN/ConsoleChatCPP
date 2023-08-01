@@ -8,7 +8,7 @@
 class ODBC final : public DBCore
 {
 private:
-    std::wstring connect_data;
+    std::string connect_data;
 
     SQLHANDLE sqlConnHandle{nullptr}; // дескриптор для соединения с базой данных
     SQLHANDLE sqlEnvHandle{nullptr};  // дескриптор окружения базы данных

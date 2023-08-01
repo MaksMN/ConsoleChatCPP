@@ -8,15 +8,15 @@ void ODBC::initialize()
     std::wstring w_dbpass = std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t>{}.from_bytes(dbpass.data());
     std::wstring w_dbname = std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t>{}.from_bytes(dbname.data());
 
-    connect_data = L"DRIVER={MySQL ODBC 8.0 ANSI Driver};SERVER=" + w_server +
-                   L";PORT=" + w_port +
-                   L";DATABASE=" + w_dbname +
-                   L";UID=" + w_dbuser +
-                   L";PWD=" + w_dbpass + L";";
+    connect_data = "DRIVER={MySQL ODBC 8.0 Unicode Driver};charset=utf8mb4;SERVER=" + server +
+                   ";PORT=" + port +
+                   ";DATABASE=" + dbname +
+                   ";UID=" + dbuser +
+                   ";PWD=" + dbpass + ";";
 
     constexpr auto SQL_RESULT_LEN = 240;
     constexpr auto SQL_RETURN_CODE_LEN = 1024;
-    SQLWCHAR retconstring[SQL_RETURN_CODE_LEN]{}; // строка для кода возврата из функций API ODBC
+    SQLCHAR retconstring[SQL_RETURN_CODE_LEN]{}; // строка для кода возврата из функций API ODBC
 
     // Выделяем дескриптор для базы данных
     if (SQL_SUCCESS != SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &sqlEnvHandle))
@@ -38,9 +38,9 @@ void ODBC::initialize()
     }
 
     // Устанавливаем соединение с сервером
-    switch (SQLDriverConnectW(sqlConnHandle,
+    switch (SQLDriverConnectA(sqlConnHandle,
                               GetDesktopWindow(),
-                              (SQLWCHAR *)connect_data.data(),
+                              (SQLCHAR *)connect_data.data(),
                               SQL_NTS,
                               retconstring,
                               1024,
@@ -78,7 +78,7 @@ std::shared_ptr<User> ODBC::getUserByID(const ullong &userID, uint &db_error_num
     ullong id;
     char login[20];
     char email[100];
-    wchar_t first_name[100];
+    char first_name[100];
     char last_name[100];
     ullong registered;
     int status;
@@ -91,7 +91,7 @@ std::shared_ptr<User> ODBC::getUserByID(const ullong &userID, uint &db_error_num
     SQLBindCol(sqlStmtHandle, 1, SQL_C_UBIGINT, &id, sizeof(id), nullptr);
     SQLBindCol(sqlStmtHandle, 2, SQL_CHAR, &login, 20, &sql_str_length);
     SQLBindCol(sqlStmtHandle, 3, SQL_CHAR, &email, 100, nullptr);
-    SQLBindCol(sqlStmtHandle, 4, SQL_WCHAR, &first_name, 100, &sql_str_length);
+    SQLBindCol(sqlStmtHandle, 4, SQL_CHAR, &first_name, 100, &sql_str_length);
     SQLBindCol(sqlStmtHandle, 5, SQL_CHAR, &last_name, 100, nullptr);
     SQLBindCol(sqlStmtHandle, 6, SQL_C_UBIGINT, &registered, sizeof(registered), nullptr);
     SQLBindCol(sqlStmtHandle, 7, SQL_INTEGER, &status, sizeof(status), nullptr);
@@ -100,8 +100,8 @@ std::shared_ptr<User> ODBC::getUserByID(const ullong &userID, uint &db_error_num
     SQLBindCol(sqlStmtHandle, 11, SQL_VARCHAR, &salt, sizeof(salt), nullptr);
     SQLFetch(sqlStmtHandle);
 
-    std::wstring s(first_name, (int)sql_str_length / 2);
-    std::wcout << s;
+    std::string s(first_name, sql_str_length);
+
     return nullptr;
 }
 
@@ -173,8 +173,8 @@ int ODBC::dbQuery(std::string &query, uint &db_error_number)
         return 1;
     }
     db_error_number = 0;
-    std::wstring w_query = Misc::toWstring(query);
-    int result = SQLExecDirectW(sqlStmtHandle, w_query.data(), SQL_NTS);
+
+    int result = SQLExecDirectA(sqlStmtHandle, (SQLCHAR *)query.data(), SQL_NTS);
     if (result != SQL_SUCCESS)
     {
         SQLFreeHandle(SQL_HANDLE_STMT, sqlStmtHandle);
