@@ -41,7 +41,10 @@ int main(int argc, const char *argv[])
     std::string pass = "zzz";
     uuu->setPass(pass);
     uuu->setEmail("sss");
-    d.DBprovider()->saveUser(uuu, login_busy, email_busy, db_errno);
+    // d.DBprovider()->saveUser(uuu, login_busy, email_busy, db_errno);
+
+    auto new_user = std::make_shared<User>("uuuu", "eeeee", "fname", "lname", "pass");
+    auto test = d.DBprovider()->addUser(new_user, login_busy, email_busy, db_errno);
 
     // auto sss = d.DBprovider()->userList(start, per_page, capacity, db_errno);
     // Misc::printMessage(sss);

@@ -82,7 +82,7 @@ std::shared_ptr<User> ODBC::getUserByID(const ullong &userID, uint &db_error_num
 std::shared_ptr<User> ODBC::getUserByLogin(const std::string &userLogin, uint &db_error_number)
 {
     db_error_number = 0;
-    std::string query = "SELECT * FROM `users` INNER JOIN hash_tab ON `users`.id = `hash_tab`.uid WHERE `id` = '" + userLogin + "' LIMIT 1;";
+    std::string query = "SELECT * FROM `users` INNER JOIN hash_tab ON `users`.id = `hash_tab`.uid WHERE `login` LIKE '" + userLogin + "' LIMIT 1;";
     int res = dbQuery(query, db_error_number);
     if (res <= 0)
         return nullptr;
@@ -152,17 +152,17 @@ bool ODBC::saveUser(std::shared_ptr<User> &user, bool &login_busy, bool &email_b
     std::string query;
 
     query = "`login` LIKE '" + user->getLogin() + "' AND `id` != " + std::to_string(user->getID()) + ";";
-    uint busy = getCount("users", query, db_error_number);
+    uint res = getCount("users", query, db_error_number);
 
-    if (busy > 0)
+    if (res > 0)
     {
         login_busy = true;
         return false;
     }
 
     query = "`email` LIKE '" + user->getEmail() + "' AND `id` != " + std::to_string(user->getID()) + ";";
-    busy = getCount("users", query, db_error_number);
-    if (busy > 0)
+    res = getCount("users", query, db_error_number);
+    if (res > 0)
     {
         email_busy = true;
         return false;
@@ -179,7 +179,7 @@ bool ODBC::saveUser(std::shared_ptr<User> &user, bool &login_busy, bool &email_b
 
     std::string query2 = "UPDATE `hash_tab` SET `hash` = '" + user->getHash() + "', `salt` = '" + user->getSalt() + "' WHERE `hash_tab`.`uid` = " + std::to_string(user->getID()) + ";";
 
-    int res = dbQuery(query, db_error_number);
+    res = dbQuery(query, db_error_number);
     if (res < 0)
         return false;
     res = dbQuery(query2, db_error_number);
@@ -194,22 +194,57 @@ bool ODBC::addUser(std::shared_ptr<User> &user, bool &login_busy, bool &email_bu
     std::string query;
 
     query = "`login` LIKE '" + user->getLogin() + "' AND `id` != " + std::to_string(user->getID()) + ";";
-    uint busy = getCount("users", query, db_error_number);
+    uint res = getCount("users", query, db_error_number);
 
-    if (busy > 0)
+    if (res > 0)
     {
         login_busy = true;
         return false;
     }
 
     query = "`email` LIKE '" + user->getEmail() + "' AND `id` != " + std::to_string(user->getID()) + ";";
-    busy = getCount("users", query, db_error_number);
-    if (busy > 0)
+    res = getCount("users", query, db_error_number);
+    if (res > 0)
     {
         email_busy = true;
         return false;
     }
-    return false;
+
+    query = "INSERT INTO `users` (`id`, `login`, `email`, `first_name`, `last_name`, `registered`, `status`, `session_key`) "
+            "VALUES (NULL, '" +
+            user->getLogin() +
+            "', '" +
+            user->getEmail() +
+            "', '" +
+            user->getFirstName() +
+            "', '" +
+            user->getLastName() +
+            "', '" +
+            std::to_string(user->getRegistered()) +
+            "', '" +
+            std::to_string(user->getStatus()) +
+            "', '" +
+            std::to_string(user->getSessionKey()) +
+            "');";
+
+    res = dbQuery(query, db_error_number);
+    if (res < 1)
+    {
+        return false;
+    }
+
+    // согласно задания хеши паролей должны быть в отдельной таблице с триггером
+    // из за этого приходится у нового пользователя получить автоинкрементный id а потом добавлять хеши
+    // если бы хеш хранился в таблице пользователя, можно было бы его засунуть в предыдущем запросе.
+    auto user_in_db = getUserByLogin(user->getLogin(), db_error_number);
+    query = "UPDATE `hash_tab` SET `hash` = '" + user->getHash() + "', `salt` = '" + user->getSalt() + "' WHERE `hash_tab`.`uid` = " + std::to_string(user_in_db->getID()) + ";";
+    res = dbQuery(query, db_error_number);
+    if (res < 1)
+    {
+        return false;
+    }
+    user = getUserByID(user_in_db->getID(), db_error_number);
+    return true;
 }
 
 std::shared_ptr<Message> ODBC::getMessageByID(const ullong &messageID, uint &db_error_number)
