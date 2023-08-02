@@ -34,7 +34,26 @@ public:
     std::string messageList(ullong &reader_id, ullong interlocutor_id, ullong &start, ullong &per_page, ullong &capacity, uint &db_error_number) override;
 
 private:
+    std::shared_ptr<User> fetchUserRow(uint &db_error_number, uint startRow = 1, bool getPassData = true);
+    std::shared_ptr<Message> fetchMessageRow(uint &db_error_number, uint startRow = 0, bool pub = true);
+
+    /// @brief Выполняет запрос
+    /// @param query
+    /// @param db_error_number
+    /// @return количество обработанных рядов или -1 если операция не затрагивает ряды.
     int dbQuery(std::string &query, uint &db_error_number);
+
+    SQLINTEGER Fetch(uint &db_error_number);
+
+    void BindCol(
+        SQLHSTMT StatementHandle,
+        SQLUSMALLINT ColumnNumber,
+        SQLSMALLINT TargetType,
+        SQLPOINTER TargetValuePtr,
+        SQLLEN BufferLength,
+        SQLLEN *StrLen_or_IndPtr);
+
+    void diagInfo(SQLINTEGER handle_type, SQLHANDLE &handle, const std::string &function, const std::string &query);
 
     void wrongDescriptorMsg()
     {
@@ -46,5 +65,15 @@ private:
         SQLDisconnect(sqlConnHandle);
         SQLFreeHandle(SQL_HANDLE_DBC, sqlConnHandle);
         SQLFreeHandle(SQL_HANDLE_ENV, sqlEnvHandle);
+    }
+};
+#include <exception>
+
+class BindColException : public std::exception
+{
+public:
+    virtual const char *what() const noexcept override
+    {
+        return "ERROR: SQLBindColException!";
     }
 };

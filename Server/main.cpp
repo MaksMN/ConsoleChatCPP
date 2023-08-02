@@ -29,10 +29,16 @@ int main(int argc, const char *argv[])
     d.initialise();
     d.DBprovider()->initialize();
     uint db_errno = 0;
+    ullong capacity = 0;
+    ullong start = 1;
+    ullong per_page = 20;
 
-    auto mmm = d.DBprovider()->getCount("users", "1", db_errno);
+    // auto mmm = d.DBprovider()->getCount("users", "1", db_errno);
 
-    auto uuu = d.DBprovider()->getUserByID(1, db_errno);
+    // auto uuu = d.DBprovider()->getUserByID(2, db_errno);
+
+    auto sss = d.DBprovider()->userList(start, per_page, capacity, db_errno);
+    Misc::printMessage(sss);
     int a = 0;
 
 #if defined(_WIN64) || defined(_WIN32)
