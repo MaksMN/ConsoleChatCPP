@@ -146,13 +146,69 @@ std::string ODBC::userList(ullong &start, ullong &per_page, ullong &capacity, ui
     return result;
 }
 
-bool ODBC::saveUser(std::shared_ptr<User> user, uint &db_error_number)
+bool ODBC::saveUser(std::shared_ptr<User> &user, bool &login_busy, bool &email_busy, uint &db_error_number)
 {
-    return false;
+    db_error_number = 0;
+    std::string query;
+
+    query = "`login` LIKE '" + user->getLogin() + "' AND `id` != " + std::to_string(user->getID()) + ";";
+    uint busy = getCount("users", query, db_error_number);
+
+    if (busy > 0)
+    {
+        login_busy = true;
+        return false;
+    }
+
+    query = "`email` LIKE '" + user->getEmail() + "' AND `id` != " + std::to_string(user->getID()) + ";";
+    busy = getCount("users", query, db_error_number);
+    if (busy > 0)
+    {
+        email_busy = true;
+        return false;
+    }
+
+    query = "UPDATE `users` SET"
+            "`email` = '" +
+            user->getEmail() +
+            "', `first_name` = '" + user->getFirstName() +
+            "', `last_name` = '" + user->getLastName() +
+            "', `registered` = '" + std::to_string(user->getRegistered()) +
+            "', `status` = '" + std::to_string(user->getStatus()) +
+            "', `session_key` = '" + std::to_string(user->getSessionKey()) + "' WHERE `users`.`id` = " + std::to_string(user->getID()) + ";";
+
+    std::string query2 = "UPDATE `hash_tab` SET `hash` = '" + user->getHash() + "', `salt` = '" + user->getSalt() + "' WHERE `hash_tab`.`uid` = " + std::to_string(user->getID()) + ";";
+
+    int res = dbQuery(query, db_error_number);
+    if (res < 0)
+        return false;
+    res = dbQuery(query2, db_error_number);
+    if (res < 0)
+        return false;
+    return true;
 }
 
 bool ODBC::addUser(std::shared_ptr<User> &user, bool &login_busy, bool &email_busy, uint &db_error_number)
 {
+    db_error_number = 0;
+    std::string query;
+
+    query = "`login` LIKE '" + user->getLogin() + "' AND `id` != " + std::to_string(user->getID()) + ";";
+    uint busy = getCount("users", query, db_error_number);
+
+    if (busy > 0)
+    {
+        login_busy = true;
+        return false;
+    }
+
+    query = "`email` LIKE '" + user->getEmail() + "' AND `id` != " + std::to_string(user->getID()) + ";";
+    busy = getCount("users", query, db_error_number);
+    if (busy > 0)
+    {
+        email_busy = true;
+        return false;
+    }
     return false;
 }
 

@@ -94,7 +94,7 @@ std::string MySQLAPI::userList(ullong &start, ullong &per_page, ullong &capacity
     return result;
 }
 
-bool MySQLAPI::saveUser(std::shared_ptr<User> user, uint &db_error_number)
+bool MySQLAPI::saveUser(std::shared_ptr<User> &user, bool &login_busy, bool &email_busy, uint &db_error_number)
 {
     std::string query = "UPDATE `users` SET"
                         "`email` = '" +

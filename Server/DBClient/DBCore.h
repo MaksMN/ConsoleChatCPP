@@ -62,7 +62,7 @@ public:
     /// @param user
     /// @param db_error_number
     /// @return
-    virtual bool saveUser(std::shared_ptr<User> user, uint &db_error_number) = 0;
+    virtual bool saveUser(std::shared_ptr<User> &user, bool &login_busy, bool &email_busy, uint &db_error_number) = 0;
 
     /// @brief Добавить нового пользователя в базу
     /// @param user
