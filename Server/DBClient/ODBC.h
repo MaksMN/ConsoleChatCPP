@@ -34,8 +34,8 @@ public:
     std::string messageList(ullong &reader_id, ullong interlocutor_id, ullong &start, ullong &per_page, ullong &capacity, uint &db_error_number) override;
 
 private:
-    std::shared_ptr<User> fetchUserRow(uint &db_error_number, uint startRow = 1, bool getPassData = true);
-    std::shared_ptr<Message> fetchMessageRow(uint &db_error_number, uint startRow = 0, bool pub = true);
+    std::shared_ptr<User> fetchUserRow(uint &db_error_number, uint startCol = 1, bool getPassData = true);
+    void fetchMessageRow(std::shared_ptr<User> &user, std::shared_ptr<Message> &msg, uint &db_error_number, uint startCol = 1, bool pub = true);
 
     /// @brief Выполняет запрос
     /// @param query
