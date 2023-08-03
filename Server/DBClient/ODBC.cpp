@@ -366,6 +366,20 @@ std::string ODBC::messageList(ullong &reader_id, ullong interlocutor_id, ullong 
     return result;
 }
 
+bool ODBC::deleteByID(ullong &id, std::string &table, uint &db_error_number)
+{
+    std::string query = "DELETE FROM `" + table + "` WHERE `id` = " + std::to_string(id) + ";";
+    return dbQuery(query, db_error_number);
+}
+
+bool ODBC::setStatus(ullong &id, std::string &table, bool add, uint &db_error_number)
+{
+    std::string set = add ? "|" : "& ~";
+    std::string query = "UPDATE `" + table + "` SET `status` = `status` " + set + " '4' WHERE `users`.`id` = " + std::to_string(id) + ";";
+
+    return dbQuery(query, db_error_number);
+}
+
 std::shared_ptr<User> ODBC::fetchUserRow(uint &db_error_number, uint startCol, bool getPassData)
 {
     ullong id;

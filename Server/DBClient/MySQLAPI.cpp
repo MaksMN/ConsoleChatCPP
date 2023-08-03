@@ -305,6 +305,16 @@ std::string MySQLAPI::messageList(ullong &reader_id, ullong interlocutor_id, ull
     return result;
 }
 
+bool MySQLAPI::deleteByID(ullong &id, std::string &table, uint &db_error_number)
+{
+    return false;
+}
+
+bool MySQLAPI::setStatus(ullong &id, std::string &table, bool add, uint &db_error_number)
+{
+    return false;
+}
+
 void MySQLAPI::hello()
 {
     Misc::printMessage("Using MySQL API!");

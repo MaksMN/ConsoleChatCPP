@@ -104,6 +104,21 @@ public:
     /// @return
     virtual std::string messageList(ullong &reader_id, ullong interlocutor_id, ullong &start, ullong &per_page, ullong &capacity, uint &db_error_number) = 0;
 
+    /// @brief удаление элемента по ID
+    /// @param id
+    /// @param table
+    /// @param db_error_number
+    /// @return
+    virtual bool deleteByID(ullong &id, std::string &table, uint &db_error_number) = 0;
+
+    /// @brief Изменяет битовые флаги статуса
+    /// @param id
+    /// @param table
+    /// @param add
+    /// @param db_error_number
+    /// @return
+    virtual bool setStatus(ullong &id, std::string &table, bool add, uint &db_error_number) = 0;
+
     /// @brief тестовая функция, указывает какой тип подключения к базе
     virtual void hello() = 0;
 };
