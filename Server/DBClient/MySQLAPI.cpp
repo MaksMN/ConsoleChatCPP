@@ -63,8 +63,8 @@ ullong MySQLAPI::getCount(std::string table, std::string where, uint &db_error_n
     if (querySelect(query, db_error_number) > 0)
     {
         count = atoll(row[0]);
-        mysql_free_result(res);
     }
+    mysql_free_result(res);
     return count;
 }
 
@@ -96,14 +96,36 @@ std::string MySQLAPI::userList(ullong &start, ullong &per_page, ullong &capacity
 
 bool MySQLAPI::saveUser(std::shared_ptr<User> &user, bool &login_busy, bool &email_busy, uint &db_error_number)
 {
-    std::string query = "UPDATE `users` SET"
-                        "`email` = '" +
-                        user->getEmail() +
-                        "', `first_name` = '" + user->getFirstName() +
-                        "', `last_name` = '" + user->getLastName() +
-                        "', `registered` = '" + std::to_string(user->getRegistered()) +
-                        "', `status` = '" + std::to_string(user->getStatus()) +
-                        "', `session_key` = '" + std::to_string(user->getSessionKey()) + "' WHERE `users`.`id` = " + std::to_string(user->getID()) + ";";
+    db_error_number = 0;
+    std::string query;
+
+    query = "`login` LIKE '" + user->getLogin() + "' AND `id` != " + std::to_string(user->getID()) + ";";
+    uint result = getCount("users", query, db_error_number);
+
+    if (result > 0)
+    {
+        login_busy = true;
+        return false;
+    }
+
+    query = "`email` LIKE '" + user->getEmail() + "' AND `id` != " + std::to_string(user->getID()) + ";";
+    result = getCount("users", query, db_error_number);
+    if (result > 0)
+    {
+        email_busy = true;
+        return false;
+    }
+
+    query = "UPDATE `users` SET"
+            "`login` = '" +
+            user->getLogin() +
+            "`email` = '" +
+            user->getEmail() +
+            "', `first_name` = '" + user->getFirstName() +
+            "', `last_name` = '" + user->getLastName() +
+            "', `registered` = '" + std::to_string(user->getRegistered()) +
+            "', `status` = '" + std::to_string(user->getStatus()) +
+            "', `session_key` = '" + std::to_string(user->getSessionKey()) + "' WHERE `users`.`id` = " + std::to_string(user->getID()) + ";";
 
     std::string query2 = "UPDATE `hash_tab` SET `hash` = '" + user->getHash() + "', `salt` = '" + user->getSalt() + "' WHERE `hash_tab`.`uid` = " + std::to_string(user->getID()) + ";";
 
@@ -119,22 +141,25 @@ bool MySQLAPI::addUser(std::shared_ptr<User> &user, bool &login_busy, bool &emai
 {
     db_error_number = 0;
     std::string query;
-    query = "SELECT COUNT(*) FROM `users` WHERE `login` LIKE '" + user->getLogin() + "';";
-    if (querySelect(query, db_error_number) > 0 && atoi(row[0]) > 0)
+
+    query = "`login` LIKE '" + user->getLogin() + "' AND `id` != " + std::to_string(user->getID()) + ";";
+    uint result = getCount("users", query, db_error_number);
+
+    if (result > 0)
     {
         login_busy = true;
-        mysql_free_result(res);
         return false;
     }
 
-    query = "SELECT COUNT(*) FROM `users` WHERE `email` LIKE '" + user->getEmail() + "';";
-    if (querySelect(query, db_error_number) > 0 && atoi(row[0]) > 0)
+    query = "`email` LIKE '" + user->getEmail() + "' AND `id` != " + std::to_string(user->getID()) + ";";
+    result = getCount("users", query, db_error_number);
+    if (result > 0)
     {
-        mysql_free_result(res);
+
         email_busy = true;
         return false;
     }
-    mysql_free_result(res);
+
     query = "INSERT INTO `users` (`id`, `login`, `email`, `first_name`, `last_name`, `registered`, `status`, `session_key`) "
             "VALUES (NULL, '" +
             user->getLogin() +
@@ -317,7 +342,7 @@ bool MySQLAPI::setStatus(ullong &id, std::string &table, bool add, uint &db_erro
 
 void MySQLAPI::hello()
 {
-    Misc::printMessage("Using MySQL API!");
+    Misc::printMessage("This is MySQL API!");
 }
 
 std::shared_ptr<User> MySQLAPI::fetchUserRow(uint startRow, bool getPassData)

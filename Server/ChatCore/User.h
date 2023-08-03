@@ -94,6 +94,7 @@ public:
     /// @brief Возвращает логин пользователя
     /// @return
     std::string getLogin();
+    void setLogin(std::string login);
 
     /// @brief Получает флаги статуса пользователя
     user::status getStatus();

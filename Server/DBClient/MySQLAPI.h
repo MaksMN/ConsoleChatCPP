@@ -17,8 +17,6 @@ public:
 
     /// @brief инициализация подключения к базе данных.
     void initialize();
-    /// @brief тестовая функция, указывает какой тип подключения к базе
-    void hello();
 
     /// @brief Получает указатель пользователя по ID
     /// @param userID
@@ -109,7 +107,8 @@ public:
     /// @return
     bool setStatus(ullong &id, std::string &table, bool add, uint &db_error_number) override;
 
-    void hello();
+    /// @brief тестовая функция, указывает какой тип подключения к базе
+    void hello() override;
 
 private:
     std::shared_ptr<User> fetchUserRow(uint startRow = 0, bool getPassData = true);

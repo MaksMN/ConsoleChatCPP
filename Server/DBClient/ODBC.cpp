@@ -62,11 +62,6 @@ void ODBC::initialize()
     }
 }
 
-void ODBC::hello()
-{
-    Misc::printMessage("Hello! Im ODBC.");
-}
-
 std::shared_ptr<User> ODBC::getUserByID(const ullong &userID, uint &db_error_number)
 {
     db_error_number = 0;
@@ -378,6 +373,11 @@ bool ODBC::setStatus(ullong &id, std::string &table, bool add, uint &db_error_nu
     std::string query = "UPDATE `" + table + "` SET `status` = `status` " + set + " '4' WHERE `users`.`id` = " + std::to_string(id) + ";";
 
     return dbQuery(query, db_error_number);
+}
+
+void ODBC::hello()
+{
+    Misc::printMessage("This is ODBC.");
 }
 
 std::shared_ptr<User> ODBC::fetchUserRow(uint &db_error_number, uint startCol, bool getPassData)

@@ -119,6 +119,10 @@ std::string User::getLogin()
 {
     return _login;
 }
+void User::setLogin(std::string login)
+{
+    _login = login;
+}
 user::status User::getStatus()
 {
     return _status;
