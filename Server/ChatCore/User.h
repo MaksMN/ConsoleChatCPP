@@ -131,6 +131,7 @@ public:
 
     ullong getSessionKey();
     void setSessionKey(ullong key);
+    bool validateSessionKey(ullong key);
 
     uint getOwnerID();
 

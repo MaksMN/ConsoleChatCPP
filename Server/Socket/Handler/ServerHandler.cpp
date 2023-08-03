@@ -37,8 +37,9 @@ void ServerHandler::Run()
     auto session_key = buffer.getSessionKey();
 
     // данные пользователя
-    user = dbClient.DBprovider()->getUserByLogin(login);
-    if ((user != nullptr && user->getSessionKey() != session_key && session_key != 0) || user == nullptr)
+    uint db_errno = 0;
+    user = dbClient.DBprovider()->getUserByLogin(login, db_errno);
+    if ((user != nullptr && user->validateSessionKey(session_key)) || user == nullptr)
     {
         user = nullptr;
         login = "Guest";

@@ -204,6 +204,13 @@ void User::setSessionKey(ullong key)
     _session_key = key;
 }
 
+bool User::validateSessionKey(ullong key)
+{
+    if (_session_key == 0)
+        return false;
+    return key == _session_key;
+}
+
 uint User::getOwnerID()
 {
     return getID();
