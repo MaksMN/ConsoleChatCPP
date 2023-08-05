@@ -9,8 +9,8 @@
 #include <sys/socket.h>
 
 #include "../Handler/ServerHandler.h"
-#include "../../Misc/Misc.h"
-#include "../../Misc/BufferActions.h"
+#include "../../../Misc/Misc.h"
+#include "../../../Misc/BufferActions.h"
 
 #define DATA_BUFFER 4096 // Размер буфера для данных
 #define CMD_BUFFER 1024  // Размер буфера команд и заголовков

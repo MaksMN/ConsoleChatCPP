@@ -13,7 +13,6 @@ int server_socket(char port[])
     for (int i{0}; i < CMD_BUFFER; i++)
         cmd_buffer[i] = '\0';
     ServerHandler handler(cmd_buffer);
-    handler.InitialiseDB();
     BufferActions buffer(cmd_buffer);
 
     // Создадим UDP сокет
