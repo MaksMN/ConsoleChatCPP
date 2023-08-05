@@ -11,6 +11,7 @@
 #include "ServerChatMap.h"
 #include "../../ChatCore/User.h"
 #include "../../DBClient/DBClient.h"
+#include "../../ChatPages/IPagesCore.h"
 #include "../../ChatPages/UserAuthPage.h"
 
 #define DATA_BUFFER 4096 // Размер буфера для данных

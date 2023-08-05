@@ -9,7 +9,7 @@
 
 class IPagesCore
 {
-private:
+protected:
     char (&cmd_buffer)[CMD_BUFFER];
     DBClient &dbClient;
 
@@ -27,9 +27,12 @@ private:
     uint pg_end;
     sv::pagination pg_mode = sv::pagination::last_page;
 
+    std::string data_text;
+
 public:
     IPagesCore(char (&_cmd_buffer)[CMD_BUFFER], DBClient &_dbclient);
     virtual ~IPagesCore() = default;
     virtual void run() = 0;
     virtual bool commandHandler() = 0;
+    std::string getText();
 };

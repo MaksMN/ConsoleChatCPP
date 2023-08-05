@@ -1,0 +1,13 @@
+CL_SRC = Client/*.cpp Client/Handler/*.cpp Client/WinClient/*.cpp Client/LinuxClient/*.cpp Misc/*.cpp
+CL_TARGET = chatclient
+PREFIX = /usr/local/bin
+
+consolechat:
+	mkdir -p bin
+	g++ -std=c++20 -o bin/$(CL_TARGET) $(CL_SRC)
+
+install:
+	install bin/$(CL_TARGET) $(PREFIX)
+	
+uninstall:
+	rm -rf $(PREFIX)/$(CL_TARGET)

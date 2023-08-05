@@ -102,7 +102,8 @@ void ServerHandler::Run()
     /* Сюда попадает любой неавторизованный пользователь */
     if (user == nullptr)
     {
-        data_buffer_text = "Guest page";
+        UserAuthPage auth(cmd_buffer, dbClient);
+        data_buffer_text = auth.getText();
         return;
     }
 

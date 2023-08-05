@@ -1,6 +1,6 @@
 #include "IPagesCore.h"
 
-class UserAuthPage final : IPagesCore
+class UserAuthPage final : public IPagesCore
 {
 private:
     /* data */
@@ -10,4 +10,7 @@ public:
 
     void run() override;
     bool commandHandler() override;
+
+private:
+    void offerRegisterOrLogin();
 };

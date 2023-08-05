@@ -1,0 +1,13 @@
+SV_SRC = Server/*.cpp Server/Handler/*.cpp Server/LinuxServer/*.cpp Server/WinServer/*.cpp Misc/*.cpp DB/*.cpp DB/Structs/*.cpp
+SV_TARGET = chatserver
+PREFIX = /usr/local/bin
+
+consolechat:
+	mkdir -p bin
+	g++ -std=c++20 -o bin/$(SV_TARGET) $(SV_SRC)
+	
+install:
+	install bin/$(SV_TARGET) $(PREFIX)
+		
+uninstall:
+	rm -rf $(PREFIX)/$(SV_TARGET)	

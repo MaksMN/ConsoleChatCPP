@@ -13,3 +13,8 @@ IPagesCore::IPagesCore(char (&_cmd_buffer)[CMD_BUFFER], DBClient &_dbclient)
     pg_end = buffer.getPgEnd();
     pg_mode = buffer.getPaginationMode();
 }
+
+std::string IPagesCore::getText()
+{
+    return data_text;
+}
