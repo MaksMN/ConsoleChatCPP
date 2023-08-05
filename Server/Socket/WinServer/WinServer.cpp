@@ -7,7 +7,6 @@ int server_socket(char port[])
         cmd_buffer[i] = '\0';
     char data_buffer[DATA_BUFFER];
     ServerHandler handler(cmd_buffer);
-    handler.InitialiseDB();
     BufferActions buffer(cmd_buffer);
 
     WSADATA WSAData;

@@ -5,11 +5,13 @@
 #include <vector>
 #include <map>
 #include <set>
-#include "../../Misc/Misc.h"
-#include "../../Misc/BufferActions.h"
+#include "../../../Misc/Misc.h"
+#include "../../../Misc/BufferActions.h"
+
 #include "ServerChatMap.h"
 #include "../../ChatCore/User.h"
-#include "../DBClient/DBClient.h"
+#include "../../DBClient/DBClient.h"
+#include "../../ChatPages/UserAuthPage.h"
 
 #define DATA_BUFFER 4096 // Размер буфера для данных
 #define CMD_BUFFER 1024  // Размер буфера команд и заголовков
@@ -37,7 +39,6 @@ private:
 public:
     explicit ServerHandler(char (&_cmd_buffer)[CMD_BUFFER]);
     ~ServerHandler() = default;
-    void InitialiseDB();
     void Run();
     void badRequest();
 
@@ -57,4 +58,7 @@ public:
     /// @brief Возвращает текст который надо отправить клиенту
     /// @return
     std::string &getDataText();
+
+    /// @brief отправляет клиенту сообщение если с БД проблемы.
+    void onDBerror();
 };

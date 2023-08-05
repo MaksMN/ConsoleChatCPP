@@ -23,14 +23,15 @@ void ClientHandler::Initialise()
     buffer.clearPmUserID();
 
     // Динамические данные
-    buffer.writeDynData(login, "MAIN_PAGE", "/chat");
+    buffer.writeDynData(login, "/auth", "/auth");
 
     data_text =
         "Вы запустили клиент чата.\n"
-        "Введите команду /chat чтобы начать общение.\n"
         "Команда /help - справка.\n"
         "Команда /hello - опрос сервера.\n"
-        "Введите команду: ";
+        "Вы не авторизованы в чате.\n"
+        "Команда: /auth:login:password - войти в чат\n"
+        "Команда: /reg - регистрация в чате";
 }
 
 void ClientHandler::Run()

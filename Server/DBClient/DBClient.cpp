@@ -7,6 +7,7 @@ DBCore *DBClient::DBprovider()
 
 void DBClient::initialise()
 {
+#if defined(_WIN64) || defined(_WIN32)
     if (Misc::getConfigValue(config_file, "DB", "db") == "mysqlapi")
     {
         _DBprovider = &mysqlapi;
@@ -17,6 +18,11 @@ void DBClient::initialise()
         _DBprovider = &odbc;
         _DBprovider->provider = 1;
     }
+#endif
+
+#if defined(__linux__)
+    _DBprovider = &mysqlapi;
+#endif
 
     _DBprovider->hello();
 }

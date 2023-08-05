@@ -1,6 +1,6 @@
 #include "MySQLAPI.h"
 
-void MySQLAPI::initialize()
+bool MySQLAPI::initialize()
 {
     // Получаем дескриптор соединения
     mysql_init(&mysql);
@@ -8,14 +8,17 @@ void MySQLAPI::initialize()
     {
         // Если дескриптор не получен — выводим сообщение об ошибке
         Misc::printMessage("Error: can't create MySQL-descriptor");
+        return false;
     }
-
+    unsigned int i = 5;
+    mysql_options(&mysql, MYSQL_OPT_CONNECT_TIMEOUT, &i);
     // Подключаемся к серверу
     if (!mysql_real_connect(&mysql, server.data(), dbuser.data(), dbpass.data(), dbname.data(), atoi(port.data()), NULL, 0))
     {
         // Если нет возможности установить соединение с БД выводим сообщение об ошибке
         Misc::printMessage("Error: can't connect to database ", false);
         Misc::printMessage(mysql_error(&mysql));
+        return false;
     }
     else
     {
@@ -26,6 +29,7 @@ void MySQLAPI::initialize()
     // Смотрим изменилась ли кодировка на нужную, по умолчанию идёт latin1
     Misc::printMessage("connection characterset: ", false);
     Misc::printMessage(mysql_character_set_name(&mysql));
+    return true;
 }
 
 std::shared_ptr<User> MySQLAPI::getUserByID(const ullong &userID, uint &db_error_number)
@@ -340,9 +344,14 @@ bool MySQLAPI::setStatus(ullong &id, std::string &table, bool add, uint &db_erro
     return false;
 }
 
+void MySQLAPI::DBclose()
+{
+    mysql_close(&mysql);
+}
+
 void MySQLAPI::hello()
 {
-    Misc::printMessage("This is MySQL API!");
+    Misc::printMessage("This server uses MySQL API");
 }
 
 std::shared_ptr<User> MySQLAPI::fetchUserRow(uint startRow, bool getPassData)

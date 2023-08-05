@@ -1,9 +1,11 @@
 #pragma once
+#if defined(_WIN64) || defined(_WIN32)
 #include "DBCore.h"
 #include <windows.h>
 #include <sqlext.h>
 #include <sqltypes.h>
 #include <sql.h>
+#include <exception>
 
 class ODBC final : public DBCore
 {
@@ -20,7 +22,7 @@ private:
 public:
     ~ODBC() = default;
     /// @brief инициализация подключения к базе данных.
-    void initialize();
+    bool initialize() override;
 
     /// @brief Получает указатель пользователя по ID
     /// @param userID
@@ -111,6 +113,8 @@ public:
     /// @return
     bool setStatus(ullong &id, std::string &table, bool add, uint &db_error_number) override;
 
+    void DBclose() override;
+
     /// @brief тестовая функция, указывает какой тип подключения к базе
     void hello() override;
 
@@ -148,7 +152,6 @@ private:
         SQLFreeHandle(SQL_HANDLE_ENV, sqlEnvHandle);
     }
 };
-#include <exception>
 
 class BindColException : public std::exception
 {
@@ -158,3 +161,5 @@ public:
         return "ERROR: SQLBindColException!";
     }
 };
+
+#endif

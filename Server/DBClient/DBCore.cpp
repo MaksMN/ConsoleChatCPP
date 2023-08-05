@@ -5,11 +5,7 @@ DBCore::DBCore() : server(Misc::getConfigValue(config_file, "DB", "server")),
                    dbuser(Misc::getConfigValue(config_file, "DB", "dbuser")),
                    dbpass(Misc::getConfigValue(config_file, "DB", "dbpass")),
                    dbname(Misc::getConfigValue(config_file, "DB", "dbname")),
-                   db_character_set(Misc::getConfigValue(config_file, "DB", "db_character_set"))
-
-{
-    Misc::printMessage("Im SQL Base Class constructor!");
-}
+                   db_character_set(Misc::getConfigValue(config_file, "DB", "db_character_set")) {}
 
 void DBCore::hello()
 {

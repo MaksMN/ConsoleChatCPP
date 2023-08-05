@@ -1,6 +1,15 @@
 #pragma once
 #include "DBCore.h"
 
+#if defined(__linux__)
+#include </usr/include/mysql/mysql.h>
+#endif
+
+#if defined(_WIN64) || defined(_WIN32)
+#include <mysql.h>
+#pragma comment(lib, "libmysql.lib")
+#endif
+
 class MySQLAPI final : public DBCore
 {
 private:
@@ -16,7 +25,7 @@ public:
     ~MySQLAPI() = default;
 
     /// @brief инициализация подключения к базе данных.
-    void initialize();
+    bool initialize() override;
 
     /// @brief Получает указатель пользователя по ID
     /// @param userID
@@ -106,6 +115,8 @@ public:
     /// @param db_error_number
     /// @return
     bool setStatus(ullong &id, std::string &table, bool add, uint &db_error_number) override;
+
+    void DBclose() override;
 
     /// @brief тестовая функция, указывает какой тип подключения к базе
     void hello() override;

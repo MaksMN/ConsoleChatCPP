@@ -1,9 +1,8 @@
 #include "ServerHandler.h"
 
-ServerHandler::ServerHandler(char (&_cmd_buffer)[CMD_BUFFER]) : cmd_buffer(_cmd_buffer) {}
-
-void ServerHandler::InitialiseDB()
+ServerHandler::ServerHandler(char (&_cmd_buffer)[CMD_BUFFER]) : cmd_buffer(_cmd_buffer)
 {
+    dbClient.initialise();
 }
 
 void ServerHandler::Run()
@@ -36,9 +35,25 @@ void ServerHandler::Run()
     auto cmd_text = buffer.getDynDataS(CMD_TEXT_COUNT);
     auto session_key = buffer.getSessionKey();
 
+    /*
+    Концепция команд
+    * /page:cmd_text - принудительно перейти на страницу cmd_text (page_text = cmd_text), по умолчанию /page:chat
+    * ввод команды cmd_text без /page - выполнить команду cmd_text на текущей странице page_text
+    * плюс могут быть команды общего назначения типа /help /hello итп
+    */
+
     // данные пользователя
+
     uint db_errno = 0;
+    dbClient.DBprovider()->initialize();
     user = dbClient.DBprovider()->getUserByLogin(login, db_errno);
+    dbClient.DBprovider()->DBclose();
+    if (db_errno)
+    {
+        onDBerror();
+        return;
+    }
+
     if ((user != nullptr && user->validateSessionKey(session_key)) || user == nullptr)
     {
         user = nullptr;
@@ -50,40 +65,38 @@ void ServerHandler::Run()
     // изменим флаги чтобы при неизвестной команде клиент встал с запросом
     buffer.createFlags(sv::get_string);
 
-    /* Общие команды чата, которые срабатывают в любом месте для всех */
-    if (cmd_text == CHAT)
-    {
-        buffer.writeDynData(login, MAIN_PAGE, CHAT);
-        page_text = MAIN_PAGE;
-    }
+    /* Команды доступные всем */
 
-    if (cmd_text == HELLO)
+    if (cmd_text == "/hello")
     {
         data_buffer_text = "Привет, " + login + "! Я сервер, я живой.\nВведите команду: ";
         clearConsole(false);
         return;
     }
-    if (cmd_text == HELP)
+    if (cmd_text == "/help")
     {
+        std::string admins_commands = user != nullptr && user->isAdmin()
+                                          ? "Команда /sv_quit - (admin)завершить работу сервера;\n"
+                                          : std::string();
         data_buffer_text =
             "\nКоманды, которые можно вызвать в любое время:\n"
-            "Команда /chat - перейти на главную страницу из любого раздела;\n"
+            "Команда /page:chat - Общий чат;\n"
+            "Команда /page:private - Личные сообщения;\n"
+            "Команда /page:users - Список пользователей;\n"
             "Команда /hello - опрос сервера;\n"
             "Команда /help - справка;\n"
             "Команда /quit - закрыть клиент;\n"
             "\n"
             "Команды, которые можно вызвать в любое время авторизованным пользователям:\n"
-            "Команда /profile - сменить имя или пароль;\n"
-            "Команда /logout - выйти из чата;\n"
-            "Команда /sv_quit - (admin)завершить работу сервера;\n"
+            "Команда /page:profile - сменить имя или пароль;\n"
+            "Команда /logout - выйти из чата;\n" +
+            admins_commands +
             "\nВведите команду: ";
         clearConsole(false);
         return;
     }
 
-    /* проверка соответствия команд карте чата */
-    if (!chatMap.checkPage(page_text, cmd_text))
-        return;
+    /* Конец зоны доступных всем команд. */
 
     /* Авторизация и регистрация */
     /* Сюда попадает любой неавторизованный пользователь */
@@ -96,7 +109,7 @@ void ServerHandler::Run()
     /* Команды чата которые срабатывают если пользователь авторизован */
 
     // закрыть сервер (только админ)
-    if (cmd_text.compare(SV_QUIT) == 0)
+    if (cmd_text.compare("/sv_quit") == 0)
     {
         if (user != nullptr && user->isAdmin())
         {
@@ -112,7 +125,7 @@ void ServerHandler::Run()
     }
 
     // Выйти
-    if (cmd_text == LOGOUT)
+    if (cmd_text == "/logout")
     {
         clearBuffer();
         clearConsole(true);
@@ -129,41 +142,30 @@ void ServerHandler::Run()
     }
 
     // профиль пользователя
-    pages_set.clear();
-    pages_set.insert(PROFILE_PAGE);
-    pages_set.insert(PROFILE_PAGE_INPUT);
-    if (cmd_text == PROFILE || pages_set.contains(page_text))
+
+    if (cmd_text == "/profile")
     {
         data_buffer_text = "edit profile page";
         return;
     }
 
     // главная страница чата
-    pages_set.clear();
-    pages_set.insert(PUBLIC_PAGE);
-    pages_set.insert(MAIN_PAGE);
-    pages_set.insert(PUBLIC_PAGE_INPUT);
-    if (pages_set.contains(page_text))
+
+    if (cmd_text == "/chat")
     {
         data_buffer_text = "chat public main page";
         return;
     }
 
-    // Список пользователей в приватном чате
-    pages_set.clear();
-    pages_set.insert(PRIVATE_PAGE_USERS);
-    pages_set.insert(PRIVATE_PAGE_USERS_INPUT);
-    if (pages_set.contains(page_text))
+    // Список пользователей
+    if (cmd_text == "/users")
     {
         data_buffer_text = "users list";
         return;
     }
 
     // Сообщения в приватном чате
-    pages_set.clear();
-    pages_set.insert(PRIVATE_PAGE_MESSAGES);
-    pages_set.insert(PRIVATE_PAGE_MESSAGES_INPUT);
-    if (pages_set.contains(page_text))
+    if (cmd_text == "/private")
     {
         data_buffer_text = "private chat page";
         return;
@@ -221,4 +223,10 @@ void ServerHandler::clearBuffer()
 std::string &ServerHandler::getDataText()
 {
     return data_buffer_text;
+}
+
+void ServerHandler::onDBerror()
+{
+    data_buffer_text = "На сервере проблемы с базой данных. Обратитесь к администратору.\n";
+    buffer.createFlags(sv::get_string);
 }

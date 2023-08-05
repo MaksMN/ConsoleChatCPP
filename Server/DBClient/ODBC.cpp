@@ -1,6 +1,6 @@
 #include "ODBC.h"
-
-void ODBC::initialize()
+#if defined(_WIN64) || defined(_WIN32)
+bool ODBC::initialize()
 {
     connect_data = "DRIVER={MySQL ODBC 8.0 Unicode Driver};charset=utf8mb4;SERVER=" + server +
                    ";PORT=" + port +
@@ -17,21 +17,21 @@ void ODBC::initialize()
     {
         diagInfo(SQL_HANDLE_ENV, sqlEnvHandle, "SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &sqlEnvHandle)", "no query");
         wrongDescriptorMsg();
-        return;
+        return false;
     }
 
     if (SQL_SUCCESS != SQLSetEnvAttr(sqlEnvHandle, SQL_ATTR_ODBC_VERSION, (SQLPOINTER)SQL_OV_ODBC3, 0))
     {
         diagInfo(SQL_HANDLE_ENV, sqlEnvHandle, "SQLSetEnvAttr", "no query");
         wrongDescriptorMsg();
-        return;
+        return false;
     }
 
     if (SQL_SUCCESS != SQLAllocHandle(SQL_HANDLE_DBC, sqlEnvHandle, &sqlConnHandle))
     {
         diagInfo(SQL_HANDLE_ENV, sqlEnvHandle, "SQLAllocHandle(SQL_HANDLE_DBC, sqlEnvHandle, &sqlConnHandle)", "no query");
         wrongDescriptorMsg();
-        return;
+        return false;
     }
 
     // Устанавливаем соединение с сервером
@@ -55,11 +55,12 @@ void ODBC::initialize()
         diagInfo(SQL_HANDLE_DBC, sqlConnHandle, "SQLDriverConnectA", "no query");
         Misc::printMessage("Could not connect to SQL Server");
         complete();
-        return;
+        return false;
 
     default:
         break;
     }
+    return true;
 }
 
 std::shared_ptr<User> ODBC::getUserByID(const ullong &userID, uint &db_error_number)
@@ -375,9 +376,14 @@ bool ODBC::setStatus(ullong &id, std::string &table, bool add, uint &db_error_nu
     return dbQuery(query, db_error_number);
 }
 
+void ODBC::DBclose()
+{
+    complete();
+}
+
 void ODBC::hello()
 {
-    Misc::printMessage("This is ODBC.");
+    Misc::printMessage("This server uses ODBC.");
 }
 
 std::shared_ptr<User> ODBC::fetchUserRow(uint &db_error_number, uint startCol, bool getPassData)
@@ -599,3 +605,4 @@ void ODBC::diagInfo(SQLINTEGER handle_type, SQLHANDLE &handle, const std::string
     Misc::printMessage("Message: " + msg);
     return;
 }
+#endif

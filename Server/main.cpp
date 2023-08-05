@@ -1,16 +1,13 @@
-#include <memory>
 #include "../Misc/Misc.h"
-#include "DBClient/DBClient.h"
 
 #if defined(_WIN64) || defined(_WIN32)
-
-// #include "WinServer/WinServer.h"
+#include "Socket/WinServer/WinServer.h"
 #include <io.h>
 #include <fcntl.h>
 
 #elif defined(__linux__)
 
-#include "LinuxServer/LinuxServer.h"
+#include "Socket/LinuxServer/LinuxServer.h"
 
 #endif
 
@@ -25,34 +22,17 @@ int main(int argc, const char *argv[])
     _setmode(_fileno(stdin), _O_U16TEXT);
 #endif
 
-    DBClient d;
-    d.initialise();
-    d.DBprovider()->initialize();
-    uint db_errno = 0;
-    ullong capacity = 0;
-    ullong start = 1;
-    ullong per_page = 20;
-    ullong reader_id = 1;
-    ullong interlocutor_id = 3;
-    bool login_busy = false, email_busy = false;
+    std::string port = Misc::getConfigValue(".console_chat/server.ini", "GENERAL", "sv_port");
+    if (port.empty())
+        port = "7777";
+    std::string sv_message =
+        "SERVER IS LISTENING THROUGH THE PORT: " + port + " WITHIN A LOCAL SYSTEM\n" +
+        "Сервисный администратор: логин - admin пароль - 1234\n"
+        "Авторизуйтесь в клиенте и смените пароль командой /page:profile\n"
+        "Чтобы завершить работу сервера, авторизуйтесь в клиенте с администраторскими правами и введите команду /sv_quit";
+    Misc::printMessage(sv_message);
 
-    auto mmm = d.DBprovider()->getCount("users", "1", db_errno);
-
-    auto uuu = d.DBprovider()->getUserByID(21, db_errno);
-
-    std::string pass = "zzz";
-    uuu->setPass(pass);
-    uuu->setEmail("qqqqqqq");
-    uuu->setLogin("uuuu");
-    bool utt = d.DBprovider()->saveUser(uuu, login_busy, email_busy, db_errno);
-
-    // auto new_user = std::make_shared<User>("uuuu", "eeeee", "fname", "lname", "pass");
-    // auto test = d.DBprovider()->addUser(new_user, login_busy, email_busy, db_errno);
-
-    // auto sss = d.DBprovider()->messageList(reader_id, interlocutor_id, start, per_page, capacity, db_errno);
-    // Misc::printMessage(sss);
-    int a = 0;
-
+    server_socket(port.data());
 #if defined(_WIN64) || defined(_WIN32)
     system("pause");
 #endif

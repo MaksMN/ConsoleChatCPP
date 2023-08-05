@@ -26,30 +26,19 @@ int main(int argc, const char **argv)
     _setmode(_fileno(stdin), _O_U16TEXT);
 #endif
     /**
-     * программу можно запустить с 1 или 2 аргументами
-     * один аргумент - порт сервера, адрес автоматически будет 127.0.0.1
-     * два аргумента - адрес порт
-     * если ничего не указано, по умолчанию 127.0.0.1:7777
+     * Адрес и порт сервера указаны в файле .console_chat/client.ini
+     * При отсутствии файла, по умолчанию 127.0.0.1:7777
      */
-    std::string port_s;
-    std::string server_address_s = "127.0.0.1";
-    if (argc == 2)
-    {
-        port_s = argv[1];
-    }
-    else if (argc == 3)
-    {
-        server_address_s = argv[1];
-        port_s = argv[2];
-    }
-    else
-    {
-        port_s = "7777";
-    }
+    std::string port = Misc::getConfigValue(".console_chat/client.ini", "GENERAL", "sv_port");
+    std::string server_address = Misc::getConfigValue(".console_chat/client.ini", "GENERAL", "sv_address");
 
-    const auto port = port_s.data();
-    const auto server_address = server_address_s.data();
-    std::cout << "CLIENT IS ESTABLISHING A CONNECTION WITH SERVER THROUGH PORT: " << port << " WITHIN A LOCAL SYSTEM" << std::endl;
-    client_socket(server_address, port);
+    if (port.empty())
+        port = "7777";
+    if (server_address.empty())
+        server_address = "127.0.0.1";
+
+    std::cout
+        << "CLIENT IS ESTABLISHING A CONNECTION WITH SERVER THROUGH PORT: " << port << " WITHIN A LOCAL SYSTEM" << std::endl;
+    client_socket(server_address.data(), port.data());
     return 0;
 }

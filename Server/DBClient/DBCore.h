@@ -6,9 +6,6 @@
 #include "../ChatCore/User.h"
 #include "../ChatCore/Message.h"
 
-#include <mysql.h>
-#pragma comment(lib, "libmysql.lib")
-
 typedef unsigned int uint;
 typedef unsigned long long ullong;
 
@@ -29,7 +26,7 @@ public:
     virtual ~DBCore() = default;
 
     /// @brief Инициализация подключения к базе
-    virtual void initialize() = 0;
+    virtual bool initialize() = 0;
 
     /// @brief Получить пользователя из базы по ID
     /// @param userID
@@ -118,6 +115,8 @@ public:
     /// @param db_error_number
     /// @return
     virtual bool setStatus(ullong &id, std::string &table, bool add, uint &db_error_number) = 0;
+
+    virtual void DBclose() = 0;
 
     /// @brief тестовая функция, указывает какой тип подключения к базе
     virtual void hello() = 0;
