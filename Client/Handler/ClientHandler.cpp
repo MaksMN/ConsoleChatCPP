@@ -4,14 +4,8 @@ ClientHandler::ClientHandler(char (&_cmd_buffer)[CMD_BUFFER]) : cmd_buffer(_cmd_
 
 void ClientHandler::Initialise()
 {
-    // При инициализации клиента надо сбросить и сформировать новый сессионный ключ,
-    // который будет действовать во время всего сеанса.
-    // он не должен быть равным нулю.
+    // При инициализации клиента надо создать нулевой сессионный ключ
     session_key = 0;
-    while (session_key == 0)
-    {
-        session_key = Misc::getRandomKey();
-    }
 
     // Статические данные
     buffer.createFlags(sv::get_string);
@@ -52,13 +46,17 @@ void ClientHandler::Run()
     data_text = "Сервер не ответил на ваш запрос.\nВведите команду: ";
 
     // пишем ответ серверу
+
     if (buffer.hasFlag(sv::no_input))
     {
+        // сервер не требует ввод пользователя для редиректа на другую страницу
         buffer.createFlags(sv::get_string);
         return;
     }
+
     if (buffer.hasFlag(sv::get_int))
     {
+        // запрос числа. Не используется.
         uint n = userInputInt.getThroughIO();
         buffer.writeDynDataPos(n, CMD_TEXT_COUNT);
     }

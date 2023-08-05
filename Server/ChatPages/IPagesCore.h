@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 #include "../../Misc/Misc.h"
 #include "../DBClient/DBClient.h"
 #include "../ChatCore/User.h"
@@ -26,6 +27,8 @@ protected:
     uint pg_per_page;
     uint pg_end;
     sv::pagination pg_mode = sv::pagination::last_page;
+
+    std::vector<std::string> commands;
 
     std::string data_text;
 

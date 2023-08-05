@@ -3,6 +3,7 @@
 ServerHandler::ServerHandler(char (&_cmd_buffer)[CMD_BUFFER]) : cmd_buffer(_cmd_buffer)
 {
     dbClient.initialise();
+    dbClient.DBprovider()->initialize();
 }
 
 void ServerHandler::Run()
@@ -44,15 +45,7 @@ void ServerHandler::Run()
 
     // данные пользователя
 
-    uint db_errno = 0;
-    dbClient.DBprovider()->initialize();
-    user = dbClient.DBprovider()->getUserByLogin(login, db_errno);
-    dbClient.DBprovider()->DBclose();
-    if (db_errno)
-    {
-        onDBerror();
-        return;
-    }
+    user = dbClient.DBprovider()->getUserByLogin(login);
 
     if ((user != nullptr && user->validateSessionKey(session_key)) || user == nullptr)
     {
@@ -103,6 +96,7 @@ void ServerHandler::Run()
     if (user == nullptr)
     {
         UserAuthPage auth(cmd_buffer, dbClient);
+        auth.run();
         data_buffer_text = auth.getText();
         return;
     }
@@ -223,6 +217,13 @@ void ServerHandler::clearBuffer()
 
 std::string &ServerHandler::getDataText()
 {
+    if (dbClient.DBprovider()->getDBerrno())
+    {
+        dbClient.DBprovider()->DBclose();
+        data_buffer_text = "На сервере проблемы с базой данных. Обратитесь к администратору.\n";
+        dbClient.DBprovider()->clearDBerrno();
+        dbClient.DBprovider()->initialize();
+    }
     return data_buffer_text;
 }
 

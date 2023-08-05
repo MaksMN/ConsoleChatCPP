@@ -12,6 +12,11 @@ IPagesCore::IPagesCore(char (&_cmd_buffer)[CMD_BUFFER], DBClient &_dbclient)
     pg_per_page = buffer.getPgPerPage();
     pg_end = buffer.getPgEnd();
     pg_mode = buffer.getPaginationMode();
+    commands = Misc::stringExplode(cmd_text, ":");
+    if (commands.size() == 0)
+    {
+        commands.push_back("none");
+    }
 }
 
 std::string IPagesCore::getText()

@@ -26,67 +26,67 @@ public:
 
     /// @brief Получает указатель пользователя по ID
     /// @param userID
-    /// @param db_error_number
+    /// @param db_errno
     /// @return
-    std::shared_ptr<User> getUserByID(const ullong &userID, uint &db_error_number) override;
+    std::shared_ptr<User> getUserByID(const ullong &userID) override;
 
     /// @brief Получает указатель пользователя по логину
     /// @param userLogin
-    /// @param db_error_number
+    /// @param db_errno
     /// @return
-    std::shared_ptr<User> getUserByLogin(const std::string &userLogin, uint &db_error_number) override;
+    std::shared_ptr<User> getUserByLogin(const std::string &userLogin) override;
 
     /// @brief Получает количество элементов с запросе SELECT COUNT(*)
     /// @param table
     /// @param where
-    /// @param db_error_number
+    /// @param db_errno
     /// @return
-    ullong getCount(std::string table, std::string where, uint &db_error_number) override;
+    ullong getCount(std::string table, std::string where) override;
 
     /// @brief Выводит список пользователей в строку
     /// @param start
     /// @param per_page
     /// @param capacity
-    /// @param db_error_number
+    /// @param db_errno
     /// @return
-    std::string userList(ullong &start, ullong &per_page, ullong &capacity, uint &db_error_number) override;
+    std::string userList(ullong &start, ullong &per_page, ullong &capacity) override;
 
     /// @brief Сохраняет пользователя если он есть в базе
     /// @param user
     /// @param login_busy true если логин занят. Сохранение отменяется.
     /// @param email_busy true если email занят. Сохранение отменяется.
-    /// @param db_error_number
+    /// @param db_errno
     /// @return
-    bool saveUser(std::shared_ptr<User> &user, bool &login_busy, bool &email_busy, uint &db_error_number) override;
+    bool saveUser(std::shared_ptr<User> &user, bool &login_busy, bool &email_busy) override;
 
     /// @brief Добавляет нового пользователя в базу
     /// @param user
     /// @param login_busy true если логин занят. Добавление отменяется.
     /// @param email_busy true если email занят. Добавление отменяется.
-    /// @param db_error_number
+    /// @param db_errno
     /// @return
-    bool addUser(std::shared_ptr<User> &user, bool &login_busy, bool &email_busy, uint &db_error_number) override;
+    bool addUser(std::shared_ptr<User> &user, bool &login_busy, bool &email_busy) override;
 
     /// @brief Получает сообщение по ID. Не работает. Возможно будет удалена.
     /// @param messageID
-    /// @param db_error_number
+    /// @param db_errno
     /// @return
-    std::shared_ptr<Message> getMessageByID(const ullong &messageID, uint &db_error_number) override;
+    std::shared_ptr<Message> getMessageByID(const ullong &messageID) override;
 
     /// @brief Добавляет сообщение в базу данных
     /// @param message
-    /// @param db_error_number
+    /// @param db_errno
     /// @return
-    bool addMessage(std::shared_ptr<Message> &message, uint &db_error_number) override;
+    bool addMessage(std::shared_ptr<Message> &message) override;
 
     /// @brief Выводит список публичных сообщений
     /// @param reader_id Если читатель не является автором, сообщение будет помечено прочитанным.
     /// @param start
     /// @param per_page
     /// @param capacity выводит количество сообщений в списке
-    /// @param db_error_number
+    /// @param db_errno
     /// @return
-    std::string messageList(ullong &reader_id, ullong &start, ullong &per_page, ullong &capacity, uint &db_error_number) override;
+    std::string messageList(ullong &reader_id, ullong &start, ullong &per_page, ullong &capacity) override;
 
     /// @brief Выводит список личных сообщений
     /// @param reader_id
@@ -94,24 +94,24 @@ public:
     /// @param start
     /// @param per_page
     /// @param capacity
-    /// @param db_error_number
+    /// @param db_errno
     /// @return
-    std::string messageList(ullong &reader_id, ullong interlocutor_id, ullong &start, ullong &per_page, ullong &capacity, uint &db_error_number) override;
+    std::string messageList(ullong &reader_id, ullong interlocutor_id, ullong &start, ullong &per_page, ullong &capacity) override;
 
     /// @brief удаление элемента по ID
     /// @param id
     /// @param table
-    /// @param db_error_number
+    /// @param db_errno
     /// @return
-    bool deleteByID(ullong &id, std::string &table, uint &db_error_number) override;
+    bool deleteByID(ullong &id, std::string &table) override;
 
     /// @brief Изменяет битовые флаги статуса
     /// @param id
     /// @param table
     /// @param add
-    /// @param db_error_number
+    /// @param db_errno
     /// @return
-    bool setStatus(ullong &id, std::string &table, bool add, uint &db_error_number) override;
+    bool setStatus(ullong &id, std::string &table, bool add) override;
 
     void DBclose() override;
 
@@ -119,16 +119,16 @@ public:
     void hello() override;
 
 private:
-    std::shared_ptr<User> fetchUserRow(uint &db_error_number, uint startCol = 1, bool getPassData = true);
-    void fetchMessageRow(std::shared_ptr<User> &user, std::shared_ptr<Message> &msg, uint &db_error_number, uint startCol = 1, bool pub = true);
+    std::shared_ptr<User> fetchUserRow(uint &db_errno, uint startCol = 1, bool getPassData = true);
+    void fetchMessageRow(std::shared_ptr<User> &user, std::shared_ptr<Message> &msg, uint startCol = 1, bool pub = true);
 
     /// @brief Выполняет запрос
     /// @param query
-    /// @param db_error_number
+    /// @param db_errno
     /// @return количество обработанных рядов или -1 если операция не затрагивает ряды.
-    int dbQuery(std::string &query, uint &db_error_number);
+    int dbQuery(std::string &query);
 
-    SQLINTEGER Fetch(uint &db_error_number);
+    SQLINTEGER Fetch(uint &db_errno);
 
     void BindCol(
         SQLHSTMT StatementHandle,

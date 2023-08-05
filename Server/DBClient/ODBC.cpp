@@ -63,36 +63,36 @@ bool ODBC::initialize()
     return true;
 }
 
-std::shared_ptr<User> ODBC::getUserByID(const ullong &userID, uint &db_error_number)
+std::shared_ptr<User> ODBC::getUserByID(const ullong &userID)
 {
-    db_error_number = 0;
+    db_errno = 0;
     std::string query = "SELECT * FROM `users` INNER JOIN hash_tab ON `users`.id = `hash_tab`.uid WHERE `id` = '" + std::to_string(userID) + "' LIMIT 1;";
-    int res = dbQuery(query, db_error_number);
+    int res = dbQuery(query);
     if (res <= 0)
         return nullptr;
-    auto user = fetchUserRow(db_error_number);
+    auto user = fetchUserRow(db_errno);
     SQLFreeHandle(SQL_HANDLE_STMT, sqlStmtHandle);
     return user;
 }
 
-std::shared_ptr<User> ODBC::getUserByLogin(const std::string &userLogin, uint &db_error_number)
+std::shared_ptr<User> ODBC::getUserByLogin(const std::string &userLogin)
 {
-    db_error_number = 0;
+    db_errno = 0;
     std::string query = "SELECT * FROM `users` INNER JOIN hash_tab ON `users`.id = `hash_tab`.uid WHERE `login` LIKE '" + userLogin + "' LIMIT 1;";
-    int res = dbQuery(query, db_error_number);
+    int res = dbQuery(query);
     if (res <= 0)
         return nullptr;
-    auto user = fetchUserRow(db_error_number);
+    auto user = fetchUserRow(db_errno);
     SQLFreeHandle(SQL_HANDLE_STMT, sqlStmtHandle);
     return user;
 }
 
-ullong ODBC::getCount(std::string table, std::string where, uint &db_error_number)
+ullong ODBC::getCount(std::string table, std::string where)
 {
-    db_error_number = 0;
+    db_errno = 0;
     ullong count = 0;
     std::string query = "SELECT COUNT(*) FROM `" + table + "` WHERE " + where + ";";
-    int res = dbQuery(query, db_error_number);
+    int res = dbQuery(query);
     if (res <= SQL_SUCCESS)
     {
         return 0;
@@ -104,29 +104,29 @@ ullong ODBC::getCount(std::string table, std::string where, uint &db_error_numbe
     }
     catch (BindColException &e)
     {
-        db_error_number = 1;
+        db_errno = 1;
         std::cout << '\n'
                   << e.what() << '\n';
         Misc::printMessage("getCount");
         return 0;
     }
-    if (Fetch(db_error_number) != SQL_SUCCESS)
+    if (Fetch(db_errno) != SQL_SUCCESS)
         return 0;
     return res;
 }
 
-std::string ODBC::userList(ullong &start, ullong &per_page, ullong &capacity, uint &db_error_number)
+std::string ODBC::userList(ullong &start, ullong &per_page, ullong &capacity)
 {
-    db_error_number = 0;
+    db_errno = 0;
     std::string query;
 
-    ullong count = getCount("users", "`id` != 0", db_error_number);
+    ullong count = getCount("users", "`id` != 0");
 
     Misc::alignPaginator(start, per_page, count);
 
     query = "SELECT * FROM `users` WHERE `id` != 0 LIMIT " + std::to_string(start - 1) + ", " + std::to_string(start + per_page) + ";";
 
-    uint res = dbQuery(query, db_error_number);
+    uint res = dbQuery(query);
     capacity = (ullong)res;
 
     if (res <= 0)
@@ -135,20 +135,20 @@ std::string ODBC::userList(ullong &start, ullong &per_page, ullong &capacity, ui
     for (int i{0}; i < res; i++)
     {
         result += std::to_string(i + 1) + ". "; // порядковый номер
-        auto user = fetchUserRow(db_error_number, 1, false);
+        auto user = fetchUserRow(db_errno, 1, false);
         result += user->userData();
         result += "\n";
     }
     return result;
 }
 
-bool ODBC::saveUser(std::shared_ptr<User> &user, bool &login_busy, bool &email_busy, uint &db_error_number)
+bool ODBC::saveUser(std::shared_ptr<User> &user, bool &login_busy, bool &email_busy)
 {
-    db_error_number = 0;
+    db_errno = 0;
     std::string query;
 
     query = "`login` LIKE '" + user->getLogin() + "' AND `id` != " + std::to_string(user->getID()) + ";";
-    uint res = getCount("users", query, db_error_number);
+    uint res = getCount("users", query);
 
     if (res > 0)
     {
@@ -157,7 +157,7 @@ bool ODBC::saveUser(std::shared_ptr<User> &user, bool &login_busy, bool &email_b
     }
 
     query = "`email` LIKE '" + user->getEmail() + "' AND `id` != " + std::to_string(user->getID()) + ";";
-    res = getCount("users", query, db_error_number);
+    res = getCount("users", query);
     if (res > 0)
     {
         email_busy = true;
@@ -175,22 +175,22 @@ bool ODBC::saveUser(std::shared_ptr<User> &user, bool &login_busy, bool &email_b
 
     std::string query2 = "UPDATE `hash_tab` SET `hash` = '" + user->getHash() + "', `salt` = '" + user->getSalt() + "' WHERE `hash_tab`.`uid` = " + std::to_string(user->getID()) + ";";
 
-    res = dbQuery(query, db_error_number);
+    res = dbQuery(query);
     if (res < 0)
         return false;
-    res = dbQuery(query2, db_error_number);
+    res = dbQuery(query2);
     if (res < 0)
         return false;
     return true;
 }
 
-bool ODBC::addUser(std::shared_ptr<User> &user, bool &login_busy, bool &email_busy, uint &db_error_number)
+bool ODBC::addUser(std::shared_ptr<User> &user, bool &login_busy, bool &email_busy)
 {
-    db_error_number = 0;
+    db_errno = 0;
     std::string query;
 
     query = "`login` LIKE '" + user->getLogin() + "' AND `id` != " + std::to_string(user->getID()) + ";";
-    uint res = getCount("users", query, db_error_number);
+    uint res = getCount("users", query);
 
     if (res > 0)
     {
@@ -199,7 +199,7 @@ bool ODBC::addUser(std::shared_ptr<User> &user, bool &login_busy, bool &email_bu
     }
 
     query = "`email` LIKE '" + user->getEmail() + "' AND `id` != " + std::to_string(user->getID()) + ";";
-    res = getCount("users", query, db_error_number);
+    res = getCount("users", query);
     if (res > 0)
     {
         email_busy = true;
@@ -223,7 +223,7 @@ bool ODBC::addUser(std::shared_ptr<User> &user, bool &login_busy, bool &email_bu
             std::to_string(user->getSessionKey()) +
             "');";
 
-    res = dbQuery(query, db_error_number);
+    res = dbQuery(query);
     if (res < 1)
     {
         return false;
@@ -232,26 +232,26 @@ bool ODBC::addUser(std::shared_ptr<User> &user, bool &login_busy, bool &email_bu
     // согласно задания хеши паролей должны быть в отдельной таблице с триггером
     // из за этого приходится у нового пользователя получить автоинкрементный id а потом добавлять хеши
     // если бы хеш хранился в таблице пользователя, можно было бы его засунуть в предыдущем запросе.
-    auto user_in_db = getUserByLogin(user->getLogin(), db_error_number);
+    auto user_in_db = getUserByLogin(user->getLogin());
     query = "UPDATE `hash_tab` SET `hash` = '" + user->getHash() + "', `salt` = '" + user->getSalt() + "' WHERE `hash_tab`.`uid` = " + std::to_string(user_in_db->getID()) + ";";
-    res = dbQuery(query, db_error_number);
+    res = dbQuery(query);
     if (res < 1)
     {
         return false;
     }
-    user = getUserByID(user_in_db->getID(), db_error_number);
+    user = getUserByID(user_in_db->getID());
     return true;
 }
 
-std::shared_ptr<Message> ODBC::getMessageByID(const ullong &messageID, uint &db_error_number)
+std::shared_ptr<Message> ODBC::getMessageByID(const ullong &messageID)
 {
     /*этот метод скорее сего будет не нужен*/
     return std::shared_ptr<Message>();
 }
 
-bool ODBC::addMessage(std::shared_ptr<Message> &message, uint &db_error_number)
+bool ODBC::addMessage(std::shared_ptr<Message> &message)
 {
-    db_error_number = 0;
+    db_errno = 0;
     std::string query =
         message->isPrivate()
             ? "INSERT INTO `private_messages` (`id`, `author_id`, `recipient_id`, `text`, `published`, `status`) "
@@ -266,7 +266,7 @@ bool ODBC::addMessage(std::shared_ptr<Message> &message, uint &db_error_number)
                   message->getText() + "', '" +
                   std::to_string(message->getPublished()) + "', '" +
                   std::to_string(message->getStatusInt() + msg::message_delivered) + "');";
-    int res = dbQuery(query, db_error_number);
+    int res = dbQuery(query);
     if (res < 1)
     {
         return false;
@@ -274,21 +274,21 @@ bool ODBC::addMessage(std::shared_ptr<Message> &message, uint &db_error_number)
     return true;
 }
 
-std::string ODBC::messageList(ullong &reader_id, ullong &start, ullong &per_page, ullong &capacity, uint &db_error_number)
+std::string ODBC::messageList(ullong &reader_id, ullong &start, ullong &per_page, ullong &capacity)
 {
-    db_error_number = 0;
+    db_errno = 0;
     std::string query;
     std::string queryUpd = "UPDATE `pub_messages` SET `status` = (`status`| " + std::to_string(msg::message_read) + ") & ~ " +
                            std::to_string(msg::message_delivered) +
                            " WHERE (`author_id` != " + std::to_string(reader_id) + ") AND (";
 
-    ullong count = getCount("pub_messages", "1", db_error_number);
+    ullong count = getCount("pub_messages", "1");
 
     Misc::alignPaginator(start, per_page, count);
 
     query = "SELECT * FROM `pub_messages` INNER JOIN `users` ON `pub_messages`.`author_id` = `users`.`id` LIMIT " + std::to_string(start - 1) + ", " + std::to_string(start + per_page) + ";";
 
-    capacity = dbQuery(query, db_error_number);
+    capacity = dbQuery(query);
 
     std::string result;
     for (ullong i = 0; i < capacity; i++)
@@ -296,7 +296,7 @@ std::string ODBC::messageList(ullong &reader_id, ullong &start, ullong &per_page
         result += std::to_string(i + 1) + ". Сообщение\n"; // порядковый номер
         std::shared_ptr<User> user;
         std::shared_ptr<Message> msg;
-        fetchMessageRow(user, msg, db_error_number);
+        fetchMessageRow(user, msg);
 
         result += user->userData() + "\n";
         result += msg->messageData();
@@ -309,19 +309,19 @@ std::string ODBC::messageList(ullong &reader_id, ullong &start, ullong &per_page
         else
             queryUpd += " OR ";
     }
-    dbQuery(queryUpd, db_error_number);
+    dbQuery(queryUpd);
     return result;
 }
 
-std::string ODBC::messageList(ullong &reader_id, ullong interlocutor_id, ullong &start, ullong &per_page, ullong &capacity, uint &db_error_number)
+std::string ODBC::messageList(ullong &reader_id, ullong interlocutor_id, ullong &start, ullong &per_page, ullong &capacity)
 {
-    db_error_number = 0;
+    db_errno = 0;
     std::string query;
     std::string queryUpd = "UPDATE `private_messages` SET `status` = (`status`| " + std::to_string(msg::message_read) + ") & ~ " +
                            std::to_string(msg::message_delivered) +
                            " WHERE (`author_id` != " + std::to_string(reader_id) + ") AND (";
 
-    ullong count = getCount("private_messages", "1", db_error_number);
+    ullong count = getCount("private_messages", "1");
 
     Misc::alignPaginator(start, per_page, count);
 
@@ -338,14 +338,14 @@ std::string ODBC::messageList(ullong &reader_id, ullong interlocutor_id, ullong 
             ") "
             "LIMIT " +
             std::to_string(start - 1) + "," + std::to_string(start + per_page) + ";";
-    capacity = dbQuery(query, db_error_number);
+    capacity = dbQuery(query);
     std::string result;
     for (ullong i = 0; i < capacity; i++)
     {
         result += std::to_string(i + 1) + ". Сообщение\n"; // порядковый номер
         std::shared_ptr<User> user;
         std::shared_ptr<Message> msg;
-        fetchMessageRow(user, msg, db_error_number, 1, false);
+        fetchMessageRow(user, msg, 1, false);
 
         result += user->userData() + "\n";
         result += msg->messageData();
@@ -358,22 +358,22 @@ std::string ODBC::messageList(ullong &reader_id, ullong interlocutor_id, ullong 
         else
             queryUpd += " OR ";
     }
-    dbQuery(queryUpd, db_error_number);
+    dbQuery(queryUpd);
     return result;
 }
 
-bool ODBC::deleteByID(ullong &id, std::string &table, uint &db_error_number)
+bool ODBC::deleteByID(ullong &id, std::string &table)
 {
     std::string query = "DELETE FROM `" + table + "` WHERE `id` = " + std::to_string(id) + ";";
-    return dbQuery(query, db_error_number);
+    return dbQuery(query);
 }
 
-bool ODBC::setStatus(ullong &id, std::string &table, bool add, uint &db_error_number)
+bool ODBC::setStatus(ullong &id, std::string &table, bool add)
 {
     std::string set = add ? "|" : "& ~";
     std::string query = "UPDATE `" + table + "` SET `status` = `status` " + set + " '4' WHERE `users`.`id` = " + std::to_string(id) + ";";
 
-    return dbQuery(query, db_error_number);
+    return dbQuery(query);
 }
 
 void ODBC::DBclose()
@@ -386,7 +386,7 @@ void ODBC::hello()
     Misc::printMessage("This server uses ODBC.");
 }
 
-std::shared_ptr<User> ODBC::fetchUserRow(uint &db_error_number, uint startCol, bool getPassData)
+std::shared_ptr<User> ODBC::fetchUserRow(uint &db_errno, uint startCol, bool getPassData)
 {
     ullong id;
     char login[50];
@@ -427,13 +427,13 @@ std::shared_ptr<User> ODBC::fetchUserRow(uint &db_error_number, uint startCol, b
     }
     catch (BindColException &e)
     {
-        db_error_number = 1;
+        db_errno = 1;
         std::cout << '\n'
                   << e.what() << '\n';
         Misc::printMessage("Ошибка вызвана функцией fetchUserRow");
     }
 
-    int res = Fetch(db_error_number);
+    int res = Fetch(db_errno);
 
     if (res == SQL_SUCCESS)
     {
@@ -461,7 +461,7 @@ std::shared_ptr<User> ODBC::fetchUserRow(uint &db_error_number, uint startCol, b
     return nullptr;
 }
 
-void ODBC::fetchMessageRow(std::shared_ptr<User> &user, std::shared_ptr<Message> &msg, uint &db_error_number, uint startCol, bool pub)
+void ODBC::fetchMessageRow(std::shared_ptr<User> &user, std::shared_ptr<Message> &msg, uint startCol, bool pub)
 {
     ullong id;
     ullong author_id;
@@ -483,7 +483,7 @@ void ODBC::fetchMessageRow(std::shared_ptr<User> &user, std::shared_ptr<Message>
     }
     catch (BindColException &e)
     {
-        db_error_number = 1;
+        db_errno = 1;
         std::cout << '\n'
                   << e.what() << '\n';
         Misc::printMessage("Ошибка вызвана функцией fetchMessageRow");
@@ -491,7 +491,7 @@ void ODBC::fetchMessageRow(std::shared_ptr<User> &user, std::shared_ptr<Message>
         msg = nullptr;
     }
     uint userCol = pub ? 6 : 7;
-    user = fetchUserRow(db_error_number, userCol, false);
+    user = fetchUserRow(db_errno, userCol, false);
 
     if (user != nullptr)
     {
@@ -513,17 +513,17 @@ void ODBC::fetchMessageRow(std::shared_ptr<User> &user, std::shared_ptr<Message>
     return;
 }
 
-int ODBC::dbQuery(std::string &query, uint &db_error_number)
+int ODBC::dbQuery(std::string &query)
 {
     SQLFreeHandle(SQL_HANDLE_STMT, sqlStmtHandle);
-    db_error_number = 0;
+    db_errno = 0;
 
     SQLINTEGER res = SQLAllocHandle(SQL_HANDLE_STMT, sqlConnHandle, &sqlStmtHandle);
     if (res != SQL_SUCCESS)
     {
         diagInfo(SQL_HANDLE_STMT, sqlStmtHandle, "SQLAllocHandle in dbQuery sqlStmtHandle", query);
         diagInfo(SQL_HANDLE_DBC, sqlConnHandle, "SQLAllocHandle in dbQuery sqlConnHandle", query);
-        db_error_number = 1;
+        db_errno = 1;
         return -1;
     }
 
@@ -533,7 +533,7 @@ int ODBC::dbQuery(std::string &query, uint &db_error_number)
         diagInfo(SQL_HANDLE_STMT, sqlStmtHandle, "SQLExecDirectA", query);
         SQLFreeHandle(SQL_HANDLE_STMT, sqlStmtHandle);
         Misc::printMessage("ODBC: Failed to complete the query " + query);
-        db_error_number = 1;
+        db_errno = 1;
         return -1;
     }
     SQLLEN RowCountPtr = -1;
@@ -543,14 +543,14 @@ int ODBC::dbQuery(std::string &query, uint &db_error_number)
     return RowCountPtr;
 }
 
-SQLINTEGER ODBC::Fetch(uint &db_error_number)
+SQLINTEGER ODBC::Fetch(uint &db_errno)
 {
-    db_error_number = 0;
+    db_errno = 0;
     int res = SQLFetch(sqlStmtHandle);
     if (res != SQL_SUCCESS && res != SQL_NO_DATA)
     {
         diagInfo(SQL_HANDLE_STMT, sqlStmtHandle, "Fetch", "");
-        db_error_number = 1;
+        db_errno = 1;
     }
 
     return res;

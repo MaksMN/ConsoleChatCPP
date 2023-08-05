@@ -2,11 +2,13 @@
 
 bool MySQLAPI::initialize()
 {
+    db_errno = 0;
     // Получаем дескриптор соединения
     mysql_init(&mysql);
     if (&mysql == nullptr)
     {
         // Если дескриптор не получен — выводим сообщение об ошибке
+        db_errno = 1;
         Misc::printMessage("Error: can't create MySQL-descriptor");
         return false;
     }
@@ -16,6 +18,7 @@ bool MySQLAPI::initialize()
     if (!mysql_real_connect(&mysql, server.data(), dbuser.data(), dbpass.data(), dbname.data(), atoi(port.data()), NULL, 0))
     {
         // Если нет возможности установить соединение с БД выводим сообщение об ошибке
+        db_errno = 1;
         Misc::printMessage("Error: can't connect to database ", false);
         Misc::printMessage(mysql_error(&mysql));
         return false;
@@ -32,39 +35,40 @@ bool MySQLAPI::initialize()
     return true;
 }
 
-std::shared_ptr<User> MySQLAPI::getUserByID(const ullong &userID, uint &db_error_number)
+std::shared_ptr<User> MySQLAPI::getUserByID(const ullong &userID)
 {
+    db_errno = 0;
+    std::shared_ptr<User> user = nullptr;
     std::string query = "SELECT * FROM `users` INNER JOIN hash_tab ON `users`.id = `hash_tab`.uid WHERE `id` = '" + std::to_string(userID) + "' LIMIT 1;";
-    if (querySelect(query, db_error_number) > 0)
+    uint result = querySelect(query);
+    if (result > 0)
     {
-        auto user = fetchUserRow();
-        mysql_free_result(res);
-        return user;
+        user = fetchUserRow();
     }
     mysql_free_result(res);
-    return nullptr;
+    return user;
 }
 
-std::shared_ptr<User> MySQLAPI::getUserByLogin(const std::string &userLogin, uint &db_error_number)
+std::shared_ptr<User> MySQLAPI::getUserByLogin(const std::string &userLogin)
 {
+    db_errno = 0;
+    std::shared_ptr<User> user = nullptr;
     std::string query = "SELECT * FROM `users` INNER JOIN hash_tab ON `users`.id = `hash_tab`.uid WHERE `login` LIKE '" + userLogin + "' LIMIT 1;";
-    querySelect(query, db_error_number);
-    if (querySelect(query, db_error_number) > 0)
+    uint result = querySelect(query);
+    if (result > 0)
     {
-        auto user = fetchUserRow();
-        mysql_free_result(res);
-        return user;
+        user = fetchUserRow();
     }
     mysql_free_result(res);
-    return nullptr;
+    return user;
 }
 
-ullong MySQLAPI::getCount(std::string table, std::string where, uint &db_error_number)
+ullong MySQLAPI::getCount(std::string table, std::string where)
 {
-    db_error_number = 0;
+    db_errno = 0;
     ullong count = 0;
     std::string query = "SELECT COUNT(*) FROM `" + table + "` WHERE " + where + ";";
-    if (querySelect(query, db_error_number) > 0)
+    if (querySelect(query) > 0)
     {
         count = atoll(row[0]);
     }
@@ -72,18 +76,18 @@ ullong MySQLAPI::getCount(std::string table, std::string where, uint &db_error_n
     return count;
 }
 
-std::string MySQLAPI::userList(ullong &start, ullong &per_page, ullong &capacity, uint &db_error_number)
+std::string MySQLAPI::userList(ullong &start, ullong &per_page, ullong &capacity)
 {
-    db_error_number = 0;
+    db_errno = 0;
     std::string query;
 
-    ullong count = getCount("users", "`id` != 0", db_error_number);
+    ullong count = getCount("users", "`id` != 0");
 
     Misc::alignPaginator(start, per_page, count);
 
     query = "SELECT * FROM `users` WHERE `id` != 0 LIMIT " + std::to_string(start - 1) + ", " + std::to_string(start + per_page) + ";";
 
-    capacity = querySelect(query, db_error_number);
+    capacity = querySelect(query);
 
     std::string result;
     for (ullong i = 0; i < capacity; i++)
@@ -98,13 +102,13 @@ std::string MySQLAPI::userList(ullong &start, ullong &per_page, ullong &capacity
     return result;
 }
 
-bool MySQLAPI::saveUser(std::shared_ptr<User> &user, bool &login_busy, bool &email_busy, uint &db_error_number)
+bool MySQLAPI::saveUser(std::shared_ptr<User> &user, bool &login_busy, bool &email_busy)
 {
-    db_error_number = 0;
+    db_errno = 0;
     std::string query;
 
     query = "`login` LIKE '" + user->getLogin() + "' AND `id` != " + std::to_string(user->getID()) + ";";
-    uint result = getCount("users", query, db_error_number);
+    uint result = getCount("users", query);
 
     if (result > 0)
     {
@@ -113,7 +117,7 @@ bool MySQLAPI::saveUser(std::shared_ptr<User> &user, bool &login_busy, bool &ema
     }
 
     query = "`email` LIKE '" + user->getEmail() + "' AND `id` != " + std::to_string(user->getID()) + ";";
-    result = getCount("users", query, db_error_number);
+    result = getCount("users", query);
     if (result > 0)
     {
         email_busy = true;
@@ -133,7 +137,7 @@ bool MySQLAPI::saveUser(std::shared_ptr<User> &user, bool &login_busy, bool &ema
 
     std::string query2 = "UPDATE `hash_tab` SET `hash` = '" + user->getHash() + "', `salt` = '" + user->getSalt() + "' WHERE `hash_tab`.`uid` = " + std::to_string(user->getID()) + ";";
 
-    if (queryUpdate(query, db_error_number) != 0)
+    if (queryUpdate(query) != 0)
     {
         return false;
     }
@@ -141,13 +145,13 @@ bool MySQLAPI::saveUser(std::shared_ptr<User> &user, bool &login_busy, bool &ema
     return true;
 }
 
-bool MySQLAPI::addUser(std::shared_ptr<User> &user, bool &login_busy, bool &email_busy, uint &db_error_number)
+bool MySQLAPI::addUser(std::shared_ptr<User> &user, bool &login_busy, bool &email_busy)
 {
-    db_error_number = 0;
+    db_errno = 0;
     std::string query;
 
     query = "`login` LIKE '" + user->getLogin() + "' AND `id` != " + std::to_string(user->getID()) + ";";
-    uint result = getCount("users", query, db_error_number);
+    uint result = getCount("users", query);
 
     if (result > 0)
     {
@@ -156,7 +160,7 @@ bool MySQLAPI::addUser(std::shared_ptr<User> &user, bool &login_busy, bool &emai
     }
 
     query = "`email` LIKE '" + user->getEmail() + "' AND `id` != " + std::to_string(user->getID()) + ";";
-    result = getCount("users", query, db_error_number);
+    result = getCount("users", query);
     if (result > 0)
     {
 
@@ -180,7 +184,7 @@ bool MySQLAPI::addUser(std::shared_ptr<User> &user, bool &login_busy, bool &emai
             "', '" +
             std::to_string(user->getSessionKey()) +
             "');";
-    if (queryUpdate(query, db_error_number) != 0)
+    if (queryUpdate(query) != 0)
     {
         mysql_free_result(res);
         return false;
@@ -191,7 +195,7 @@ bool MySQLAPI::addUser(std::shared_ptr<User> &user, bool &login_busy, bool &emai
     // если бы хеш хранился в таблице пользователя, можно было бы его засунуть в предыдущем запросе.
     query = "SELECT `id` FROM `users` WHERE `login` LIKE '" + user->getLogin() + "';";
     ullong id;
-    if (querySelect(query, db_error_number) > 0)
+    if (querySelect(query) > 0)
     {
         id = atoll(row[0]);
         mysql_free_result(res);
@@ -205,23 +209,23 @@ bool MySQLAPI::addUser(std::shared_ptr<User> &user, bool &login_busy, bool &emai
 
     query = "UPDATE `hash_tab` SET `hash` = '" + user->getHash() + "', `salt` = '" + user->getSalt() + "' WHERE `hash_tab`.`uid` = " + std::to_string(id) + ";";
 
-    if (queryUpdate(query, db_error_number) != 0)
+    if (queryUpdate(query) != 0)
     {
         return false;
     }
-    user = getUserByID(id, db_error_number);
-    return user != nullptr && db_error_number == 0;
+    user = getUserByID(id);
+    return user != nullptr && db_errno == 0;
 }
 
-std::shared_ptr<Message> MySQLAPI::getMessageByID(const ullong &messageID, uint &db_error_number)
+std::shared_ptr<Message> MySQLAPI::getMessageByID(const ullong &messageID)
 {
 
     return std::shared_ptr<Message>();
 }
 
-bool MySQLAPI::addMessage(std::shared_ptr<Message> &message, uint &db_error_number)
+bool MySQLAPI::addMessage(std::shared_ptr<Message> &message)
 {
-    db_error_number = 0;
+    db_errno = 0;
     std::string query =
         message->isPrivate()
             ? "INSERT INTO `private_messages` (`id`, `author_id`, `recipient_id`, `text`, `published`, `status`) "
@@ -236,28 +240,28 @@ bool MySQLAPI::addMessage(std::shared_ptr<Message> &message, uint &db_error_numb
                   message->getText() + "', '" +
                   std::to_string(message->getPublished()) + "', '" +
                   std::to_string(message->getStatusInt() + msg::message_delivered) + "');";
-    if (queryUpdate(query, db_error_number) != 0)
+    if (queryUpdate(query) != 0)
     {
         return false;
     }
-    return db_error_number == 0;
+    return db_errno == 0;
 }
 
-std::string MySQLAPI::messageList(ullong &reader_id, ullong &start, ullong &per_page, ullong &capacity, uint &db_error_number)
+std::string MySQLAPI::messageList(ullong &reader_id, ullong &start, ullong &per_page, ullong &capacity)
 {
-    db_error_number = 0;
+    db_errno = 0;
     std::string query;
     std::string queryUpd = "UPDATE `pub_messages` SET `status` = (`status`| " + std::to_string(msg::message_read) + ") & ~ " +
                            std::to_string(msg::message_delivered) +
                            " WHERE (`author_id` != " + std::to_string(reader_id) + ") AND (";
 
-    ullong count = getCount("pub_messages", "1", db_error_number);
+    ullong count = getCount("pub_messages", "1");
 
     Misc::alignPaginator(start, per_page, count);
 
     query = "SELECT * FROM `pub_messages` INNER JOIN `users` ON `pub_messages`.`author_id` = `users`.`id` LIMIT " + std::to_string(start - 1) + ", " + std::to_string(start + per_page) + ";";
 
-    capacity = querySelect(query, db_error_number);
+    capacity = querySelect(query);
 
     std::string result;
     for (ullong i = 0; i < capacity; i++)
@@ -276,20 +280,20 @@ std::string MySQLAPI::messageList(ullong &reader_id, ullong &start, ullong &per_
         else
             queryUpd += " OR ";
     }
-    queryUpdate(queryUpd, db_error_number);
+    queryUpdate(queryUpd);
     mysql_free_result(res);
     return result;
 }
 
-std::string MySQLAPI::messageList(ullong &reader_id, ullong interlocutor_id, ullong &start, ullong &per_page, ullong &capacity, uint &db_error_number)
+std::string MySQLAPI::messageList(ullong &reader_id, ullong interlocutor_id, ullong &start, ullong &per_page, ullong &capacity)
 {
-    db_error_number = 0;
+    db_errno = 0;
     std::string query;
     std::string queryUpd = "UPDATE `private_messages` SET `status` = (`status`| " + std::to_string(msg::message_read) + ") & ~ " +
                            std::to_string(msg::message_delivered) +
                            " WHERE (`author_id` != " + std::to_string(reader_id) + ") AND (";
 
-    ullong count = getCount("private_messages", "1", db_error_number);
+    ullong count = getCount("private_messages", "1");
 
     Misc::alignPaginator(start, per_page, count);
 
@@ -307,7 +311,7 @@ std::string MySQLAPI::messageList(ullong &reader_id, ullong interlocutor_id, ull
             "LIMIT " +
             std::to_string(start - 1) + "," + std::to_string(start + per_page) + ";";
 
-    capacity = querySelect(query, db_error_number);
+    capacity = querySelect(query);
 
     std::string result;
     for (ullong i = 0; i < capacity; i++)
@@ -324,7 +328,7 @@ std::string MySQLAPI::messageList(ullong &reader_id, ullong interlocutor_id, ull
         if (i + 1 == capacity)
         {
             queryUpd += ");";
-            queryUpdate(queryUpd, db_error_number);
+            queryUpdate(queryUpd);
         }
         else
             queryUpd += " OR ";
@@ -334,12 +338,12 @@ std::string MySQLAPI::messageList(ullong &reader_id, ullong interlocutor_id, ull
     return result;
 }
 
-bool MySQLAPI::deleteByID(ullong &id, std::string &table, uint &db_error_number)
+bool MySQLAPI::deleteByID(ullong &id, std::string &table)
 {
     return false;
 }
 
-bool MySQLAPI::setStatus(ullong &id, std::string &table, bool add, uint &db_error_number)
+bool MySQLAPI::setStatus(ullong &id, std::string &table, bool add)
 {
     return false;
 }
@@ -420,9 +424,9 @@ std::shared_ptr<Message> MySQLAPI::fetchMessageRow(uint startRow, bool pub)
     return nullptr;
 }
 
-uint MySQLAPI::querySelect(std::string &query, uint &db_error_number)
+uint MySQLAPI::querySelect(std::string &query)
 {
-    db_error_number = 0;
+    db_errno = 0;
     mysql_query(&mysql, query.data());
     if (res = mysql_store_result(&mysql))
     {
@@ -431,20 +435,20 @@ uint MySQLAPI::querySelect(std::string &query, uint &db_error_number)
     }
     else
     {
-        db_error_number = mysql_errno(&mysql);
+        db_errno = mysql_errno(&mysql);
         Misc::printMessage(mysql_error(&mysql));
         return 0;
     }
     return 0;
 }
 
-uint MySQLAPI::queryUpdate(std::string &query, uint &db_error_number)
+uint MySQLAPI::queryUpdate(std::string &query)
 {
-    db_error_number = 0;
+    db_errno = 0;
     uint query_result = mysql_query(&mysql, query.data());
     if (query_result != 0)
     {
-        db_error_number = mysql_errno(&mysql);
+        db_errno = mysql_errno(&mysql);
         Misc::printMessage(mysql_error(&mysql));
         return query_result;
     }
