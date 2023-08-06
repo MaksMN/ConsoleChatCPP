@@ -13,9 +13,14 @@ IPagesCore::IPagesCore(char (&_cmd_buffer)[CMD_BUFFER], DBClient &_dbclient)
     pg_end = buffer.getPgEnd();
     pg_mode = buffer.getPaginationMode();
     commands = Misc::stringExplode(cmd_text, ":");
+    page_parsed = Misc::stringExplode(page_text, '\n');
     if (commands.size() == 0)
     {
         commands.push_back("none");
+    }
+    if (page_parsed.size() == 0)
+    {
+        page_parsed.push_back("none");
     }
 }
 

@@ -18,5 +18,8 @@ public:
 
 private:
     bool authCommand();
+
+    bool regCommand();
+    bool regPage();
     void offerRegisterOrLogin();
 };

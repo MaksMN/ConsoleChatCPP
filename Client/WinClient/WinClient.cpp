@@ -56,7 +56,10 @@ int client_socket(char server_address[], char port[])
         // запишем в буфер текст который отобразится если сервер отвалится
         if (result == -1)
         {
-            handler.setDataText("Сервер не ответил на ваш запрос.\nВведите команду: ");
+            handler.setDataText("Сервер не ответил на ваш запрос. Обратитесь к администратору.\nВведите команду /hello чтобы опросить сервер: ");
+            buffer.createFlags(sv::get_string);
+            auto login = buffer.getDynDataS(LOGIN_COUNT);
+            buffer.writeDynData(login, "none", "none");
             continue;
         }
         // убеждаемся что это был командный буфер

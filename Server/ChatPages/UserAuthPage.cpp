@@ -11,8 +11,15 @@ void UserAuthPage::run()
         return;
     }
 
-    if (commands[0] == "/reg")
+    if (regCommand())
     {
+        return;
+    }
+
+    if (regPage())
+    {
+
+        return;
     }
     offerRegisterOrLogin();
 }
@@ -60,6 +67,143 @@ bool UserAuthPage::authCommand()
                 }
             }
         }
+    }
+
+    return false;
+}
+
+bool UserAuthPage::regCommand()
+{
+    if (commands[0] == "/reg")
+    {
+        // ввод логина
+        buffer.createFlags(sv::clear_console, sv::get_string);
+        buffer.writeDynDataPos("/register", PAGE_TEXT_COUNT);
+        data_text = "Регистрация.\n"
+                    "Введите логин (до 50 символов): ";
+        return true;
+    }
+    return false;
+}
+
+bool UserAuthPage::regPage()
+{
+    if (page_parsed[0] != "/register")
+        return false;
+    uint _count;
+    if (page_parsed.size() == 1)
+    {
+        // введен логин
+        _count = dbClient.DBprovider()->getCount("users", "`login` LIKE '" + cmd_text + "' LIMIT 1");
+        if (_count > 0)
+        {
+            buffer.createFlags(sv::clear_console, sv::get_string);
+            buffer.writeDynDataPos("none", CMD_TEXT_COUNT);
+            data_text = "Регистрация.\n"
+                        "Логин занят.\n"
+                        "Введите логин (до 50 символов): ";
+            return true;
+        }
+        // ввод email
+        buffer.createFlags(sv::clear_console, sv::get_string);
+        buffer.writeDynDataPos(page_text + "\n" + cmd_text, PAGE_TEXT_COUNT);
+        buffer.writeDynDataPos("none", CMD_TEXT_COUNT);
+        data_text = "Регистрация.\n"
+                    "Введите E-mail (до 50 символов): ";
+        return true;
+    }
+    if (page_parsed.size() == 2)
+    {
+        // введен емайл
+        _count = dbClient.DBprovider()->getCount("users", "`email` LIKE '" + cmd_text + "' LIMIT 1");
+        if (_count > 0)
+        {
+            buffer.createFlags(sv::clear_console, sv::get_string);
+            buffer.writeDynDataPos("none", CMD_TEXT_COUNT);
+            data_text = "Регистрация.\n"
+                        "E-mail занят.\n"
+                        "Введите E-mail (до 50 символов): ";
+            return true;
+        }
+
+        // ввод имени
+        buffer.createFlags(sv::clear_console, sv::get_string);
+        buffer.writeDynDataPos(page_text + "\n" + cmd_text, PAGE_TEXT_COUNT);
+        buffer.writeDynDataPos("none", CMD_TEXT_COUNT);
+        data_text = "Регистрация.\n"
+                    "Введите Имя (до 50 символов): ";
+        return true;
+    }
+    if (page_parsed.size() == 3)
+    {
+        // введено имя
+
+        // ввод фамилии
+        buffer.createFlags(sv::clear_console, sv::get_string);
+        buffer.writeDynDataPos(page_text + "\n" + cmd_text, PAGE_TEXT_COUNT);
+        buffer.writeDynDataPos("none", CMD_TEXT_COUNT);
+        data_text = "Регистрация.\n"
+                    "Введите Фамилию (до 50 символов): ";
+        return true;
+    }
+    if (page_parsed.size() == 4)
+    {
+        // введена фамилия
+
+        // ввод пароля
+        buffer.createFlags(sv::clear_console, sv::get_string);
+        buffer.writeDynDataPos(page_text + "\n" + cmd_text, PAGE_TEXT_COUNT);
+        buffer.writeDynDataPos("none", CMD_TEXT_COUNT);
+        data_text = "Регистрация.\n"
+                    "Введите пароль: ";
+
+        return true;
+    }
+
+    if (page_parsed.size() == 5)
+    {
+        // всё введено
+        auto u = std::make_shared<User>(page_parsed[1], page_parsed[2], page_parsed[3], page_parsed[4], page_parsed[5]);
+        bool email_busy, login_busy = false;
+        bool res = dbClient.DBprovider()->addUser(u, login_busy, email_busy);
+        if (login_busy)
+        {
+            buffer.createFlags(sv::clear_console, sv::get_string);
+            data_text = "Во время регистрации логин был занят другим пользователем.\n"
+                        "Введите команду /reg чтобы зарегистрироваться снова.\n"
+                        "Команда /help - справка."
+                        "\nВведите команду: ";
+            return true;
+        }
+        else if (login_busy)
+        {
+            buffer.createFlags(sv::clear_console, sv::get_string);
+            data_text = "Во время регистрации E-mail был занят другим пользователем.\n"
+                        "Введите команду /reg чтобы зарегистрироваться снова.\n"
+                        "Команда /help - справка."
+                        "\nВведите команду: ";
+            return true;
+        }
+        else if (!res)
+        {
+            buffer.createFlags(sv::clear_console, sv::get_string);
+            data_text = "Не удалось завершить регистрацию по техническим причинам на сервере.\n"
+                        "Обратитесь к серверному администратору.\n"
+                        "Команда /hello - опрос сервера."
+                        "\nВведите команду: ";
+            return true;
+        }
+
+        // пользователь удачно добавлен в базу
+        session_key = Misc::getRandomKey();
+        u->setSessionKey(session_key);
+        dbClient.DBprovider()->saveUser(u);
+        buffer.removeFlag(sv::get_string);
+        buffer.addFlags(sv::no_input, sv::clear_console, sv::write_session);
+        buffer.setSessionKey(session_key);
+        buffer.writeDynData(u->getLogin(), "/chat", "/chat"); // редирект в общий чат
+        data_text = " ";
+        return true;
     }
 
     return false;

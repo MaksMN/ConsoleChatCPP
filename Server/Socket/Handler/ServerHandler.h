@@ -15,7 +15,7 @@
 #include "../../ChatPages/UserAuthPage.h"
 
 #define DATA_BUFFER 4096 // Размер буфера для данных
-#define CMD_BUFFER 1024  // Размер буфера команд и заголовков
+#define CMD_BUFFER 4096  // Размер буфера команд и заголовков
 
 typedef unsigned int uint;
 typedef unsigned long long ullong;
