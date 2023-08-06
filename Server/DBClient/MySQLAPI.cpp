@@ -70,7 +70,7 @@ ullong MySQLAPI::getCount(std::string table, std::string where)
     std::string query = "SELECT COUNT(*) FROM `" + table + "` WHERE " + where + ";";
     if (querySelect(query) > 0)
     {
-        count = atoll(row[0]);
+        count = std::strtoull(row[0], nullptr, 10);
     }
     mysql_free_result(res);
     return count;
@@ -228,7 +228,7 @@ bool MySQLAPI::addUser(std::shared_ptr<User> &user, bool &login_busy, bool &emai
     ullong id;
     if (querySelect(query) > 0)
     {
-        id = atoll(row[0]);
+        id = std::strtoull(row[0], nullptr, 10);
         mysql_free_result(res);
     }
     else
@@ -395,14 +395,14 @@ std::shared_ptr<User> MySQLAPI::fetchUserRow(uint startRow, bool getPassData)
     {
         std::string hash;
         std::string salt;
-        ullong id = atoll(row[startRow]);
+        ullong id = std::strtoull(row[startRow], nullptr, 10);
         std::string login = (std::string)row[++startRow];
         std::string email = (std::string)row[++startRow];
         std::string first_name = (std::string)row[++startRow];
         std::string last_name = (std::string)row[++startRow];
-        ullong registered = atoll(row[++startRow]);
+        ullong registered = std::strtoull(row[++startRow], nullptr, 10);
         user::status status = (user::status)atoi(row[++startRow]);
-        ullong session_key = atoll(row[++startRow]);
+        ullong session_key = std::strtoull(row[++startRow], nullptr, 10);
         ++startRow;
         if (getPassData)
         {
@@ -433,13 +433,13 @@ std::shared_ptr<Message> MySQLAPI::fetchMessageRow(uint startRow, bool pub)
 {
     if (mysql_num_rows(res))
     {
-        ullong id = atoll(row[startRow]);
-        ullong author_id = atoll(row[++startRow]);
+        ullong id = std::strtoull(row[startRow], nullptr, 10);
+        ullong author_id = std::strtoull(row[++startRow], nullptr, 10);
         ullong recipient_id;
         if (!pub)
-            recipient_id = atoll(row[++startRow]);
+            recipient_id = std::strtoull(row[++startRow], nullptr, 10);
         std::string text = (std::string)row[++startRow];
-        ullong published = atoll(row[++startRow]);
+        ullong published = std::strtoull(row[++startRow], nullptr, 10);
         msg::status status = (msg::status)atoi(row[++startRow]);
         if (pub)
         {

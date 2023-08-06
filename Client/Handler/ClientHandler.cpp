@@ -39,6 +39,7 @@ void ClientHandler::Run()
     {
         session_key = buffer.getSessionKey();
     }
+    buffer.removeFlag(sv::write_session);
 
     Misc::printMessage(data_text, false);
 
@@ -54,13 +55,7 @@ void ClientHandler::Run()
         return;
     }
 
-    if (buffer.hasFlag(sv::get_int))
-    {
-        // запрос числа. Не используется.
-        uint n = userInputInt.getThroughIO();
-        buffer.writeDynDataPos(n, CMD_TEXT_COUNT);
-    }
-    else
+    if (buffer.hasFlag(sv::get_string))
     {
         std::string s = userInputStr.getStringIO();
         if (s.size() == 0)

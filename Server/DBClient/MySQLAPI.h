@@ -1,5 +1,6 @@
 #pragma once
 #include "DBCore.h"
+#include <cstdlib>
 
 #if defined(__linux__)
 #include </usr/include/mysql/mysql.h>
