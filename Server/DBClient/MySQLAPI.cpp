@@ -127,7 +127,7 @@ bool MySQLAPI::saveUser(std::shared_ptr<User> &user, bool &login_busy, bool &ema
     query = "UPDATE `users` SET"
             "`login` = '" +
             user->getLogin() +
-            "`email` = '" +
+            "', `email` = '" +
             user->getEmail() +
             "', `first_name` = '" + user->getFirstName() +
             "', `last_name` = '" + user->getLastName() +
@@ -138,6 +138,37 @@ bool MySQLAPI::saveUser(std::shared_ptr<User> &user, bool &login_busy, bool &ema
     std::string query2 = "UPDATE `hash_tab` SET `hash` = '" + user->getHash() + "', `salt` = '" + user->getSalt() + "' WHERE `hash_tab`.`uid` = " + std::to_string(user->getID()) + ";";
 
     if (queryUpdate(query) != 0)
+    {
+        return false;
+    }
+    if (queryUpdate(query2) != 0)
+    {
+        return false;
+    }
+
+    return true;
+}
+
+bool MySQLAPI::saveUser(std::shared_ptr<User> &user)
+{
+    std::string query = "UPDATE `users` SET"
+                        "`login` = '" +
+                        user->getLogin() +
+                        "', `email` = '" +
+                        user->getEmail() +
+                        "', `first_name` = '" + user->getFirstName() +
+                        "', `last_name` = '" + user->getLastName() +
+                        "', `registered` = '" + std::to_string(user->getRegistered()) +
+                        "', `status` = '" + std::to_string(user->getStatus()) +
+                        "', `session_key` = '" + std::to_string(user->getSessionKey()) + "' WHERE `users`.`id` = " + std::to_string(user->getID()) + ";";
+
+    std::string query2 = "UPDATE `hash_tab` SET `hash` = '" + user->getHash() + "', `salt` = '" + user->getSalt() + "' WHERE `hash_tab`.`uid` = '" + std::to_string(user->getID()) + "';";
+
+    if (queryUpdate(query) != 0)
+    {
+        return false;
+    }
+    if (queryUpdate(query2) != 0)
     {
         return false;
     }

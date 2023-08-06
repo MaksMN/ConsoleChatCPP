@@ -56,11 +56,17 @@ public:
     /// @return
     virtual std::string userList(ullong &start, ullong &per_page, ullong &capacity) = 0;
 
-    /// @brief Сохранить пользователя если он уже есть в базе
+    /// @brief Сохранить пользователя если он уже есть в базе с проверкой уникальности логина и email
     /// @param user
-    /// @param db_errno
+    /// @param login_busy
+    /// @param email_busy
     /// @return
     virtual bool saveUser(std::shared_ptr<User> &user, bool &login_busy, bool &email_busy) = 0;
+
+    /// @brief Сохранить пользователя если он уже есть в базе без проверки уникальности логина и email
+    /// @param user
+    /// @return
+    virtual bool saveUser(std::shared_ptr<User> &user) = 0;
 
     /// @brief Добавить нового пользователя в базу
     /// @param user

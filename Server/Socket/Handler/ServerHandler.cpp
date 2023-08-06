@@ -47,10 +47,18 @@ void ServerHandler::Run()
 
     user = dbClient.DBprovider()->getUserByLogin(login);
 
-    if ((user != nullptr && user->validateSessionKey(session_key)) || user == nullptr)
+    if (user != nullptr)
     {
-        user = nullptr;
-        login = "Guest";
+        bool valid_key = user->validateSessionKey(session_key);
+        if (!valid_key)
+        {
+            user = nullptr;
+        }
+    }
+    if (user == nullptr)
+    {
+        login == "Guest";
+        buffer.writeDynData(login, page_text, cmd_text);
     }
 
     // Запишем в буфер данные на случай если при обработке данные не изменятся.

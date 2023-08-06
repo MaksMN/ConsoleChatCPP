@@ -42,6 +42,9 @@ bool UserAuthPage::authCommand()
                 if (u->validatePass(commands[2]))
                 {
                     session_key = Misc::getRandomKey();
+                    u->setSessionKey(session_key);
+                    dbClient.DBprovider()->saveUser(u);
+
                     buffer.removeFlag(sv::get_string);
                     buffer.addFlags(sv::no_input, sv::clear_console, sv::write_session);
                     buffer.setSessionKey(session_key);

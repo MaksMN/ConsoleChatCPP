@@ -165,7 +165,9 @@ bool ODBC::saveUser(std::shared_ptr<User> &user, bool &login_busy, bool &email_b
     }
 
     query = "UPDATE `users` SET"
-            "`email` = '" +
+            "`login` = '" +
+            user->getLogin() +
+            "', `email` = '" +
             user->getEmail() +
             "', `first_name` = '" + user->getFirstName() +
             "', `last_name` = '" + user->getLastName() +
@@ -176,6 +178,31 @@ bool ODBC::saveUser(std::shared_ptr<User> &user, bool &login_busy, bool &email_b
     std::string query2 = "UPDATE `hash_tab` SET `hash` = '" + user->getHash() + "', `salt` = '" + user->getSalt() + "' WHERE `hash_tab`.`uid` = " + std::to_string(user->getID()) + ";";
 
     res = dbQuery(query);
+    if (res < 0)
+        return false;
+    res = dbQuery(query2);
+    if (res < 0)
+        return false;
+    return true;
+}
+
+bool ODBC::saveUser(std::shared_ptr<User> &user)
+{
+    db_errno = 0;
+    std::string query = "UPDATE `users` SET"
+                        "`login` = '" +
+                        user->getLogin() +
+                        "', `email` = '" +
+                        user->getEmail() +
+                        "', `first_name` = '" + user->getFirstName() +
+                        "', `last_name` = '" + user->getLastName() +
+                        "', `registered` = '" + std::to_string(user->getRegistered()) +
+                        "', `status` = '" + std::to_string(user->getStatus()) +
+                        "', `session_key` = '" + std::to_string(user->getSessionKey()) + "' WHERE `users`.`id` = " + std::to_string(user->getID()) + ";";
+
+    std::string query2 = "UPDATE `hash_tab` SET `hash` = '" + user->getHash() + "', `salt` = '" + user->getSalt() + "' WHERE `hash_tab`.`uid` = " + std::to_string(user->getID()) + ";";
+
+    uint res = dbQuery(query);
     if (res < 0)
         return false;
     res = dbQuery(query2);

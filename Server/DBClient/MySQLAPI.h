@@ -62,6 +62,11 @@ public:
     /// @return
     bool saveUser(std::shared_ptr<User> &user, bool &login_busy, bool &email_busy) override;
 
+    /// @brief Сохранить пользователя если он уже есть в базе без проверки уникальности логина и email
+    /// @param user
+    /// @return
+    bool saveUser(std::shared_ptr<User> &user) override;
+
     /// @brief Добавляет нового пользователя в базу
     /// @param user
     /// @param login_busy true если логин занят. Добавление отменяется.
