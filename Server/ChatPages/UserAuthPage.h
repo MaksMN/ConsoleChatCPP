@@ -1,3 +1,5 @@
+#pragma once
+
 #include "IPagesCore.h"
 
 class UserAuthPage final : public IPagesCore

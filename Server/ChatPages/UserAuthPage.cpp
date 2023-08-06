@@ -55,7 +55,7 @@ bool UserAuthPage::authCommand()
                     buffer.removeFlag(sv::get_string);
                     buffer.addFlags(sv::no_input, sv::clear_console, sv::write_session);
                     buffer.setSessionKey(session_key);
-                    buffer.writeDynData(u->getLogin(), "/chat", "/chat"); // редирект в общий чат
+                    buffer.writeDynData(u->getLogin(), "none", "/chat"); // редирект в общий чат
                     data_text = " ";
                     return true;
                 }
@@ -201,7 +201,7 @@ bool UserAuthPage::regPage()
         buffer.removeFlag(sv::get_string);
         buffer.addFlags(sv::no_input, sv::clear_console, sv::write_session);
         buffer.setSessionKey(session_key);
-        buffer.writeDynData(u->getLogin(), "/chat", "/chat"); // редирект в общий чат
+        buffer.writeDynData(u->getLogin(), "none", "/chat"); // редирект в общий чат
         data_text = " ";
         return true;
     }

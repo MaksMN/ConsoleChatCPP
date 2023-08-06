@@ -131,6 +131,8 @@ public:
     /// @param value
     void setPgEnd(uint value);
 
+    void pgClear();
+
     /// @brief получить размер подблока динамических данных
     /// @param blockCount номер подблока
     /// @return

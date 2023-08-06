@@ -72,6 +72,13 @@ void BufferActions::setPgEnd(uint value)
     Misc::writeIntBuffer(value, cmd_buffer, PG_END_ADDR);
 }
 
+void BufferActions::pgClear()
+{
+    setPaginationMode(sv::pagination::last_page);
+    setPgStart(1);
+    setPgPerPage(20);
+}
+
 uint BufferActions::getDynDataSize(uint blockCount)
 {
     uint addr = Misc::findDynamicData(cmd_buffer, DYN_DATA_ADDR, blockCount);

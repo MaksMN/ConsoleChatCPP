@@ -140,13 +140,16 @@ void ServerHandler::Run()
     {
         clearConsole(true);
         data_buffer_text = "Вы заблокированы. Введите команду /logout: ";
-        buffer.writeDynData(login, USER_BANNED, NONE);
+        buffer.writeDynData(login, "none", "none");
         return;
     }
 
+    /* С этого места обрабатываются только команды страниц чата */
+
+    auto cmd = chatMap.check(page_text, cmd_text);
     // профиль пользователя
 
-    if (cmd_text == "/profile")
+    if (cmd == "/profile")
     {
         data_buffer_text = "edit profile page";
         return;
@@ -154,28 +157,28 @@ void ServerHandler::Run()
 
     // главная страница чата
 
-    if (cmd_text == "/chat")
+    if (cmd == "/chat")
     {
         data_buffer_text = "chat public main page";
         return;
     }
 
     // Список пользователей
-    if (cmd_text == "/users")
+    if (cmd == "/users")
     {
         data_buffer_text = "users list";
         return;
     }
 
     // Сообщения в приватном чате
-    if (cmd_text == "/private")
+    if (cmd == "/private")
     {
         data_buffer_text = "private chat page";
         return;
     }
 
     // Запишем в буфер данные если ни одна из команд не попала под условия обработки.
-    data_buffer_text = "Не найдена страница для вашей команды.\nВведите команду /chat: ";
+    data_buffer_text = "Не найдена страница для вашей команды.\nВведите команду /help: ";
     buffer.createFlags(sv::get_string);
     clearConsole(false);
     return;
@@ -213,14 +216,14 @@ void ServerHandler::clearBuffer()
 {
     // Статические данные
     user->setSessionKey(0);
-    buffer.setSessionKey(Misc::getRandomKey());
+    buffer.setSessionKey(0);
     buffer.createFlags(sv::get_string);
     buffer.setPaginationMode(sv::last_page);
     buffer.setPgPerPage(10);
     buffer.setPgStart(1);
     buffer.setPgEnd(0);
     // Динамические данные
-    buffer.writeDynData("Guest", "MAIN_PAGE", "NONE");
+    buffer.writeDynData("Guest", "none", "none");
 }
 
 std::string &ServerHandler::getDataText()
