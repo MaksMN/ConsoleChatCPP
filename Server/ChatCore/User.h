@@ -69,7 +69,7 @@ public:
 
     /// @brief Возвращает ID пользователя
     /// @return
-    uint getID();
+    ullong getID();
 
     /// @brief Возвращает имя фамилию пользователя
     /// @return

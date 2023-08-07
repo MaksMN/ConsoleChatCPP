@@ -103,7 +103,7 @@ void ServerHandler::Run()
     /* Сюда попадает любой неавторизованный пользователь */
     if (user == nullptr)
     {
-        UserAuthPage auth(cmd_buffer, dbClient);
+        UserAuthPage auth(cmd_buffer, dbClient, user);
         auth.run();
         data_buffer_text = auth.getText();
         return;
@@ -159,7 +159,9 @@ void ServerHandler::Run()
 
     if (cmd == "/chat")
     {
-        data_buffer_text = "chat public main page";
+        PublicChatPage chat(cmd_buffer, dbClient, user);
+        chat.run();
+        data_buffer_text = chat.getText();
         return;
     }
 

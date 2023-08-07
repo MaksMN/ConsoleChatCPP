@@ -68,7 +68,7 @@ void User::setInDB(bool in_db)
     _in_db = in_db;
 }
 
-uint User::getID()
+ullong User::getID()
 {
     return _id;
 }

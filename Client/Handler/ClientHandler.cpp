@@ -12,7 +12,7 @@ void ClientHandler::Initialise()
     buffer.setSessionKey(session_key);
     buffer.setPaginationMode(sv::last_page);
     buffer.setPgPerPage(10);
-    buffer.setPgStart(0);
+    buffer.setPgStart(1);
     buffer.setPgEnd(0);
     buffer.clearPmUserID();
 

@@ -313,7 +313,7 @@ std::string ODBC::messageList(ullong &reader_id, ullong &start, ullong &per_page
 
     Misc::alignPaginator(start, per_page, count);
 
-    query = "SELECT * FROM `pub_messages` INNER JOIN `users` ON `pub_messages`.`author_id` = `users`.`id` LIMIT " + std::to_string(start - 1) + ", " + std::to_string(start + per_page) + ";";
+    query = "SELECT * FROM `pub_messages` INNER JOIN `users` ON `pub_messages`.`author_id` = `users`.`id` ORDER BY `pub_messages`.`published` ASC LIMIT " + std::to_string(start - 1) + ", " + std::to_string(per_page) + ";";
 
     capacity = dbQuery(query);
 
@@ -336,7 +336,8 @@ std::string ODBC::messageList(ullong &reader_id, ullong &start, ullong &per_page
         else
             queryUpd += " OR ";
     }
-    dbQuery(queryUpd);
+    if (capacity > 0)
+        dbQuery(queryUpd);
     return result;
 }
 
@@ -363,8 +364,8 @@ std::string ODBC::messageList(ullong &reader_id, ullong interlocutor_id, ullong 
             " AND `private_messages`.`recipient_id` = " +
             std::to_string(reader_id) +
             ") "
-            "LIMIT " +
-            std::to_string(start - 1) + "," + std::to_string(start + per_page) + ";";
+            "ORDER BY `private_messages`.`published` ASC LIMIT " +
+            std::to_string(start - 1) + "," + std::to_string(per_page) + ";";
     capacity = dbQuery(query);
     std::string result;
     for (ullong i = 0; i < capacity; i++)
@@ -385,7 +386,8 @@ std::string ODBC::messageList(ullong &reader_id, ullong interlocutor_id, ullong 
         else
             queryUpd += " OR ";
     }
-    dbQuery(queryUpd);
+    if (capacity > 0)
+        dbQuery(queryUpd);
     return result;
 }
 

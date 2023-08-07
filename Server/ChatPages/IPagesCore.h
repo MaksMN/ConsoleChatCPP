@@ -14,7 +14,7 @@ protected:
     char (&cmd_buffer)[CMD_BUFFER];
     DBClient &dbClient;
 
-    std::shared_ptr<User> AuthorizedUser = nullptr;
+    std::shared_ptr<User> &AuthorizedUser;
 
     std::string page_text;
     std::string cmd_text;
@@ -34,9 +34,10 @@ protected:
     std::string data_text;
 
 public:
-    IPagesCore(char (&_cmd_buffer)[CMD_BUFFER], DBClient &_dbclient);
+    IPagesCore(char (&_cmd_buffer)[CMD_BUFFER], DBClient &_dbclient, std::shared_ptr<User> &authorizedUser);
     virtual ~IPagesCore() = default;
     virtual void run() = 0;
     virtual bool commandHandler() = 0;
     std::string getText();
+    void setAuthorizedUser(std::shared_ptr<User> &user);
 };

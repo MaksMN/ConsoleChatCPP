@@ -1,7 +1,7 @@
 #include "IPagesCore.h"
 
-IPagesCore::IPagesCore(char (&_cmd_buffer)[CMD_BUFFER], DBClient &_dbclient)
-    : cmd_buffer(_cmd_buffer), dbClient(_dbclient)
+IPagesCore::IPagesCore(char (&_cmd_buffer)[CMD_BUFFER], DBClient &_dbclient, std::shared_ptr<User> &authorizedUser)
+    : cmd_buffer(_cmd_buffer), dbClient(_dbclient), AuthorizedUser(authorizedUser)
 {
 
     login = buffer.getDynDataS(LOGIN_COUNT);
@@ -27,4 +27,9 @@ IPagesCore::IPagesCore(char (&_cmd_buffer)[CMD_BUFFER], DBClient &_dbclient)
 std::string IPagesCore::getText()
 {
     return data_text;
+}
+
+void IPagesCore::setAuthorizedUser(std::shared_ptr<User> &user)
+{
+    AuthorizedUser = user;
 }

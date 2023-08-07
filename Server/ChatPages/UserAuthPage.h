@@ -12,7 +12,7 @@ private:
         "Введите команду: ";
 
 public:
-    UserAuthPage(char (&_cmd_buffer)[CMD_BUFFER], DBClient &_dbclient);
+    UserAuthPage(char (&_cmd_buffer)[CMD_BUFFER], DBClient &_dbclient, std::shared_ptr<User> &authorizedUser);
     ~UserAuthPage() = default;
 
     void run() override;

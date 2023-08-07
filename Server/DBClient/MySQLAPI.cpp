@@ -290,14 +290,14 @@ std::string MySQLAPI::messageList(ullong &reader_id, ullong &start, ullong &per_
 
     Misc::alignPaginator(start, per_page, count);
 
-    query = "SELECT * FROM `pub_messages` INNER JOIN `users` ON `pub_messages`.`author_id` = `users`.`id` LIMIT " + std::to_string(start - 1) + ", " + std::to_string(start + per_page) + ";";
-
+    query = "SELECT * FROM `pub_messages` INNER JOIN `users` ON `pub_messages`.`author_id` = `users`.`id` ORDER BY `pub_messages`.`published` ASC LIMIT " + std::to_string(start - 1) + "," + std::to_string(per_page) + ";";
+    Misc::printMessage(query);
     capacity = querySelect(query);
 
     std::string result;
     for (ullong i = 0; i < capacity; i++)
     {
-        result += std::to_string(i + 1) + ". Сообщение\n"; // порядковый номер
+        result += std::to_string(i + start) + ". Сообщение\n"; // порядковый номер
         auto message = fetchMessageRow(0, true);
         auto user = fetchUserRow(5, false);
 
@@ -311,7 +311,8 @@ std::string MySQLAPI::messageList(ullong &reader_id, ullong &start, ullong &per_
         else
             queryUpd += " OR ";
     }
-    queryUpdate(queryUpd);
+    if (capacity > 0)
+        queryUpdate(queryUpd);
     mysql_free_result(res);
     return result;
 }
@@ -339,8 +340,8 @@ std::string MySQLAPI::messageList(ullong &reader_id, ullong interlocutor_id, ull
             " AND `private_messages`.`recipient_id` = " +
             std::to_string(reader_id) +
             ") "
-            "LIMIT " +
-            std::to_string(start - 1) + "," + std::to_string(start + per_page) + ";";
+            "ORDER BY `private_messages`.`published` ASC LIMIT " +
+            std::to_string(start - 1) + "," + std::to_string(per_page) + ";";
 
     capacity = querySelect(query);
 
@@ -364,7 +365,8 @@ std::string MySQLAPI::messageList(ullong &reader_id, ullong interlocutor_id, ull
         else
             queryUpd += " OR ";
     }
-
+    if (capacity > 0)
+        queryUpdate(queryUpd);
     mysql_free_result(res);
     return result;
 }

@@ -309,8 +309,8 @@ void Misc::alignPaginator(ullong &start, ullong &per_page, ullong &count)
 {
     if (per_page == 0)
         per_page = 1;
-    if (start == 0)
-        start = 1;
     if (start > count)
         start = count;
+    if (start == 0)
+        start = 1;
 }
