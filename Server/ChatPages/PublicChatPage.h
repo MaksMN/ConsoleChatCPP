@@ -11,4 +11,6 @@ public:
 
     void run() override;
     bool commandHandler() override;
+    void setHideStatusByID(ullong id, msg::status status);
+    void deleteMessageByID(ullong id);
 };

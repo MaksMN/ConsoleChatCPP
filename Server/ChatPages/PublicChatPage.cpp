@@ -23,6 +23,10 @@ void PublicChatPage::run()
             buffer.pgClear();
             is_command = true;
         }
+        if (cmd_text == "/update")
+        {
+            is_command = true;
+        }
         if (commands[0] == "/m" && commands.size() == 2)
         {
             uint m = abs(atoi(commands[1].data()));
@@ -38,7 +42,27 @@ void PublicChatPage::run()
             buffer.setPgPerPage(pp);
             is_command = true;
         }
-
+        if (AuthorizedUser->isAdmin())
+        {
+            if (commands[0] == "/hide" && commands.size() == 2)
+            {
+                auto id = std::strtoull(commands[1].data(), nullptr, 10);
+                setHideStatusByID(id, msg::status::hidden_);
+                is_command = true;
+            }
+            if (commands[0] == "/unhide" && commands.size() == 2)
+            {
+                auto id = std::strtoull(commands[1].data(), nullptr, 10);
+                setHideStatusByID(id, msg::status::unhide);
+                is_command = true;
+            }
+            if (commands[0] == "/delete" && commands.size() == 2)
+            {
+                auto id = std::strtoull(commands[1].data(), nullptr, 10);
+                deleteMessageByID(id);
+                is_command = true;
+            }
+        }
         // если введена не команда, значит введено сообщение
         if (!is_command)
         {
@@ -76,11 +100,18 @@ void PublicChatPage::run()
         data_text += "Показаны сообщения " + std::to_string(start) + " - " + std::to_string(lastMsg) + " из " + std::to_string(all_messages);
     }
     data_text += "\nВы: " + AuthorizedUser->userData();
+    data_text += service_message;
 
     data_text += "\nКоманда: /m:число - перейти к сообщению №..;"
                  "\nКоманда: /pp:число - установить количество сообщений на страницу;"
-                 "\nКоманда: /pclear - установить режим: всегда последние 20 сообщений;"
-                 "\nВведите текст сообщения или команду: ";
+                 "\nКоманда: /pclear - установить режим: всегда последние 20 сообщений;";
+    if (AuthorizedUser->isAdmin())
+    {
+        data_text += "\nКоманда: /hide:число - скрыть сообщение по ID;";
+        data_text += "\nКоманда: /unhide:число - открыть сообщение по ID;";
+        data_text += "\nКоманда: /delete:число - удалить сообщение по ID;";
+    }
+    data_text += "\nВведите текст сообщения или команду: ";
     buffer.createFlags(sv::clear_console, sv::get_string);
     buffer.writeDynData(AuthorizedUser->getLogin(), "/chat", "none");
 }
@@ -88,4 +119,37 @@ void PublicChatPage::run()
 bool PublicChatPage::commandHandler()
 {
     return false;
+}
+
+void PublicChatPage::setHideStatusByID(ullong id, msg::status status)
+{
+    if (!AuthorizedUser->isAdmin())
+        return;
+    uint count_msg = dbClient.DBprovider()->getCount("pub_messages", "`id` = " + std::to_string(id));
+    if (count_msg > 0)
+    {
+        if (status == msg::status::hidden_)
+            dbClient.DBprovider()->setStatus(id, "pub_messages", 1, status);
+        if (status == msg::status::unhide)
+            dbClient.DBprovider()->setStatus(id, "pub_messages", 0, msg::status::hidden_);
+    }
+    else
+    {
+        service_message += "\n\nНе найдено сообщение для скрытия.\n";
+    }
+}
+
+void PublicChatPage::deleteMessageByID(ullong id)
+{
+    if (!AuthorizedUser->isAdmin())
+        return;
+    uint count_msg = dbClient.DBprovider()->getCount("pub_messages", "`id` = " + std::to_string(id));
+    if (count_msg > 0)
+    {
+        dbClient.DBprovider()->deleteByID(id, "pub_messages");
+    }
+    else
+    {
+        service_message += "\n\nНе найдено сообщение для удаления.\n";
+    }
 }

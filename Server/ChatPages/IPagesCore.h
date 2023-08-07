@@ -32,6 +32,7 @@ protected:
     std::vector<std::string> page_parsed;
 
     std::string data_text;
+    std::string service_message;
 
 public:
     IPagesCore(char (&_cmd_buffer)[CMD_BUFFER], DBClient &_dbclient, std::shared_ptr<User> &authorizedUser);

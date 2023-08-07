@@ -11,7 +11,8 @@ namespace msg
         complain_ = 8, // жалоба
         author_deleted = 16,
         message_delivered = 32,
-        message_read = 64
+        message_read = 64,
+        unhide = 128
     };
 };
 

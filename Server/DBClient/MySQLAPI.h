@@ -112,15 +112,15 @@ public:
     /// @param table
     /// @param db_errno
     /// @return
-    bool deleteByID(ullong &id, std::string &table) override;
+    bool deleteByID(ullong &id, std::string &&table) override;
 
-    /// @brief Изменяет битовые флаги статуса
+    /// @brief изменение флагов статуса
     /// @param id
     /// @param table
-    /// @param add
-    /// @param db_errno
+    /// @param action 0 - удалить флаг; 1 - добавить флаг; 3 - очистить и задать новые флаги
+    /// @param new_status
     /// @return
-    bool setStatus(ullong &id, std::string &table, bool add) override;
+    bool setStatus(ullong &id, std::string &&table, uint action, uint new_status) override;
 
     void DBclose() override;
 

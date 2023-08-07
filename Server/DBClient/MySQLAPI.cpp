@@ -371,14 +371,27 @@ std::string MySQLAPI::messageList(ullong &reader_id, ullong interlocutor_id, ull
     return result;
 }
 
-bool MySQLAPI::deleteByID(ullong &id, std::string &table)
+bool MySQLAPI::deleteByID(ullong &id, std::string &&table)
 {
-    return false;
+    std::string query = "DELETE FROM `" + table + "` WHERE `id` = " + std::to_string(id) + ";";
+    queryUpdate(query);
+    return db_errno == 0;
 }
 
-bool MySQLAPI::setStatus(ullong &id, std::string &table, bool add)
+bool MySQLAPI::setStatus(ullong &id, std::string &&table, uint action, uint new_status)
 {
-    return false;
+    db_errno = 0;
+    std::string set;
+    if (action == 0)
+        set = "`status` = `status` & ~ '" + std::to_string(new_status) + "'";
+    if (action == 1)
+        set = "`status` = `status` | '" + std::to_string(new_status) + "'";
+    if (action == 3)
+        set = "`status` = '" + std::to_string(new_status) + "'";
+
+    std::string query = "UPDATE `" + table + "` SET " + set + " WHERE `id` = " + std::to_string(id) + ";";
+    queryUpdate(query);
+    return db_errno == 0;
 }
 
 void MySQLAPI::DBclose()
@@ -487,8 +500,3 @@ uint MySQLAPI::queryUpdate(std::string &query)
     }
     return query_result;
 }
-/*
-UPDATE `pub_messages`
-SET `status` = `status` | 4
-WHERE `id` = 3 OR `id` = 11 OR `id` = 16;
-*/
