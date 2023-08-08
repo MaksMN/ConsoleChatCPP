@@ -114,6 +114,8 @@ public:
 
     /// @brief Проверяет флаг администратора
     bool isAdmin();
+    bool isServiceAdmin();
+
     /// @brief Проверяет флаг пользователя
     /// @return
     bool isUser();

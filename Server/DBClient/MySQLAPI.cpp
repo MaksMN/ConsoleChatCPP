@@ -38,6 +38,8 @@ bool MySQLAPI::initialize()
 std::shared_ptr<User> MySQLAPI::getUserByID(const ullong &userID)
 {
     db_errno = 0;
+    if (userID == 0)
+        return nullptr;
     std::shared_ptr<User> user = nullptr;
     std::string query = "SELECT * FROM `users` INNER JOIN hash_tab ON `users`.id = `hash_tab`.uid WHERE `id` = '" + std::to_string(userID) + "' LIMIT 1;";
     uint result = querySelect(query);
@@ -92,7 +94,7 @@ std::string MySQLAPI::userList(ullong &start, ullong &per_page, ullong &capacity
     std::string result;
     for (ullong i = 0; i < capacity; i++)
     {
-        result += std::to_string(i + 1) + ". "; // порядковый номер
+        result += std::to_string(i + start) + ". "; // порядковый номер
         auto user = fetchUserRow(0, false);
         result += user->userData();
         result += "\n";

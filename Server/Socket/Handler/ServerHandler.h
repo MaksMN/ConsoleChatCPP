@@ -15,6 +15,7 @@
 #include "../../ChatPages/UserAuthPage.h"
 #include "../../ChatPages/PrivateChatPage.h"
 #include "../../ChatPages/PublicChatPage.h"
+#include "../../ChatPages/UserListPage.h"
 
 #define DATA_BUFFER 4096 // Размер буфера для данных
 #define CMD_BUFFER 4096  // Размер буфера команд и заголовков

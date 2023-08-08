@@ -129,7 +129,7 @@ user::status User::getStatus()
 }
 void User::setStatus(user::status &status)
 {
-    if (getID() == 0)
+    if (getID() == 1)
     {
         return;
     }
@@ -138,7 +138,7 @@ void User::setStatus(user::status &status)
 
 void User::toUser()
 {
-    if (getID() == 0)
+    if (getID() == 1)
     {
         return;
     }
@@ -155,7 +155,7 @@ void User::unBan()
 }
 void User::ban()
 {
-    if (getID() == 0)
+    if (getID() == 1)
     {
         return;
     }
@@ -166,6 +166,10 @@ void User::ban()
 bool User::isAdmin()
 {
     return flags.hasFlag(_status, user::admin_);
+}
+bool User::isServiceAdmin()
+{
+    return flags.hasFlag(_status, user::admin_) && getID() == 1;
 }
 bool User::isUser()
 {

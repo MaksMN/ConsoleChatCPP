@@ -168,7 +168,9 @@ void ServerHandler::Run()
     // Список пользователей
     if (cmd == "/users")
     {
-        data_buffer_text = "users list";
+        UserListPage chat(cmd_buffer, dbClient, user);
+        chat.run();
+        data_buffer_text = chat.getText();
         return;
     }
 

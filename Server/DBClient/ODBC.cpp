@@ -66,6 +66,8 @@ bool ODBC::initialize()
 std::shared_ptr<User> ODBC::getUserByID(const ullong &userID)
 {
     db_errno = 0;
+    if (userID == 0)
+        return nullptr;
     std::string query = "SELECT * FROM `users` INNER JOIN hash_tab ON `users`.id = `hash_tab`.uid WHERE `id` = '" + std::to_string(userID) + "' LIMIT 1;";
     int res = dbQuery(query);
     if (res <= 0)
@@ -134,7 +136,7 @@ std::string ODBC::userList(ullong &start, ullong &per_page, ullong &capacity)
     std::string result;
     for (int i{0}; i < res; i++)
     {
-        result += std::to_string(i + 1) + ". "; // порядковый номер
+        result += std::to_string(i + start) + ". "; // порядковый номер
         auto user = fetchUserRow(db_errno, 1, false);
         result += user->userData();
         result += "\n";
