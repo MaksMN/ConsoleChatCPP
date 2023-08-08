@@ -175,7 +175,9 @@ void ServerHandler::Run()
     // Сообщения в приватном чате
     if (cmd == "/private")
     {
-        data_buffer_text = "private chat page";
+        PrivateChatPage chat(cmd_buffer, dbClient, user);
+        chat.run();
+        data_buffer_text = chat.getText();
         return;
     }
 

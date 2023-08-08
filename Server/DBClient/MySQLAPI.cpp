@@ -348,7 +348,7 @@ std::string MySQLAPI::messageList(ullong &reader_id, ullong interlocutor_id, ull
     std::string result;
     for (ullong i = 0; i < capacity; i++)
     {
-        result += std::to_string(i + 1) + ". Сообщение\n"; // порядковый номер
+        result += std::to_string(i + start) + ". Сообщение\n"; // порядковый номер
         auto message = fetchMessageRow(0, false);
         auto user = fetchUserRow(6, false);
 

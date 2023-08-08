@@ -5,6 +5,7 @@
 #include <vector>
 #include <map>
 #include <set>
+#include "../../../Misc/Misc.h"
 
 /// @brief класс карты страниц чата
 class ServerChatMap

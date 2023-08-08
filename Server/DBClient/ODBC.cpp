@@ -320,7 +320,7 @@ std::string ODBC::messageList(ullong &reader_id, ullong &start, ullong &per_page
     std::string result;
     for (ullong i = 0; i < capacity; i++)
     {
-        result += std::to_string(i + 1) + ". Сообщение\n"; // порядковый номер
+        result += std::to_string(i + start) + ". Сообщение\n"; // порядковый номер
         std::shared_ptr<User> user;
         std::shared_ptr<Message> msg;
         fetchMessageRow(user, msg);
@@ -370,7 +370,7 @@ std::string ODBC::messageList(ullong &reader_id, ullong interlocutor_id, ullong 
     std::string result;
     for (ullong i = 0; i < capacity; i++)
     {
-        result += std::to_string(i + 1) + ". Сообщение\n"; // порядковый номер
+        result += std::to_string(i + start) + ". Сообщение\n"; // порядковый номер
         std::shared_ptr<User> user;
         std::shared_ptr<Message> msg;
         fetchMessageRow(user, msg, 1, false);

@@ -116,11 +116,6 @@ void PublicChatPage::run()
     buffer.writeDynData(AuthorizedUser->getLogin(), "/chat", "none");
 }
 
-bool PublicChatPage::commandHandler()
-{
-    return false;
-}
-
 void PublicChatPage::setHideStatusByID(ullong id, msg::status status)
 {
     if (!AuthorizedUser->isAdmin())

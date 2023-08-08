@@ -10,7 +10,8 @@ public:
     ~PublicChatPage() = default;
 
     void run() override;
-    bool commandHandler() override;
+
+private:
     void setHideStatusByID(ullong id, msg::status status);
     void deleteMessageByID(ullong id);
 };

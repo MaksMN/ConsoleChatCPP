@@ -24,11 +24,6 @@ void UserAuthPage::run()
     offerRegisterOrLogin();
 }
 
-bool UserAuthPage::commandHandler()
-{
-    return false;
-}
-
 bool UserAuthPage::authCommand()
 {
     if (commands[0] == "/auth")

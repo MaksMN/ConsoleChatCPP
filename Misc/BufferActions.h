@@ -1,6 +1,7 @@
 #pragma once
 #include "Flags.h"
 #include "Misc.h"
+#include <climits>
 
 #define FLAGS_ADDR 0
 #define DATA_PACKETS_ADDR 1
@@ -148,6 +149,8 @@ public:
     /// @return
     uint getDynDataI(uint blockCount);
 
+    /* в личных сообщениях значение PmUserID = ULLONG_MAX будет считаться как пользователь не выбран */
+
     /// @brief Получить ID собеседника ЛС
     /// @return
     ullong getPmUserID();
@@ -155,13 +158,13 @@ public:
     /// @brief Изменить ID собеседника ЛС
     /// @param id
     void setPmUserID(ullong id);
-    /// @brief Записывает в блок собеседника ЛС информацию если он не найден
-    void PmUserIDNoFound();
-    /// @brief Обнуляет блок собеседника ЛС
+
+    /// @brief Записывает в блок собеседника ЛС ULLONG_MAX, что значит пользователь не выбран
     void clearPmUserID();
-    /// @brief проверяет метку блока собеседника ЛС помечена ли она как не найдено.
+
+    /// @brief Проверяет выбран ли пользователь.
     /// @return
-    bool isNotFoundPmUserID();
+    bool PmUserIsNotSelected();
 
     /// @brief Записывает количество пакетов с текстовыми данными
     void setDataPacketsCount(unsigned char value);

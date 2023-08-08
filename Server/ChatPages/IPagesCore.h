@@ -38,7 +38,7 @@ public:
     IPagesCore(char (&_cmd_buffer)[CMD_BUFFER], DBClient &_dbclient, std::shared_ptr<User> &authorizedUser);
     virtual ~IPagesCore() = default;
     virtual void run() = 0;
-    virtual bool commandHandler() = 0;
+
     std::string getText();
     void setAuthorizedUser(std::shared_ptr<User> &user);
 };

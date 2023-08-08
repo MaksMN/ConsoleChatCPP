@@ -16,7 +16,6 @@ public:
     ~UserAuthPage() = default;
 
     void run() override;
-    bool commandHandler() override;
 
 private:
     bool authCommand();
