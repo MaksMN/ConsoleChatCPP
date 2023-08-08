@@ -126,6 +126,17 @@ void PrivateChatPage::privateChat()
         }
     }
 
+    if (interlocutorUser->isBanned())
+    {
+        data_text += "\nВы:\t\t" + AuthorizedUser->userData();
+        data_text += "\nСобеседник:\t заблокирован. С ним нельзя вести личную беседу.\n";
+        data_text += commands_text;
+        data_text += "\nВведите команду: ";
+        buffer.createFlags(sv::clear_console, sv::get_string);
+        buffer.writeDynData(AuthorizedUser->getLogin(), "/private", "none");
+        return;
+    }
+
     /*Список сообщений*/
     ullong reader_id = AuthorizedUser->getID();
     ullong interlocutor_id = interlocutorUser->getID();
@@ -139,9 +150,12 @@ void PrivateChatPage::privateChat()
                                                               std::to_string(interlocutor_id) +
                                                               " AND `private_messages`.`recipient_id` = " +
                                                               std::to_string(reader_id) +
+
                                                               ")");
     if (all_messages < 1)
     {
+        data_text += "\nВы:\t\t" + AuthorizedUser->userData();
+        data_text += "\nСобеседник:\t" + interlocutorUser->userData();
         data_text += "В чате нет сообщений.\nВведите текст первого сообщения: ";
         buffer.createFlags(sv::clear_console, sv::get_string);
         buffer.writeDynData(AuthorizedUser->getLogin(), "/private", "none");
@@ -169,13 +183,7 @@ void PrivateChatPage::privateChat()
     data_text += "\nВы:\t\t" + AuthorizedUser->userData();
     data_text += "\nСобеседник:\t" + interlocutorUser->userData();
     data_text += service_message;
-
-    data_text += "\nКоманда: /m:число - перейти к сообщению №..;"
-                 "\nКоманда: /pp:число - установить количество сообщений на страницу;"
-                 "\nКоманда: /pclear - установить режим: всегда последние 20 сообщений;";
-    "\nКоманда: /chat - перейти в общий чат;";
-    "\nКоманда: /help - информация о других командах;";
-
+    data_text += commands_text;
     data_text += "\nВведите текст сообщения или команду: ";
     buffer.createFlags(sv::clear_console, sv::get_string);
     buffer.writeDynData(AuthorizedUser->getLogin(), "/private", "none");
