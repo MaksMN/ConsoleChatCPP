@@ -151,7 +151,9 @@ void ServerHandler::Run()
 
     if (cmd == "/profile")
     {
-        data_buffer_text = "edit profile page";
+        UserProfilePage chat(cmd_buffer, dbClient, user);
+        chat.run();
+        data_buffer_text = chat.getText();
         return;
     }
 

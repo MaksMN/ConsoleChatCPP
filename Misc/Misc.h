@@ -18,7 +18,7 @@ namespace Misc
     /// @param endl true - добавить перевод строки
     void printMessage(const std::string &msg, bool endl = true);
 
-    std::wstring toWstring(std::string str);
+    std::wstring toWstring(const std::string &str);
 
     /// @brief Преобразует timestamp в обычное время
     /// @param timestamp
@@ -122,7 +122,7 @@ namespace Misc
     /// @param section
     /// @param value
     /// @return
-    std::string getConfigValue(std::string path, std::string section, std::string value);
+    std::string getConfigValue(const std::string &path, const std::string &section, const std::string &value);
 
     /*
     формат конфиг файла
@@ -145,5 +145,5 @@ namespace Misc
     /// @param start
     /// @param per_page
     /// @param count
-    void alignPaginator(ullong &start, ullong &per_page, ullong &count);
+    void alignPaginator(ullong &start, ullong &per_page, const ullong &count);
 }

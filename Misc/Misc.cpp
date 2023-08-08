@@ -14,7 +14,7 @@ void Misc::printMessage(const std::string &msg, bool endl)
 #endif
 }
 
-std::wstring Misc::toWstring(std::string str)
+std::wstring Misc::toWstring(const std::string &str)
 {
     return std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t>{}.from_bytes(str.data());
 }
@@ -149,12 +149,12 @@ std::vector<char> Misc::writeVectorBuffer(const std::string &str)
 
 ullong Misc::getRandomKey()
 {
+    // cppcheck ругается, на эту функцию. Но она дает очень хороший рандом именно из за ее стиля.
     char buf[8];
     ullong key = std::abs(std::rand());
     std::srand(time(NULL) - key);
     for (int i{0}; i < 8; i++)
     {
-        // std::srand(time(NULL) - buf[0]);
         buf[i] = std::abs(std::rand());
     }
     memcpy(&key, buf, 8);
@@ -223,12 +223,11 @@ std::string Misc::getRandomStr(const unsigned char length)
 
         // если 60+  - нижний регистр
         buf[i] = 97 + (rnd % 26);
-        continue;
     }
     return std::string(buf, length);
 }
 
-std::string Misc::getConfigValue(std::string path, std::string section, std::string value)
+std::string Misc::getConfigValue(const std::string &path, const std::string &section, const std::string &value)
 {
     std::ifstream stream(path);
 
@@ -305,7 +304,7 @@ std::string Misc::getConfigValue(std::string path, std::string section, std::str
     return std::string();
 }
 
-void Misc::alignPaginator(ullong &start, ullong &per_page, ullong &count)
+void Misc::alignPaginator(ullong &start, ullong &per_page, const ullong &count)
 {
     if (per_page == 0)
         per_page = 1;

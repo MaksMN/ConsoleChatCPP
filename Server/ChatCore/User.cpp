@@ -1,27 +1,27 @@
 #include "User.h"
 
 User::User(const std::string &login, const std::string &email, const std::string &first_name, const std::string &last_name, std::string &pass)
+    : _login(login),
+      _email(email),
+      _first_name(first_name),
+      _last_name(last_name),
+      _registered(time(NULL)),
+      _status(user::user_),
+      _in_db(false)
 {
-    _login = login;
-    _email = email;
-    _first_name = first_name;
-    _last_name = last_name;
-    _registered = time(NULL);
-    _status = user::user_;
     setPass(pass);
-    _in_db = false;
 }
 
 User::User(const std::string &&login, const std::string &&email, const std::string &&first_name, const std::string &&last_name, std::string &&pass)
+    : _login(login),
+      _email(email),
+      _first_name(first_name),
+      _last_name(last_name),
+      _registered(time(NULL)),
+      _status(user::user_),
+      _in_db(false)
 {
-    _login = login;
-    _email = email;
-    _first_name = first_name;
-    _last_name = last_name;
-    _registered = time(NULL);
-    _status = user::user_;
     setPass(pass);
-    _in_db = false;
 }
 
 User::User(const ullong &id,
@@ -34,19 +34,17 @@ User::User(const ullong &id,
            const ullong &session_key,
            const std::string &pass_hash,
            const std::string &pass_salt)
-{
-    _id = id;
-    _login = login;
-    _email = email;
-    _first_name = first_name;
-    _last_name = last_name;
-    _registered = registered;
-    _status = (user::status)status;
-    _session_key = session_key,
-    _pass_hash = pass_hash;
-    _pass_salt = pass_salt;
-    _in_db = true;
-}
+    : _id(id),
+      _login(login),
+      _email(email),
+      _first_name(first_name),
+      _last_name(last_name),
+      _registered(registered),
+      _status((user::status)status),
+      _session_key(session_key),
+      _pass_hash(pass_hash),
+      _pass_salt(pass_salt),
+      _in_db(true) {}
 
 bool User::InDB()
 {
@@ -90,6 +88,16 @@ void User::setName(const std::string &first_name, const std::string &last_name)
     }
 }
 
+void User::setFirstName(const std::string &first_name)
+{
+    _first_name = first_name;
+}
+
+void User::setLastName(const std::string &last_name)
+{
+    _last_name = last_name;
+}
+
 std::string User::getFirstName()
 {
     return _first_name;
@@ -110,7 +118,7 @@ std::string User::getEmail()
     return _email;
 }
 
-void User::setEmail(std::string email)
+void User::setEmail(const std::string &email)
 {
     _email = email;
 }
@@ -119,7 +127,7 @@ std::string User::getLogin()
 {
     return _login;
 }
-void User::setLogin(std::string login)
+void User::setLogin(const std::string &login)
 {
     _login = login;
 }

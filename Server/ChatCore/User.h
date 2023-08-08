@@ -78,6 +78,8 @@ public:
     /// @brief Изменяет имя фамилию пользователя. Параметр с пустой строкой игнорируется.
     /// @param name
     void setName(const std::string &first_name, const std::string &last_name);
+    void setFirstName(const std::string &first_name);
+    void setLastName(const std::string &last_name);
 
     std::string getFirstName();
     std::string getLastName();
@@ -89,12 +91,12 @@ public:
 
     /// @brief изменяет email
     /// @param email
-    void setEmail(std::string email);
+    void setEmail(const std::string &email);
 
     /// @brief Возвращает логин пользователя
     /// @return
     std::string getLogin();
-    void setLogin(std::string login);
+    void setLogin(const std::string &login);
 
     /// @brief Получает флаги статуса пользователя
     user::status getStatus();

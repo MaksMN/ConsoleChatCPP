@@ -22,41 +22,24 @@ private:
 public:
     ~Message() = default;
 
-    /// @brief Создание нового публичного сообщения
-    /// @param author_id
-    /// @param text
-    Message(ullong author_id, std::string text);
+    /// @brief Создание нового публичного сообщения перед добавлением в базу
+    Message(const ullong &author_id, const std::string &text);
 
     /// @brief Создание публичного сообщения из базы
-    /// @param author_id
-    /// @param text
-    /// @param published
-    /// @param status
-    Message(ullong id, ullong author_id, std::string text, ullong published, uint status);
+    Message(const ullong &id, const ullong &author_id, const std::string &text, const ullong &published, const uint status);
 
-    /// @brief Создание нового приватного сообщения
-    /// @param author_id
-    /// @param recipient_id
-    /// @param text
-    Message(ullong author_id, ullong recipient_id, std::string text);
+    /// @brief Создание нового приватного сообщения для добавления в базу
+    Message(const ullong &author_id, const ullong &recipient_id, const std::string &text);
 
     /// @brief Создание приватного сообщения из базы
-    /// @param id
-    /// @param author_id
-    /// @param recipient_id
-    /// @param text
-    /// @param published
-    /// @param status
-    Message(ullong id, ullong author_id, ullong recipient_id, std::string text, ullong published, uint status);
+    Message(const ullong &id, const ullong &author_id, const ullong &recipient_id, const std::string &text, const ullong &published, const uint status);
 
     /// @brief Возвращает статус сообщения
-    /// @return
     msg::status getStatus();
 
     uint getStatusInt();
 
     /// @brief Изменяет статус сообщения
-    /// @param status
     void setStatus(msg::status status);
 
     /* добавление/удаление статусов */

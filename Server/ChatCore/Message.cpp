@@ -1,40 +1,32 @@
 #include "Message.h"
 
-Message::Message(ullong author_id, std::string text)
-{
-    _author_id = author_id;
-    _text = text;
-    _status = msg::public_;
-    _published = time(NULL);
-}
+Message::Message(const ullong &author_id, const std::string &text)
+    : _author_id(author_id),
+      _text(text),
+      _status(msg::public_),
+      _published(time(NULL)) {}
 
-Message::Message(ullong id, ullong author_id, std::string text, ullong published, uint status)
-{
-    _id = id;
-    _author_id = author_id;
-    _text = text;
-    _published = published;
-    _status = (msg::status)status;
-}
+Message::Message(const ullong &id, const ullong &author_id, const std::string &text, const ullong &published, const uint status)
+    : _id(id),
+      _author_id(author_id),
+      _text(text),
+      _status(msg::public_),
+      _published(time(NULL)) {}
 
-Message::Message(ullong author_id, ullong recipient_id, std::string text)
-{
-    _author_id = author_id;
-    _recipient_id = recipient_id;
-    _text = text;
-    _status = msg::private_;
-    _published = time(NULL);
-}
+Message::Message(const ullong &author_id, const ullong &recipient_id, const std::string &text)
+    : _author_id(author_id),
+      _recipient_id(recipient_id),
+      _text(text),
+      _status(msg::private_),
+      _published(time(NULL)) {}
 
-Message::Message(ullong id, ullong author_id, ullong recipient_id, std::string text, ullong published, uint status)
-{
-    _id = id;
-    _author_id = author_id;
-    _recipient_id = recipient_id;
-    _text = text;
-    _published = published;
-    _status = (msg::status)status;
-}
+Message::Message(const ullong &id, const ullong &author_id, const ullong &recipient_id, const std::string &text, const ullong &published, const uint status)
+    : _id(id),
+      _author_id(author_id),
+      _recipient_id(recipient_id),
+      _text(text),
+      _status(msg::private_),
+      _published(time(NULL)) {}
 
 msg::status Message::getStatus()
 {

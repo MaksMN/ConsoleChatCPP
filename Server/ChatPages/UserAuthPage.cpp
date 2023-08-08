@@ -75,7 +75,7 @@ bool UserAuthPage::regCommand()
         buffer.createFlags(sv::clear_console, sv::get_string);
         buffer.writeDynDataPos("/register", PAGE_TEXT_COUNT);
         data_text = "Регистрация.\n"
-                    "Введите логин (до 50 символов): ";
+                    "Введите логин: ";
         return true;
     }
     return false;
@@ -96,7 +96,7 @@ bool UserAuthPage::regPage()
             buffer.writeDynDataPos("none", CMD_TEXT_COUNT);
             data_text = "Регистрация.\n"
                         "Логин занят.\n"
-                        "Введите логин (до 50 символов): ";
+                        "Введите логин: ";
             return true;
         }
         // ввод email
@@ -104,7 +104,7 @@ bool UserAuthPage::regPage()
         buffer.writeDynDataPos(page_text + "\n" + cmd_text, PAGE_TEXT_COUNT);
         buffer.writeDynDataPos("none", CMD_TEXT_COUNT);
         data_text = "Регистрация.\n"
-                    "Введите E-mail (до 50 символов): ";
+                    "Введите E-mail: ";
         return true;
     }
     if (page_parsed.size() == 2)
@@ -117,7 +117,7 @@ bool UserAuthPage::regPage()
             buffer.writeDynDataPos("none", CMD_TEXT_COUNT);
             data_text = "Регистрация.\n"
                         "E-mail занят.\n"
-                        "Введите E-mail (до 50 символов): ";
+                        "Введите E-mail: ";
             return true;
         }
 
@@ -126,7 +126,7 @@ bool UserAuthPage::regPage()
         buffer.writeDynDataPos(page_text + "\n" + cmd_text, PAGE_TEXT_COUNT);
         buffer.writeDynDataPos("none", CMD_TEXT_COUNT);
         data_text = "Регистрация.\n"
-                    "Введите Имя (до 50 символов): ";
+                    "Введите Имя: ";
         return true;
     }
     if (page_parsed.size() == 3)
@@ -138,7 +138,7 @@ bool UserAuthPage::regPage()
         buffer.writeDynDataPos(page_text + "\n" + cmd_text, PAGE_TEXT_COUNT);
         buffer.writeDynDataPos("none", CMD_TEXT_COUNT);
         data_text = "Регистрация.\n"
-                    "Введите Фамилию (до 50 символов): ";
+                    "Введите Фамилию: ";
         return true;
     }
     if (page_parsed.size() == 4)
@@ -170,7 +170,7 @@ bool UserAuthPage::regPage()
                         "\nВведите команду: ";
             return true;
         }
-        else if (login_busy)
+        else if (email_busy)
         {
             buffer.createFlags(sv::clear_console, sv::get_string);
             data_text = "Во время регистрации E-mail был занят другим пользователем.\n"

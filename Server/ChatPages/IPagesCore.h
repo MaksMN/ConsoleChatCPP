@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <set>
 #include "../../Misc/Misc.h"
 #include "../DBClient/DBClient.h"
 #include "../ChatCore/User.h"
