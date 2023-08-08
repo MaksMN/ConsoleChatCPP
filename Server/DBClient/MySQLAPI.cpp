@@ -293,7 +293,7 @@ std::string MySQLAPI::messageList(ullong &reader_id, ullong &start, ullong &per_
     Misc::alignPaginator(start, per_page, count);
 
     query = "SELECT * FROM `pub_messages` INNER JOIN `users` ON `pub_messages`.`author_id` = `users`.`id` ORDER BY `pub_messages`.`published` ASC LIMIT " + std::to_string(start - 1) + "," + std::to_string(per_page) + ";";
-    Misc::printMessage(query);
+
     capacity = querySelect(query);
 
     std::string result;

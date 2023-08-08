@@ -28,7 +28,7 @@ int main(int argc, const char *argv[])
     std::string sv_message =
         "SERVER IS LISTENING THROUGH THE PORT: " + port + " WITHIN A LOCAL SYSTEM\n" +
         "Сервисный администратор: логин - admin пароль - 1234\n"
-        "Авторизуйтесь в клиенте и смените пароль командой /page:profile\n"
+        "Авторизуйтесь в клиенте и смените пароль командой /profile\n"
         "Чтобы завершить работу сервера, авторизуйтесь в клиенте с администраторскими правами и введите команду /sv_quit";
     Misc::printMessage(sv_message);
 

@@ -37,7 +37,7 @@ int main(int argc, const char **argv)
     if (server_address.empty())
         server_address = "127.0.0.1";
 
-    Misc::printMessage("CLIENT IS ESTABLISHING A CONNECTION WITH SERVER THROUGH PORT: " + port + " WITHIN A LOCAL SYSTEM");
+    Misc::printMessage("Клиент подключен к серверу: " + server_address + ":" + port + " Другие параметры подключения можно задать в файле .console_chat/client.ini");
     client_socket(server_address.data(), port.data());
     return 0;
 }
