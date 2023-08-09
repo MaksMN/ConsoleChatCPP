@@ -10,7 +10,7 @@ IPagesCore::IPagesCore(char (&_cmd_buffer)[CMD_BUFFER], DBClient &_dbclient, std
     cmd_text = buffer.getDynDataS(CMD_TEXT_COUNT);
     pg_start = buffer.getPgStart();
     pg_per_page = buffer.getPgPerPage();
-    pg_end = buffer.getPgEnd();
+    pg_end = buffer.getUserInputCount();
     pg_mode = buffer.getPaginationMode();
     commands = Misc::stringExplode(cmd_text, ":");
     page_parsed = Misc::stringExplode(page_text, '\n');

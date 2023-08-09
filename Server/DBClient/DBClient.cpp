@@ -23,6 +23,4 @@ void DBClient::initialise()
 #if defined(__linux__)
     _DBprovider = &mysqlapi;
 #endif
-
-    _DBprovider->hello();
 }

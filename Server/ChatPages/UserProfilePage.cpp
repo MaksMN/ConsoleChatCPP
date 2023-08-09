@@ -5,10 +5,11 @@ UserProfilePage::UserProfilePage(char (&_cmd_buffer)[CMD_BUFFER], DBClient &_dbc
 
 void UserProfilePage::run()
 {
+    buffer.setUserInputCount(107);
     profileCommands();
 
     buffer.writeDynData(login, "/profile", cmd_text);
-    data_text = "Страница редактирования профиля.\n";
+    data_text = "Страница редактирования профиля.\nМаксимальное количество символов - 100";
     data_text += AuthorizedUser->userData();
 
     data_text += service_message;

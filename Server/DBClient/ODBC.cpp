@@ -2,15 +2,16 @@
 #if defined(_WIN64) || defined(_WIN32)
 bool ODBC::initialize()
 {
-    connect_data = "DRIVER={MySQL ODBC 8.0 Unicode Driver};charset=utf8mb4;SERVER=" + server +
+    connect_data = "DRIVER={MySQL ODBC 8.0 ANSI Driver};SERVER=" + server +
                    ";PORT=" + port +
                    ";DATABASE=" + dbname +
                    ";UID=" + dbuser +
                    ";PWD=" + dbpass + ";";
+    Misc::printMessage("Сервер БД: " + server + ":" + port + " ODBC");
+    std::wstring w_connect_data = Misc::string_to_wstring(connect_data);
 
-    constexpr auto SQL_RESULT_LEN = 240;
     constexpr auto SQL_RETURN_CODE_LEN = 1024;
-    SQLCHAR retconstring[SQL_RETURN_CODE_LEN]{}; // строка для кода возврата из функций API ODBC
+    SQLWCHAR retconstring[SQL_RETURN_CODE_LEN]{}; // строка для кода возврата из функций API ODBC
 
     // Выделяем дескриптор для базы данных
     if (SQL_SUCCESS != SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &sqlEnvHandle))
@@ -35,9 +36,9 @@ bool ODBC::initialize()
     }
 
     // Устанавливаем соединение с сервером
-    switch (SQLDriverConnectA(sqlConnHandle,
+    switch (SQLDriverConnectW(sqlConnHandle,
                               GetDesktopWindow(),
-                              (SQLCHAR *)connect_data.data(),
+                              (SQLWCHAR *)w_connect_data.data(),
                               SQL_NTS,
                               retconstring,
                               1024,
@@ -112,7 +113,8 @@ ullong ODBC::getCount(std::string table, std::string where)
         Misc::printMessage("getCount");
         return 0;
     }
-    if (Fetch(db_errno) != SQL_SUCCESS)
+    auto called = "getCount " + query;
+    if (Fetch(db_errno, called) != SQL_SUCCESS)
         return 0;
     return res;
 }
@@ -327,16 +329,22 @@ std::string ODBC::messageList(ullong &reader_id, ullong &start, ullong &per_page
         std::shared_ptr<Message> msg;
         fetchMessageRow(user, msg);
 
-        result += user->userData() + "\n";
-        result += msg->messageData();
+        if (user != nullptr && msg != nullptr)
+        {
+            result += user->userData() + "\n";
+            result += msg->messageData();
+            result += "\n\n";
 
-        result += "\n\n";
-
-        queryUpd += "`id` = " + std::to_string(msg->getID());
-        if (i + 1 == capacity)
-            queryUpd += ");";
+            queryUpd += "`id` = " + std::to_string(msg->getID());
+            if (i + 1 == capacity)
+                queryUpd += ");";
+            else
+                queryUpd += " OR ";
+        }
         else
-            queryUpd += " OR ";
+        {
+            result += "Не удалось получить сообщение из базы данных. Возможная причина: нестандарные символы в тексте сообщения. Переключите сервер в режим MySQL API\n\n";
+        }
     }
     if (capacity > 0)
         dbQuery(queryUpd);
@@ -376,17 +384,23 @@ std::string ODBC::messageList(ullong &reader_id, ullong interlocutor_id, ullong 
         std::shared_ptr<User> user;
         std::shared_ptr<Message> msg;
         fetchMessageRow(user, msg, 1, false);
+        if (user != nullptr && msg != nullptr)
+        {
+            result += user->userData() + "\n";
+            result += msg->messageData();
 
-        result += user->userData() + "\n";
-        result += msg->messageData();
+            result += "\n\n";
 
-        result += "\n\n";
-
-        queryUpd += "`id` = " + std::to_string(msg->getID());
-        if (i + 1 == capacity)
-            queryUpd += ");";
+            queryUpd += "`id` = " + std::to_string(msg->getID());
+            if (i + 1 == capacity)
+                queryUpd += ");";
+            else
+                queryUpd += " OR ";
+        }
         else
-            queryUpd += " OR ";
+        {
+            result += "Не удалось получить сообщение из базы данных. Возможная причина: нестандарные символы в тексте сообщения. Переключите сервер в режим MySQL API\n\n";
+        }
     }
     if (capacity > 0)
         dbQuery(queryUpd);
@@ -428,17 +442,17 @@ void ODBC::hello()
 std::shared_ptr<User> ODBC::fetchUserRow(uint &db_errno, uint startCol, bool getPassData)
 {
     ullong id;
-    char login[50];
-    char email[500];
-    char first_name[500];
-    char last_name[500];
+    wchar_t login[SQL_CHAR_RESULT_LEN];
+    wchar_t email[SQL_CHAR_RESULT_LEN];
+    wchar_t first_name[SQL_CHAR_RESULT_LEN];
+    wchar_t last_name[SQL_CHAR_RESULT_LEN];
     ullong registered;
     int status;
     ullong session_key;
     std::string hash;
     std::string salt;
-    char db_hash[41];
-    char db_salt[41];
+    wchar_t db_hash[SQL_CHAR_RESULT_LEN];
+    wchar_t db_salt[SQL_CHAR_RESULT_LEN];
 
     SQLLEN login_length;
     SQLLEN email_length;
@@ -449,10 +463,10 @@ std::shared_ptr<User> ODBC::fetchUserRow(uint &db_errno, uint startCol, bool get
     try
     {
         BindCol(sqlStmtHandle, startCol, SQL_C_UBIGINT, &id, sizeof(id), nullptr);
-        BindCol(sqlStmtHandle, ++startCol, SQL_CHAR, &login, 20, &login_length);
-        BindCol(sqlStmtHandle, ++startCol, SQL_CHAR, &email, 500, &email_length);
-        BindCol(sqlStmtHandle, ++startCol, SQL_CHAR, &first_name, 500, &first_name_length);
-        BindCol(sqlStmtHandle, ++startCol, SQL_CHAR, &last_name, 500, &last_name_length);
+        BindCol(sqlStmtHandle, ++startCol, SQL_WCHAR, &login, SQL_CHAR_RESULT_LEN, &login_length);
+        BindCol(sqlStmtHandle, ++startCol, SQL_WCHAR, &email, SQL_CHAR_RESULT_LEN, &email_length);
+        BindCol(sqlStmtHandle, ++startCol, SQL_WCHAR, &first_name, SQL_CHAR_RESULT_LEN, &first_name_length);
+        BindCol(sqlStmtHandle, ++startCol, SQL_WCHAR, &last_name, SQL_CHAR_RESULT_LEN, &last_name_length);
         BindCol(sqlStmtHandle, ++startCol, SQL_C_UBIGINT, &registered, sizeof(registered), nullptr);
         BindCol(sqlStmtHandle, ++startCol, SQL_INTEGER, &status, sizeof(status), nullptr);
         BindCol(sqlStmtHandle, ++startCol, SQL_C_UBIGINT, &session_key, sizeof(session_key), nullptr);
@@ -460,8 +474,8 @@ std::shared_ptr<User> ODBC::fetchUserRow(uint &db_errno, uint startCol, bool get
         if (getPassData)
         {
             ++startCol;
-            BindCol(sqlStmtHandle, ++startCol, SQL_CHAR, &db_hash, 41, &hash_length);
-            BindCol(sqlStmtHandle, ++startCol, SQL_CHAR, &db_salt, 41, &salt_length);
+            BindCol(sqlStmtHandle, ++startCol, SQL_WCHAR, &db_hash, SQL_CHAR_RESULT_LEN, &hash_length);
+            BindCol(sqlStmtHandle, ++startCol, SQL_WCHAR, &db_salt, SQL_CHAR_RESULT_LEN, &salt_length);
         }
     }
     catch (BindColException &e)
@@ -471,24 +485,24 @@ std::shared_ptr<User> ODBC::fetchUserRow(uint &db_errno, uint startCol, bool get
                   << e.what() << '\n';
         Misc::printMessage("Ошибка вызвана функцией fetchUserRow");
     }
-
-    int res = Fetch(db_errno);
+    std::string called = "fetchUserRow вызвала Fetch";
+    int res = Fetch(db_errno, called);
 
     if (res == SQL_SUCCESS)
     {
 
         if (getPassData)
         {
-            hash = std::string(db_hash, hash_length);
-            salt = std::string(db_salt, salt_length);
+            hash = Misc::wstring_to_string(std::wstring(db_hash, hash_length / 2));
+            salt = Misc::wstring_to_string(std::wstring(db_salt, salt_length / 2));
         }
 
         auto user = std::make_shared<User>(
             id,
-            std::string(login, login_length),
-            std::string(email, email_length),
-            std::string(first_name, first_name_length),
-            std::string(last_name, last_name_length),
+            Misc::wstring_to_string(std::wstring(login, login_length / 2)),
+            Misc::wstring_to_string(std::wstring(email, email_length / 2)),
+            Misc::wstring_to_string(std::wstring(first_name, first_name_length / 2)),
+            Misc::wstring_to_string(std::wstring(last_name, last_name_length / 2)),
             registered,
             (user::status)status,
             session_key,
@@ -505,7 +519,7 @@ void ODBC::fetchMessageRow(std::shared_ptr<User> &user, std::shared_ptr<Message>
     ullong id;
     ullong author_id;
     ullong recipient_id;
-    char text[5000];
+    wchar_t text[SQL_CHAR_BIG_RESULT_LEN];
     ullong published;
     int status;
 
@@ -516,7 +530,7 @@ void ODBC::fetchMessageRow(std::shared_ptr<User> &user, std::shared_ptr<Message>
         BindCol(sqlStmtHandle, ++startCol, SQL_C_UBIGINT, &author_id, sizeof(author_id), nullptr);
         if (!pub)
             BindCol(sqlStmtHandle, ++startCol, SQL_C_UBIGINT, &recipient_id, sizeof(recipient_id), nullptr);
-        BindCol(sqlStmtHandle, ++startCol, SQL_CHAR, &text, 5000, &text_len);
+        BindCol(sqlStmtHandle, ++startCol, SQL_WCHAR, &text, SQL_CHAR_BIG_RESULT_LEN, &text_len);
         BindCol(sqlStmtHandle, ++startCol, SQL_C_UBIGINT, &published, sizeof(published), nullptr);
         BindCol(sqlStmtHandle, ++startCol, SQL_INTEGER, &status, sizeof(status), nullptr);
     }
@@ -536,11 +550,11 @@ void ODBC::fetchMessageRow(std::shared_ptr<User> &user, std::shared_ptr<Message>
     {
         if (pub)
         {
-            msg = std::make_shared<Message>(id, author_id, std::string(text, text_len), published, status);
+            msg = std::make_shared<Message>(id, author_id, Misc::wstring_to_string(std::wstring(text, text_len / 2)), published, status);
         }
         else
         {
-            msg = std::make_shared<Message>(id, author_id, recipient_id, std::string(text, text_len), published, status);
+            msg = std::make_shared<Message>(id, author_id, recipient_id, Misc::wstring_to_string(std::wstring(text, text_len / 2)), published, status);
         }
     }
     else
@@ -558,16 +572,16 @@ int ODBC::dbQuery(std::string &query)
     db_errno = 0;
 
     SQLINTEGER res = SQLAllocHandle(SQL_HANDLE_STMT, sqlConnHandle, &sqlStmtHandle);
-    if (res != SQL_SUCCESS)
+    if (res != SQL_SUCCESS && res != SQL_SUCCESS_WITH_INFO)
     {
         diagInfo(SQL_HANDLE_STMT, sqlStmtHandle, "SQLAllocHandle in dbQuery sqlStmtHandle", query);
         diagInfo(SQL_HANDLE_DBC, sqlConnHandle, "SQLAllocHandle in dbQuery sqlConnHandle", query);
         db_errno = 1;
         return -1;
     }
-
-    int result = SQLExecDirectA(sqlStmtHandle, (SQLCHAR *)query.data(), SQL_NTS);
-    if (result != SQL_SUCCESS)
+    std::wstring w_query = Misc::string_to_wstring(query);
+    int result = SQLExecDirectW(sqlStmtHandle, (SQLWCHAR *)w_query.data(), SQL_NTS);
+    if (result != SQL_SUCCESS && res != SQL_SUCCESS_WITH_INFO)
     {
         diagInfo(SQL_HANDLE_STMT, sqlStmtHandle, "SQLExecDirectA", query);
         SQLFreeHandle(SQL_HANDLE_STMT, sqlStmtHandle);
@@ -579,17 +593,28 @@ int ODBC::dbQuery(std::string &query)
     if (result == SQL_SUCCESS)
         SQLRowCount(sqlStmtHandle, &RowCountPtr);
 
+    if (res == SQL_SUCCESS_WITH_INFO)
+    {
+        diagInfo(SQL_HANDLE_STMT, sqlStmtHandle, "dbQuery", query);
+    }
+
     return RowCountPtr;
 }
 
-SQLINTEGER ODBC::Fetch(uint &db_errno)
+SQLINTEGER ODBC::Fetch(uint &db_errno, std::string &called)
 {
     db_errno = 0;
     int res = SQLFetch(sqlStmtHandle);
-    if (res != SQL_SUCCESS && res != SQL_NO_DATA)
+    if (res != SQL_SUCCESS && res != SQL_NO_DATA && res != SQL_SUCCESS_WITH_INFO)
     {
+        Misc::printMessage(called);
         diagInfo(SQL_HANDLE_STMT, sqlStmtHandle, "Fetch", "");
         db_errno = 1;
+    }
+
+    if (res == SQL_SUCCESS_WITH_INFO)
+    {
+        diagInfo(SQL_HANDLE_STMT, sqlStmtHandle, "ODBC::Fetch", called);
     }
 
     return res;
@@ -598,10 +623,14 @@ SQLINTEGER ODBC::Fetch(uint &db_errno)
 void ODBC::BindCol(SQLHSTMT StatementHandle, SQLUSMALLINT ColumnNumber, SQLSMALLINT TargetType, SQLPOINTER TargetValuePtr, SQLLEN BufferLength, SQLLEN *StrLen_or_IndPtr)
 {
     SQLRETURN res = SQLBindCol(StatementHandle, ColumnNumber, TargetType, TargetValuePtr, BufferLength, StrLen_or_IndPtr);
-    if (!(res == SQL_SUCCESS || res == SQL_SUCCESS_WITH_INFO))
+    if (res != SQL_SUCCESS && res != SQL_SUCCESS_WITH_INFO)
     {
         diagInfo(SQL_HANDLE_STMT, StatementHandle, "SQLBindCol", "");
         throw BindColException();
+    }
+    if (res == SQL_SUCCESS_WITH_INFO)
+    {
+        diagInfo(SQL_HANDLE_STMT, StatementHandle, "SQLBindCol", "");
     }
 }
 

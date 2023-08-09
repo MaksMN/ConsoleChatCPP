@@ -7,6 +7,9 @@
 #include <sql.h>
 #include <exception>
 
+constexpr auto SQL_CHAR_RESULT_LEN = 2048;
+constexpr auto SQL_CHAR_BIG_RESULT_LEN = 200000;
+
 class ODBC final : public DBCore
 {
 private:
@@ -133,7 +136,7 @@ private:
     /// @return количество обработанных рядов или -1 если операция не затрагивает ряды.
     int dbQuery(std::string &query);
 
-    SQLINTEGER Fetch(uint &db_errno);
+    SQLINTEGER Fetch(uint &db_errno, std::string &called);
 
     void BindCol(
         SQLHSTMT StatementHandle,

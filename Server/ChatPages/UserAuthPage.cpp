@@ -5,6 +5,7 @@ UserAuthPage::UserAuthPage(char (&_cmd_buffer)[CMD_BUFFER], DBClient &_dbclient,
 
 void UserAuthPage::run()
 {
+    buffer.setUserInputCount(100);
     // если пришла команда auth
     if (authCommand())
     {
@@ -75,7 +76,7 @@ bool UserAuthPage::regCommand()
         buffer.createFlags(sv::clear_console, sv::get_string);
         buffer.writeDynDataPos("/register", PAGE_TEXT_COUNT);
         data_text = "Регистрация.\n"
-                    "Введите логин: ";
+                    "Введите логин (100): ";
         return true;
     }
     return false;
@@ -96,7 +97,7 @@ bool UserAuthPage::regPage()
             buffer.writeDynDataPos("none", CMD_TEXT_COUNT);
             data_text = "Регистрация.\n"
                         "Логин занят.\n"
-                        "Введите логин: ";
+                        "Введите логин (100): ";
             return true;
         }
         // ввод email
@@ -104,7 +105,7 @@ bool UserAuthPage::regPage()
         buffer.writeDynDataPos(page_text + "\n" + cmd_text, PAGE_TEXT_COUNT);
         buffer.writeDynDataPos("none", CMD_TEXT_COUNT);
         data_text = "Регистрация.\n"
-                    "Введите E-mail: ";
+                    "Введите E-mail (100): ";
         return true;
     }
     if (page_parsed.size() == 2)
@@ -117,7 +118,7 @@ bool UserAuthPage::regPage()
             buffer.writeDynDataPos("none", CMD_TEXT_COUNT);
             data_text = "Регистрация.\n"
                         "E-mail занят.\n"
-                        "Введите E-mail: ";
+                        "Введите E-mail (100): ";
             return true;
         }
 
@@ -126,7 +127,7 @@ bool UserAuthPage::regPage()
         buffer.writeDynDataPos(page_text + "\n" + cmd_text, PAGE_TEXT_COUNT);
         buffer.writeDynDataPos("none", CMD_TEXT_COUNT);
         data_text = "Регистрация.\n"
-                    "Введите Имя: ";
+                    "Введите Имя (100): ";
         return true;
     }
     if (page_parsed.size() == 3)
@@ -138,7 +139,7 @@ bool UserAuthPage::regPage()
         buffer.writeDynDataPos(page_text + "\n" + cmd_text, PAGE_TEXT_COUNT);
         buffer.writeDynDataPos("none", CMD_TEXT_COUNT);
         data_text = "Регистрация.\n"
-                    "Введите Фамилию: ";
+                    "Введите Фамилию (100): ";
         return true;
     }
     if (page_parsed.size() == 4)
@@ -150,7 +151,7 @@ bool UserAuthPage::regPage()
         buffer.writeDynDataPos(page_text + "\n" + cmd_text, PAGE_TEXT_COUNT);
         buffer.writeDynDataPos("none", CMD_TEXT_COUNT);
         data_text = "Регистрация.\n"
-                    "Введите пароль: ";
+                    "Введите пароль (100): ";
 
         return true;
     }

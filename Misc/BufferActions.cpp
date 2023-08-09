@@ -62,14 +62,14 @@ void BufferActions::setPgPerPage(uint value)
     Misc::writeIntBuffer(value, cmd_buffer, PG_PERPAGE_ADDR);
 }
 
-uint BufferActions::getPgEnd()
+uint BufferActions::getUserInputCount()
 {
-    return Misc::getInt(cmd_buffer, PG_END_ADDR);
+    return Misc::getInt(cmd_buffer, USER_INPUT_COUNT_ADDR);
 }
 
-void BufferActions::setPgEnd(uint value)
+void BufferActions::setUserInputCount(uint value)
 {
-    Misc::writeIntBuffer(value, cmd_buffer, PG_END_ADDR);
+    Misc::writeIntBuffer(value, cmd_buffer, USER_INPUT_COUNT_ADDR);
 }
 
 void BufferActions::pgClear()

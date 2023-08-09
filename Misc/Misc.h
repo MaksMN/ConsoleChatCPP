@@ -18,7 +18,13 @@ namespace Misc
     /// @param endl true - добавить перевод строки
     void printMessage(const std::string &msg, bool endl = true);
 
-    std::wstring toWstring(const std::string &str);
+    std::wstring string_to_wstring(const std::string &str);
+    std::string wstring_to_string(const std::wstring &wstr);
+
+    /// @brief Вычисляет количесво символов в строке. Отрицательные числа рассматриваются как двухбайтовые.
+    /// @param string
+    /// @return
+    uint getSymbolsCount(const std::string string);
 
     /// @brief Преобразует timestamp в обычное время
     /// @param timestamp

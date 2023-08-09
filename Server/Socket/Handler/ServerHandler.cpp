@@ -232,7 +232,7 @@ void ServerHandler::clearBuffer()
     buffer.setPaginationMode(sv::last_page);
     buffer.setPgPerPage(10);
     buffer.setPgStart(1);
-    buffer.setPgEnd(0);
+    buffer.setUserInputCount(1000);
     // Динамические данные
     buffer.writeDynData("Guest", "none", "none");
 }

@@ -3,6 +3,7 @@
 bool MySQLAPI::initialize()
 {
     db_errno = 0;
+    Misc::printMessage("Сервер БД: " + server + ":" + port + " MySQL API");
     // Получаем дескриптор соединения
     mysql_init(&mysql);
     if (&mysql == nullptr)

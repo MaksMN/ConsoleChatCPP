@@ -14,9 +14,30 @@ void Misc::printMessage(const std::string &msg, bool endl)
 #endif
 }
 
-std::wstring Misc::toWstring(const std::string &str)
+std::wstring Misc::string_to_wstring(const std::string &str)
 {
     return std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t>{}.from_bytes(str.data());
+}
+
+std::string Misc::wstring_to_string(const std::wstring &wstr)
+{
+    std::wstring_convert<std::codecvt_utf8<wchar_t>> conv1;
+    std::string str = conv1.to_bytes(wstr);
+    return str;
+}
+
+uint Misc::getSymbolsCount(const std::string string)
+{
+    uint positives = 0;
+    uint negatives = 0;
+    for (uint i{0}; i < string.size(); i++)
+    {
+        if (string.data()[i] >= 0)
+            positives++;
+        else
+            negatives++;
+    }
+    return positives + (negatives / 2);
 }
 
 std::string Misc::StampToTime(long long timestamp)

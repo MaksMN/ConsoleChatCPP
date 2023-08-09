@@ -9,7 +9,7 @@
 #define PG_MODE_ADDR 10
 #define PG_START_ADDR 11
 #define PG_PERPAGE_ADDR 15
-#define PG_END_ADDR 19
+#define USER_INPUT_COUNT_ADDR 19
 #define PM_USER_ID 23
 
 #define DYN_DATA_ADDR 31
@@ -25,13 +25,14 @@ typedef unsigned long long ullong;
 /*
 
     Командный пакет
-    |флаги(1)|data packets (1)|session_key (8)|pg_mode(1)|pg_start(4)|pg_perPage(4)|pg_end(4)| pm_user_id (8) |login_size(4)|login|page_size(4)|PAGE_TEXT|cmd_size(4)|CMD_TEXT|
+    |флаги(1)|data packets (1)|session_key (8)|pg_mode(1)|pg_start(4)|pg_perPage(4)|inputs(4)| pm_user_id (8) |login_size(4)|login|page_size(4)|PAGE_TEXT|cmd_size(4)|CMD_TEXT|
     0        1                2               10         11          15            19        23               31
     |_________________________________________________________________________________________________________|
     |                                  ^                                                                      |
     |                               static                                                                    |  dynamic
 
     data packets - количество пакетов с текстом отправляемых клиенту
+    inputs - количество байт для ввода пользователем.
 */
 
 namespace sv
@@ -127,10 +128,10 @@ public:
     void setPgPerPage(uint value);
     /// @brief последний элемент в пагинации
     /// @return
-    uint getPgEnd();
+    uint getUserInputCount();
     /// @brief последний элемент в пагинации
     /// @param value
-    void setPgEnd(uint value);
+    void setUserInputCount(uint value);
 
     void pgClear();
 

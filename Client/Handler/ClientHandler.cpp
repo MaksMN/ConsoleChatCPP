@@ -13,7 +13,7 @@ void ClientHandler::Initialise()
     buffer.setPaginationMode(sv::last_page);
     buffer.setPgPerPage(10);
     buffer.setPgStart(1);
-    buffer.setPgEnd(0);
+    buffer.setUserInputCount(1000);
     buffer.clearPmUserID();
 
     // Динамические данные
@@ -57,19 +57,42 @@ void ClientHandler::Run()
 
     if (buffer.hasFlag(sv::get_string))
     {
-        std::string s = userInputStr.getStringIO();
+        std::string s;
+
+        do
+        {
+            s = userInputStr.getStringIO();
+            // ограничение ввода
+            uint max_symbols = buffer.getUserInputCount();
+            uint characters_entered = Misc::getSymbolsCount(s);
+            if (characters_entered > max_symbols)
+            {
+                Misc::printMessage("Вы превысили максимально допустимое количество символов - " + std::to_string(max_symbols));
+                Misc::printMessage("Введите допустимое количество символов: ", false);
+                continue;
+            }
+            else
+            {
+                break;
+            }
+
+        } while (1);
+
         if (s.size() == 0)
         {
+            // если введена пустая строка - записывается команда /update
             buffer.writeDynDataPos("/update", CMD_TEXT_COUNT);
         }
         else
         {
+            // Предотвращение полного переполнения буфера
             uint cmd_pos = Misc::findDynamicData(cmd_buffer, DYN_DATA_ADDR, CMD_TEXT_COUNT);
             uint cmd_max_size = CMD_BUFFER - cmd_pos - 5;
             if (s.size() > cmd_max_size)
             {
                 s.erase(0, s.size() - cmd_max_size);
             }
+            buffer.setUserInputCount(1000); // сбросим ограничение на ввод
             buffer.writeDynDataPos(s, CMD_TEXT_COUNT);
         }
 

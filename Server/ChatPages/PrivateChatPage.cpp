@@ -7,6 +7,7 @@ PrivateChatPage::PrivateChatPage(char (&_cmd_buffer)[CMD_BUFFER], DBClient &_dbc
 
 void PrivateChatPage::run()
 {
+    buffer.setUserInputCount(1000);
     if (commands.size() > 0 && commands[0] == "/private" && page_text != "/private")
     {
         buffer.writeDynData(AuthorizedUser->getLogin(), "/private", cmd_text);

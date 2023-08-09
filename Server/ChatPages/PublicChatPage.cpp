@@ -7,6 +7,7 @@ PublicChatPage::PublicChatPage(char (&_cmd_buffer)[CMD_BUFFER], DBClient &_dbcli
 
 void PublicChatPage::run()
 {
+    buffer.setUserInputCount(1000);
     /* если пользователь пришел с другой страницы или ввел команду /pclear */
     if (page_text != "/chat" || cmd_text == "/pclear")
     {
