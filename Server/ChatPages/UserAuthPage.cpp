@@ -121,10 +121,28 @@ bool UserAuthPage::regPage()
                         "Введите E-mail (100): ";
             return true;
         }
+        std::vector<std::string> email_parse = Misc::stringExplode(cmd_text, "@");
+        uint symbols = 0;
+        for (int i{0}; i < cmd_text.size(); i++)
+        {
+            if (cmd_text[i] == '@')
+                symbols++;
+            if (symbols > 1)
+                break;
+        }
+        if (email_parse.size() != 2 || symbols > 1)
+        {
+            buffer.createFlags(sv::clear_console, sv::get_string);
+            buffer.writeDynDataPos("none", CMD_TEXT_COUNT);
+            data_text = "Регистрация.\n"
+                        "E-mail должен иметь символ @ в середине.\n"
+                        "Введите E-mail (100): ";
+            return true;
+        }
 
         // ввод имени
         buffer.createFlags(sv::clear_console, sv::get_string);
-        buffer.writeDynDataPos(page_text + "\n" + cmd_text, PAGE_TEXT_COUNT);
+        buffer.writeDynDataPos(page_text + "\n" + cmd_text, PAGE_TEXT_COUNT); // записываем email в буфер
         buffer.writeDynDataPos("none", CMD_TEXT_COUNT);
         data_text = "Регистрация.\n"
                     "Введите Имя (100): ";

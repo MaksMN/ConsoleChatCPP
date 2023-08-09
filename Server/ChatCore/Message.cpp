@@ -10,8 +10,8 @@ Message::Message(const ullong &id, const ullong &author_id, const std::string &t
     : _id(id),
       _author_id(author_id),
       _text(text),
-      _status(msg::public_),
-      _published(time(NULL)) {}
+      _status((msg::status)status),
+      _published(published) {}
 
 Message::Message(const ullong &author_id, const ullong &recipient_id, const std::string &text)
     : _author_id(author_id),
@@ -25,8 +25,8 @@ Message::Message(const ullong &id, const ullong &author_id, const ullong &recipi
       _author_id(author_id),
       _recipient_id(recipient_id),
       _text(text),
-      _status(msg::private_),
-      _published(time(NULL)) {}
+      _status((msg::status)status),
+      _published(published) {}
 
 msg::status Message::getStatus()
 {
@@ -166,7 +166,7 @@ std::string Message::messageData()
         s1 += "[скрыто] ";
     if (isRead())
         s1 += "[прочитано] ";
-    else
+    if (!isRead())
         s1 += "[не прочитано] ";
     if (isDelivered())
         s1 += "[доставлено] ";

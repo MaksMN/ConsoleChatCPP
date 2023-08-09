@@ -33,7 +33,7 @@ int client_socket(char server_address[], char port[])
                   << " Something went wrong Connection Failed" << std::endl;
         exit(1);
     }
-    int iTimeout = 60000;
+    int iTimeout = 8000;
     auto iRet = setsockopt(socket_descriptor,
                            SOL_SOCKET,
                            SO_RCVTIMEO,

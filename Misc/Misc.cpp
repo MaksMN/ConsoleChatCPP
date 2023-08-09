@@ -46,7 +46,7 @@ std::string Misc::StampToTime(long long timestamp)
     struct tm tm;
     tm = *localtime(&tick);
     std::string day = (tm.tm_mday < 10) ? "0" + std::to_string(tm.tm_mday) : std::to_string(tm.tm_mday);
-    std::string month = (tm.tm_mon < 10) ? "0" + std::to_string(tm.tm_mon) : std::to_string(tm.tm_mon);
+    std::string month = (tm.tm_mon + 1 < 10) ? "0" + std::to_string(tm.tm_mon + 1) : std::to_string(tm.tm_mon + 1);
     std::string year = std::to_string(tm.tm_year + 1900);
     std::string hour = (tm.tm_hour < 10) ? "0" + std::to_string(tm.tm_hour) : std::to_string(tm.tm_hour);
     std::string min = (tm.tm_min < 10) ? "0" + std::to_string(tm.tm_min) : std::to_string(tm.tm_min);

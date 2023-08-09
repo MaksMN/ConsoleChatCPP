@@ -30,7 +30,7 @@ int client_socket(char server_address[], char port[])
         exit(1);
     }
     struct timeval tv;
-    tv.tv_sec = 5;
+    tv.tv_sec = 8;
     tv.tv_usec = 0;
     auto in = setsockopt(socket_descriptor, SOL_SOCKET, SO_RCVTIMEO, (const char *)&tv, sizeof tv);
     while (handler.getWork())
