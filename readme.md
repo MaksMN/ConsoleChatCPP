@@ -106,6 +106,8 @@ sv_port=7777 ;порт который слушает сервер чата
 
 [DB]
 ; Выбор клиента базы данных.
+; mysqlapi - Linux, Windows
+; odbc - только Windows
 ; mysqlapi | odbc
 db=mysqlapi
 server=127.0.0.1
