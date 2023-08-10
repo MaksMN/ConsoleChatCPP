@@ -11,7 +11,9 @@ bool ODBC::initialize()
     Misc::printMessage("База данных: " + dbname);
     Misc::printMessage("Пользователь БД: " + dbuser);
     Misc::printMessage("Кодировка: " + db_character_set);
-    Misc::printMessage("Для работы с БД используется ODBC\nПодключение к серверу БД...");
+    Misc::printMessage("Для работы с БД используется ODBC");
+    Misc::printMessage("Изменить параметры сервера можно в файле .console_chat/server.ini");
+    Misc::printMessage("\nПодключение к серверу БД...");
     std::wstring w_connect_data = Misc::string_to_wstring(connect_data);
 
     constexpr auto SQL_RETURN_CODE_LEN = 1024;

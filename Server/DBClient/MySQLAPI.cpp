@@ -7,7 +7,9 @@ bool MySQLAPI::initialize()
     Misc::printMessage("База данных: " + dbname);
     Misc::printMessage("Пользователь БД: " + dbuser);
     Misc::printMessage("Кодировка: " + db_character_set);
-    Misc::printMessage("Для работы с БД используется MySQLAPI\nПодключение к серверу БД...");
+    Misc::printMessage("Для работы с БД используется MySQLAPI");
+    Misc::printMessage("Изменить параметры сервера можно в файле .console_chat/server.ini");
+    Misc::printMessage("\nПодключение к серверу БД...");
     // Получаем дескриптор соединения
     mysql_init(&mysql);
     if (&mysql == nullptr)
