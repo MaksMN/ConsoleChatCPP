@@ -60,42 +60,42 @@ public:
     /// @return
     bool InDB();
 
+    /// @brief получает хеш пароля
     std::string getHash();
+    /// @brief получает соль
     std::string getSalt();
 
     /// @brief Обновляет статус принадлежности пользователя к базе.
-    /// @param in_db
     void setInDB(bool in_db);
 
     /// @brief Возвращает ID пользователя
-    /// @return
     ullong getID();
 
     /// @brief Возвращает имя фамилию пользователя
-    /// @return
     std::string getName();
 
     /// @brief Изменяет имя фамилию пользователя. Параметр с пустой строкой игнорируется.
-    /// @param name
     void setName(const std::string &first_name, const std::string &last_name);
     void setFirstName(const std::string &first_name);
     void setLastName(const std::string &last_name);
 
+    /// @brief получает имя
     std::string getFirstName();
+    /// @brief получает фамилию
     std::string getLastName();
+    /// @brief получает таймштамп регистрации
     ullong getRegistered();
 
     /// @brief Возвращает Email
-    /// @return
     std::string getEmail();
 
     /// @brief изменяет email
-    /// @param email
     void setEmail(const std::string &email);
 
     /// @brief Возвращает логин пользователя
-    /// @return
     std::string getLogin();
+
+    /// @brief Изменяет логин
     void setLogin(const std::string &login);
 
     /// @brief Получает флаги статуса пользователя
@@ -108,7 +108,6 @@ public:
     bool isBanned();
 
     /// @brief Удаляет флаг блокировки пользователя
-    /// @return
     void unBan();
 
     /// @brief Добавляет флаг блокировки пользователя
@@ -116,10 +115,11 @@ public:
 
     /// @brief Проверяет флаг администратора
     bool isAdmin();
+
+    /// @brief Проверяет флаги сервисного администратора
     bool isServiceAdmin();
 
     /// @brief Проверяет флаг пользователя
-    /// @return
     bool isUser();
 
     /// @brief Устанавливает флаг администратора
@@ -131,13 +131,20 @@ public:
     /// @brief Изменяет пароль пользователя
     void setPass(std::string &pass);
 
+    /// @brief проверяет правильность пароля
     bool validatePass(std::string &pass);
 
+    /// @brief получает сессионный ключ
     ullong getSessionKey();
+
+    /// @brief изменяет сессионный ключ
     void setSessionKey(ullong key);
+
+    /// @brief проверяет валидность сессионного ключа
     bool validateSessionKey(ullong key);
 
     uint getOwnerID();
 
+    /// @brief Записывает в строку все данные пользователя для отображения на экране
     std::string userData();
 };

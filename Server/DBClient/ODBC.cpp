@@ -7,7 +7,11 @@ bool ODBC::initialize()
                    ";DATABASE=" + dbname +
                    ";UID=" + dbuser +
                    ";PWD=" + dbpass + ";";
-    Misc::printMessage("Сервер БД: " + server + ":" + port + " ODBC");
+    Misc::printMessage("Сервер БД: " + server + ":" + port);
+    Misc::printMessage("База данных: " + dbname);
+    Misc::printMessage("Пользователь БД: " + dbuser);
+    Misc::printMessage("Кодировка: " + db_character_set);
+    Misc::printMessage("Для работы с БД используется ODBC\nПодключение к серверу БД...");
     std::wstring w_connect_data = Misc::string_to_wstring(connect_data);
 
     constexpr auto SQL_RETURN_CODE_LEN = 1024;
@@ -48,13 +52,13 @@ bool ODBC::initialize()
 
     case SQL_SUCCESS:
     case SQL_SUCCESS_WITH_INFO:
-        Misc::printMessage("Successfully connected to SQL Server");
+        Misc::printMessage("Успешное подключение к SQL Server");
         break;
 
     case SQL_INVALID_HANDLE:
     case SQL_ERROR:
-        diagInfo(SQL_HANDLE_DBC, sqlConnHandle, "SQLDriverConnectA", "no query");
-        Misc::printMessage("Could not connect to SQL Server");
+        diagInfo(SQL_HANDLE_DBC, sqlConnHandle, "SQLDriverConnect", "");
+        Misc::printMessage("Не удалось подключиться к SQL Server");
         complete();
         return false;
 
@@ -399,7 +403,7 @@ std::string ODBC::messageList(ullong &reader_id, ullong interlocutor_id, ullong 
         }
         else
         {
-            result += "Не удалось получить сообщение из базы данных. Возможная причина: нестандарные символы в тексте сообщения. Переключите сервер в режим MySQL API\n\n";
+            result += "Не удалось получить сообщение из базы данных. Возможная причина: нестандартные символы в тексте сообщения. Переключите сервер в режим MySQL API\n\n";
         }
     }
     if (capacity > 0)

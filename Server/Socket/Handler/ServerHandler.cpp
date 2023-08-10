@@ -242,7 +242,7 @@ std::string &ServerHandler::getDataText()
     if (dbClient.DBprovider()->getDBerrno())
     {
         dbClient.DBprovider()->DBclose();
-        data_buffer_text = "На сервере проблемы с базой данных. Обратитесь к администратору.\n";
+        data_buffer_text = "На сервере проблемы с базой данных. Обратитесь к администратору.\nВведите команду /hello для обновления подключения: ";
         dbClient.DBprovider()->clearDBerrno();
         dbClient.DBprovider()->initialize();
     }

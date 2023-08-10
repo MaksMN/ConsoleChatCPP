@@ -44,24 +44,34 @@ public:
 
     /* добавление/удаление статусов */
 
+    /// @brief проверка на публичное сообщение
     bool isPublic();
+    /// @brief Проверка на приватное сообщение
     bool isPrivate();
+    /// @brief присваивает статус публичного сообщения
     void toPublic();
+    /// @brief присваивает статус приватного сообщения
     void toPrivate();
+    /// @brief присваивает статус отправленного сообщения
     void toDelivered();
+    /// @brief удаляет статус отправленного сообщения
     void unDelivered();
+    /// @brief проверяет статус отправленного сообщения
     bool isDelivered();
+    /// @brief присваивает статус "прочитано"
     void read();
+    /// @brief удаляет статус "прочитано"
     void toUnread();
+    /// @brief проверяет статус "прочитано"
     bool isRead();
 
+    /// @brief получает таймштамп даты публикации
     ullong getPublished();
 
     /// @brief Добавляет флаг скрытия
     void hide();
 
     /// @brief Проверяет есть ли в сообщении флаг скрытия
-    /// @return
     bool isHidden();
 
     /// @brief Удаляет флаг скрытия
@@ -74,22 +84,19 @@ public:
     void to_private();
 
     /// @brief Возвращает ID сообщения
-    /// @return
     uint getID();
 
     /// @brief Возвращает ID автора сообщения
-    /// @return
     uint getAuthorID();
 
     /// @brief Возвращает ID получателя приватного сообщения
-    /// @return
     uint getRecipientID();
 
     /// @brief Возвращает текст сообщения
-    /// @return
     std::string getText();
 
     uint getOwnerID();
 
+    /// @brief Выводит в строку данные сообщения для печати
     std::string messageData();
 };

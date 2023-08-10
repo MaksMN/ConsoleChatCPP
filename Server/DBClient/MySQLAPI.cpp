@@ -3,14 +3,18 @@
 bool MySQLAPI::initialize()
 {
     db_errno = 0;
-    Misc::printMessage("Сервер БД: " + server + ":" + port + " MySQL API");
+    Misc::printMessage("Сервер БД: " + server + ":" + port);
+    Misc::printMessage("База данных: " + dbname);
+    Misc::printMessage("Пользователь БД: " + dbuser);
+    Misc::printMessage("Кодировка: " + db_character_set);
+    Misc::printMessage("Для работы с БД используется MySQLAPI\nПодключение к серверу БД...");
     // Получаем дескриптор соединения
     mysql_init(&mysql);
     if (&mysql == nullptr)
     {
         // Если дескриптор не получен — выводим сообщение об ошибке
         db_errno = 1;
-        Misc::printMessage("Error: can't create MySQL-descriptor");
+        Misc::printMessage("Ошибка: не удается создать MySQL-дескриптор");
         return false;
     }
     unsigned int i = 5;
@@ -20,18 +24,18 @@ bool MySQLAPI::initialize()
     {
         // Если нет возможности установить соединение с БД выводим сообщение об ошибке
         db_errno = 1;
-        Misc::printMessage("Error: can't connect to database ", false);
+        Misc::printMessage("Ошибка: невозможно подключиться к базе данных ", false);
         Misc::printMessage(mysql_error(&mysql));
         return false;
     }
     else
     {
         // Если соединение успешно установлено выводим фразу — "Success!"
-        Misc::printMessage("MySQL connection Success!");
+        Misc::printMessage("Успешное подключение к MySQL!");
     }
-    mysql_set_character_set(&mysql, "utf8mb4");
+    mysql_set_character_set(&mysql, db_character_set.data());
     // Смотрим изменилась ли кодировка на нужную, по умолчанию идёт latin1
-    Misc::printMessage("connection characterset: ", false);
+    Misc::printMessage("Connection characterset: ", false);
     Misc::printMessage(mysql_character_set_name(&mysql));
     return true;
 }

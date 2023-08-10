@@ -97,7 +97,7 @@ bool Message::isRead()
 
 ullong Message::getPublished()
 {
-    return +_published;
+    return _published;
 }
 
 void Message::hide()
