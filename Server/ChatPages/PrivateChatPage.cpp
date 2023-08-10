@@ -88,6 +88,28 @@ void PrivateChatPage::privateChat()
         buffer.pgClear();
     }
 
+    if (interlocutorUser->isBanned())
+    {
+        data_text += "\nВы:\t\t" + AuthorizedUser->userData();
+        data_text += "\nСобеседник:\t заблокирован. С ним нельзя вести личную беседу.\n";
+        data_text += commands_text;
+        data_text += "\nВведите команду: ";
+        buffer.createFlags(sv::clear_console, sv::get_string);
+        buffer.writeDynData(AuthorizedUser->getLogin(), "/private", "none");
+        return;
+    }
+
+    if (interlocutorUser->getID() == AuthorizedUser->getID())
+    {
+        data_text += "\nВы: " + AuthorizedUser->userData();
+        data_text += "\nНельзя вести личную беседу с самим собой.\n";
+        data_text += commands_text;
+        data_text += "\nВведите команду: ";
+        buffer.createFlags(sv::clear_console, sv::get_string);
+        buffer.writeDynData(AuthorizedUser->getLogin(), "/private", "none");
+        return;
+    }
+
     /* обработка команд */
 
     if (commands.size() > 0 && commands[0] != "/private")
@@ -125,17 +147,6 @@ void PrivateChatPage::privateChat()
             std::shared_ptr<Message> msg = std::make_shared<Message>(AuthorizedUser->getID(), interlocutorUser->getID(), cmd_text);
             dbClient.DBprovider()->addMessage(msg);
         }
-    }
-
-    if (interlocutorUser->isBanned())
-    {
-        data_text += "\nВы:\t\t" + AuthorizedUser->userData();
-        data_text += "\nСобеседник:\t заблокирован. С ним нельзя вести личную беседу.\n";
-        data_text += commands_text;
-        data_text += "\nВведите команду: ";
-        buffer.createFlags(sv::clear_console, sv::get_string);
-        buffer.writeDynData(AuthorizedUser->getLogin(), "/private", "none");
-        return;
     }
 
     /*Список сообщений*/
