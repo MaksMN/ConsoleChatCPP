@@ -18,7 +18,7 @@ void Logger::write(char (&_cmd_buffer)[CMD_BUFFER])
         cmd_buffer[i] = _cmd_buffer[i];
 }
 
-dstd::string Logger::read()
+std::string Logger::read()
 {
     return std::string();
 }
