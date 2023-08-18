@@ -39,6 +39,7 @@ bool MySQLAPI::initialize()
     // Смотрим изменилась ли кодировка на нужную, по умолчанию идёт latin1
     Misc::printMessage("Connection characterset: ", false);
     Misc::printMessage(mysql_character_set_name(&mysql));
+    Misc::printMessage("server> ", false);
     return true;
 }
 
@@ -190,7 +191,7 @@ bool MySQLAPI::addUser(std::shared_ptr<User> &user, bool &login_busy, bool &emai
     db_errno = 0;
     std::string query;
 
-    query = "`login` LIKE '" + user->getLogin() + "' AND `id` != " + std::to_string(user->getID()) + ";";
+    query = "`login` LIKE '" + user->getLogin() + "';";
     uint result = getCount("users", query);
 
     if (result > 0)
@@ -199,7 +200,7 @@ bool MySQLAPI::addUser(std::shared_ptr<User> &user, bool &login_busy, bool &emai
         return false;
     }
 
-    query = "`email` LIKE '" + user->getEmail() + "' AND `id` != " + std::to_string(user->getID()) + ";";
+    query = "`email` LIKE '" + user->getEmail() + "';";
     result = getCount("users", query);
     if (result > 0)
     {
@@ -244,6 +245,7 @@ bool MySQLAPI::addUser(std::shared_ptr<User> &user, bool &login_busy, bool &emai
     {
         mysql_free_result(res);
         Misc::printMessage("Не удалось получить автоинкрементный ID пользователя");
+        Misc::printMessage("server> ", false);
         return false;
     }
 
@@ -492,6 +494,7 @@ uint MySQLAPI::querySelect(std::string &query)
     {
         db_errno = mysql_errno(&mysql);
         Misc::printMessage(mysql_error(&mysql));
+        Misc::printMessage("server> ", false);
         return 0;
     }
     return 0;
@@ -505,6 +508,7 @@ uint MySQLAPI::queryUpdate(std::string &query)
     {
         db_errno = mysql_errno(&mysql);
         Misc::printMessage(mysql_error(&mysql));
+        Misc::printMessage("server> ", false);
         return query_result;
     }
     return query_result;
