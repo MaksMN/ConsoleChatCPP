@@ -1,8 +1,8 @@
 #include "Logger.h"
 
-Logger::Logger()
+Logger::Logger(char (&_cmd_buffer)[CMD_BUFFER]) : cmd_buffer(_cmd_buffer)
 {
-    file_stream.open(log_file_name);
+    file_stream.open(log_file_name, file_stream.in | file_stream.out | file_stream.ate | file_stream.app);
 }
 
 Logger::~Logger()
@@ -11,14 +11,14 @@ Logger::~Logger()
         file_stream.close();
 }
 
-void Logger::write(char (&_cmd_buffer)[CMD_BUFFER])
+void Logger::write()
 {
-    char cmd_buffer[CMD_BUFFER];
-    for (int i{0}; i < CMD_BUFFER; i++)
-        cmd_buffer[i] = _cmd_buffer[i];
+    LoggerThread logger_thread(mutex, cmd_buffer, file_stream);
+    logger_thread.write();
 }
 
-std::string Logger::read()
+void Logger::read()
 {
-    return std::string();
+    LoggerThread logger_thread(mutex, cmd_buffer, file_stream);
+    logger_thread.read();
 }
