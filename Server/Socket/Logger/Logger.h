@@ -11,7 +11,7 @@ private:
     char (&cmd_buffer)[CMD_BUFFER];
 
 public:
-    Logger(char (&_cmd_buffer)[CMD_BUFFER]);
+        Logger(char (&_cmd_buffer)[CMD_BUFFER]);
     ~Logger();
 
     void write();

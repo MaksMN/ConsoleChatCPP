@@ -53,10 +53,10 @@ void LoggerThread::_read()
     uint file_size = std::filesystem::file_size(LOG_FILE_NAME);
     std::string last_str;
 
-    for (uint i{file_size - 1}; i > 0; i--)
+    for (uint i{file_size - 2}; i > 0; i--)
     {
         file_stream.seekp(i);
-        char *ch;
+        char ch[1];
         file_stream.read(ch, 1);
         if (*ch != '\n')
             last_str.insert(0, ch);
