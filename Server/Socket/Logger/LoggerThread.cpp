@@ -50,14 +50,16 @@ void LoggerThread::_write()
 void LoggerThread::_read()
 {
     mutex.lock();
-    uint file_size = std::filesystem::file_size(LOG_FILE_NAME);
+    int file_size = std::filesystem::file_size(LOG_FILE_NAME);
     std::string last_str;
 
-    for (uint i{file_size - 2}; i > 0; i--)
+    for (int i{file_size}; i > 0; i--)
     {
-        file_stream.seekp(i);
+        file_stream.seekp(i - 1);
         char ch[1];
         file_stream.read(ch, 1);
+        if (i == file_size && *ch == '\n')
+            continue;
         if (*ch != '\n')
             last_str.insert(0, ch);
         else
