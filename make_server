@@ -1,4 +1,4 @@
-SV_SRC = -std=c++20 Server/main.cpp Server/DBClient/*.cpp Server/ChatCore/*.cpp Server/Socket/Handler/*.cpp Server/Socket/LinuxServer/*.cpp Misc/*.cpp Server/ChatPages/*.cpp `mysql_config --cflags --libs`
+SV_SRC = -std=c++20 Server/main.cpp Server/DBClient/*.cpp Server/ChatCore/*.cpp Server/Socket/Handler/*.cpp Server/Socket/LinuxServer/*.cpp Misc/*.cpp Server/ChatPages/*.cpp Server/Socket/Logger/*.cpp Server/Socket/SVCLI/*.cpp `mysql_config --cflags --libs`
 SV_TARGET = chatserver
 PREFIX = /usr/local/bin
 
