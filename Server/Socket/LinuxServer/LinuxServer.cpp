@@ -14,6 +14,10 @@ int server_socket(char port[])
         cmd_buffer[i] = '\0';
     ServerHandler handler(cmd_buffer);
     BufferActions buffer(cmd_buffer);
+    Logger logger(cmd_buffer);
+    SVCLI svcli;
+    std::thread svcli_thread([&svcli]()
+                             { svcli.run(); });
 
     // Создадим UDP сокет
     socket_file_descriptor = socket(AF_INET, SOCK_DGRAM, 0);
@@ -36,6 +40,7 @@ int server_socket(char port[])
             Misc::printMessage("На сервер пришли поврежденные данные");
             continue;
         }
+        logger.write();
         buffer.removeFlag(sv::cmd_buffer);
         handler.Run(); // обработка входящих данных и формирование ответа
 
@@ -71,6 +76,7 @@ int server_socket(char port[])
     }
 
     // закрываем сокет, завершаем соединение
+    svcli_thread.detach();
     close(socket_file_descriptor);
     return 0;
 }

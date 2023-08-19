@@ -8,6 +8,10 @@ int server_socket(char port[])
     char data_buffer[DATA_BUFFER];
     ServerHandler handler(cmd_buffer);
     BufferActions buffer(cmd_buffer);
+    Logger logger(cmd_buffer);
+    SVCLI svcli;
+    std::thread svcli_thread([&svcli]()
+                             { svcli.run(); });
 
     WSADATA WSAData;
     WORD sockVersion = MAKEWORD(2, 2);
@@ -48,6 +52,7 @@ int server_socket(char port[])
             Misc::printMessage("На сервер пришли поврежденные данные");
             continue;
         }
+        logger.write();
         buffer.removeFlag(sv::cmd_buffer);
         handler.Run();
 

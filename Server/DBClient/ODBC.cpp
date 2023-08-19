@@ -55,12 +55,14 @@ bool ODBC::initialize()
     case SQL_SUCCESS:
     case SQL_SUCCESS_WITH_INFO:
         Misc::printMessage("Успешное подключение к SQL Server");
+        Misc::printMessage("server> ", false);
         break;
 
     case SQL_INVALID_HANDLE:
     case SQL_ERROR:
         diagInfo(SQL_HANDLE_DBC, sqlConnHandle, "SQLDriverConnect", "");
         Misc::printMessage("Не удалось подключиться к SQL Server");
+        Misc::printMessage("server> ", false);
         complete();
         return false;
 
@@ -117,6 +119,7 @@ ullong ODBC::getCount(std::string table, std::string where)
         std::cout << '\n'
                   << e.what() << '\n';
         Misc::printMessage("getCount");
+        Misc::printMessage("server> ", false);
         return 0;
     }
     auto called = "getCount " + query;
@@ -226,7 +229,7 @@ bool ODBC::addUser(std::shared_ptr<User> &user, bool &login_busy, bool &email_bu
     db_errno = 0;
     std::string query;
 
-    query = "`login` LIKE '" + user->getLogin() + "' AND `id` != " + std::to_string(user->getID()) + ";";
+    query = "`login` LIKE '" + user->getLogin() + "';";
     uint res = getCount("users", query);
 
     if (res > 0)
@@ -235,7 +238,7 @@ bool ODBC::addUser(std::shared_ptr<User> &user, bool &login_busy, bool &email_bu
         return false;
     }
 
-    query = "`email` LIKE '" + user->getEmail() + "' AND `id` != " + std::to_string(user->getID()) + ";";
+    query = "`email` LIKE '" + user->getEmail() + "';";
     res = getCount("users", query);
     if (res > 0)
     {
@@ -443,6 +446,7 @@ void ODBC::DBclose()
 void ODBC::hello()
 {
     Misc::printMessage("This server uses ODBC.");
+    Misc::printMessage("server> ", false);
 }
 
 std::shared_ptr<User> ODBC::fetchUserRow(uint &db_errno, uint startCol, bool getPassData)
@@ -490,6 +494,7 @@ std::shared_ptr<User> ODBC::fetchUserRow(uint &db_errno, uint startCol, bool get
         std::cout << '\n'
                   << e.what() << '\n';
         Misc::printMessage("Ошибка вызвана функцией fetchUserRow");
+        Misc::printMessage("server> ", false);
     }
     std::string called = "fetchUserRow вызвала Fetch";
     int res = Fetch(db_errno, called);
@@ -546,6 +551,7 @@ void ODBC::fetchMessageRow(std::shared_ptr<User> &user, std::shared_ptr<Message>
         std::cout << '\n'
                   << e.what() << '\n';
         Misc::printMessage("Ошибка вызвана функцией fetchMessageRow");
+        Misc::printMessage("server> ", false);
         user = nullptr;
         msg = nullptr;
     }
@@ -677,6 +683,7 @@ void ODBC::diagInfo(SQLINTEGER handle_type, SQLHANDLE &handle, const std::string
     Misc::printMessage("Sqlstate: " + sqlstate + " Расшифровка https://learn.microsoft.com/ru-ru/sql/odbc/reference/syntax/odbc-api-reference?view=sql-server-ver16");
     Misc::printMessage("NativeError: " + std::to_string((int)NativeErrorPtr));
     Misc::printMessage("Message: " + msg);
+    Misc::printMessage("server> ", false);
     return;
 }
 #endif

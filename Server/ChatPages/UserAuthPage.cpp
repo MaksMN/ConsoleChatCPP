@@ -178,7 +178,7 @@ bool UserAuthPage::regPage()
     {
         // всё введено
         auto u = std::make_shared<User>(page_parsed[1], page_parsed[2], page_parsed[3], page_parsed[4], cmd_text);
-        bool email_busy, login_busy = false;
+        bool email_busy = false, login_busy = false;
         bool res = dbClient.DBprovider()->addUser(u, login_busy, email_busy);
         if (login_busy)
         {
