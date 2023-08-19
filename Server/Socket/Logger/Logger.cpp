@@ -2,7 +2,7 @@
 
 Logger::Logger(char (&_cmd_buffer)[CMD_BUFFER]) : cmd_buffer(_cmd_buffer)
 {
-    file_stream.open(log_file_name, file_stream.in | file_stream.out | file_stream.ate | file_stream.app);
+    file_stream.open(log_file_name, file_stream.in | file_stream.out | file_stream.ate | file_stream.app | file_stream.binary);
 }
 
 Logger::~Logger()

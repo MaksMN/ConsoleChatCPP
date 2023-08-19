@@ -55,13 +55,14 @@ void LoggerThread::_read()
 
     for (int i{file_size}; i > 0; i--)
     {
-        file_stream.seekp(i - 1);
+        std::streampos pos = i - 1;
+        file_stream.seekp(pos);
         char ch[1];
         file_stream.read(ch, 1);
         if (i == file_size && *ch == '\n')
             continue;
         if (*ch != '\n')
-            last_str.insert(0, ch);
+            last_str.insert(0, 1, ch[0]);
         else
             break;
     }
